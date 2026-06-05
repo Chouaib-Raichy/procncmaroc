@@ -1,0 +1,281 @@
+import { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import api from '../api/axios';
+
+export default function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [activeCat, setActiveCat] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const ddRef = useRef(null);
+
+  useEffect(() => {
+    api.get('/categories')
+      .then((res) => setCategories(res.data))
+      .catch(() => setCategories([]));
+  }, []);
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (ddRef.current && !ddRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+        setActiveCat(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
+
+  const closeAll = () => {
+    setMenuOpen(false);
+    setDropdownOpen(false);
+    setActiveCat(null);
+  };
+
+  const isMobile = () => window.innerWidth <= 900;
+  const active = (path) => location.pathname === path ? { color: '#a37a39' } : {};
+
+  return (
+    <nav style={styles.nav}>
+      <Link to="/" style={styles.logo}>
+        <span style={styles.logoText}>PRO CNC MAROC</span>
+      </Link>
+      <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div className={`nav-links${menuOpen ? ' open' : ''}`} style={styles.links}>
+        <Link to="/" style={{...styles.link, ...active('/')}} onClick={closeAll}>Home</Link>
+        <Link to="/partner-map" style={{...styles.link, ...active('/partner-map')}} onClick={closeAll}>Partner Map</Link>
+
+        <div ref={ddRef} style={{ position: 'relative' }}
+          onMouseEnter={() => { if (!isMobile()) setDropdownOpen(true); }}
+          onMouseLeave={() => { if (!isMobile()) { setDropdownOpen(false); setActiveCat(null); } }}
+        >
+          <Link
+            to="/our-machines"
+            onClick={closeAll}
+            style={{ ...styles.link, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px', textDecoration: 'none', ...(location.pathname.startsWith('/our-machines') || location.pathname.startsWith('/machines/') ? { color: '#a37a39' } : {}) }}
+          >
+            Our Machines <span style={{ fontSize: '10px' }}>&#9662;</span>
+          </Link>
+
+          {(dropdownOpen || menuOpen) && categories.length > 0 && (
+            <div
+              style={!isMobile() ? styles.dropdown : styles.dropdownMobile}
+              onClick={() => { if (isMobile()) setDropdownOpen(false); }}
+            >
+              {categories.map((cat) => (
+                <div
+                  key={cat.id}
+                  style={styles.catItem}
+                  onMouseEnter={() => { if (!isMobile()) setActiveCat(cat.id); }}
+                  onMouseLeave={() => { if (!isMobile()) setActiveCat(null); }}
+                >
+                  <div style={styles.catRow} onClick={() => { if (isMobile()) setActiveCat(activeCat === cat.id ? null : cat.id); }}>
+                    <Link
+                      to={`/our-machines`}
+                      style={styles.catLabel}
+                      onClick={(e) => { e.stopPropagation(); closeAll(); }}
+                    >
+                      {cat.name}
+                    </Link>
+                    {cat.machines?.length > 0 && <span style={styles.arrow}>&#9656;</span>}
+                  </div>
+                  {activeCat === cat.id && cat.machines?.length > 0 && (
+                    <div style={!isMobile() ? styles.subDropdown : styles.subDropdownMobile}>
+                      {cat.machines.map((m) => (
+                        <Link
+                          key={m.id}
+                          to={`/machines/${m.id}`}
+                          style={styles.machineLink}
+                          onClick={closeAll}
+                        >
+                          {m.title}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <Link to="/products" style={{...styles.link, ...active('/products')}} onClick={closeAll}>Products</Link>
+        <Link to="/about-us" style={{...styles.link, ...active('/about-us')}} onClick={closeAll}>About Us</Link>
+        <Link to="/contact-us" style={{...styles.link, ...active('/contact-us')}} onClick={closeAll}>Contact Us</Link>
+        {user && user.role === 'admin' && (
+          <Link to="/dashboard" className="dashboard-link" style={{ ...styles.link, ...styles.dashboardLink, ...active('/dashboard') }} onClick={closeAll}>Dashboard</Link>
+        )}
+        {user ? (
+          <div style={styles.authGroup}>
+            <span style={styles.userName}>{user.name}</span>
+            <button onClick={() => { handleLogout(); closeAll(); }} style={styles.logoutBtn}>Logout</button>
+          </div>
+        ) : (
+          <div style={styles.authGroup}>
+            <Link to="/login" style={{...styles.link, ...active('/login')}} onClick={closeAll}>Login</Link>
+            <Link to="/signup" className="signup-link" style={styles.signupBtn} onClick={closeAll}>Signup</Link>
+          </div>
+        )}
+      </div>
+    </nav>
+  );
+}
+
+const styles = {
+  nav: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '0 clamp(16px, 4vw, 40px)',
+    height: '70px',
+    background: 'linear-gradient(to bottom, #000 0%, #1a1a1a 100%)',
+    color: '#fff',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.3)',
+    position: 'sticky',
+    top: 0,
+    zIndex: 1000,
+  },
+  logo: {
+    display: 'flex',
+    alignItems: 'center',
+    textDecoration: 'none',
+    color: '#a37a39',
+    padding: '8px 0',
+    flexShrink: 0,
+  },
+  logoText: {
+    fontSize: 'clamp(18px, 3vw, 24px)',
+    fontWeight: '800',
+    letterSpacing: '2px',
+    color: '#a37a39',
+    fontFamily: "Georgia, 'Times New Roman', Times, serif",
+  },
+  links: {
+    alignItems: 'center',
+    gap: 'clamp(8px, 1.5vw, 20px)',
+    fontFamily: "Georgia, 'Times New Roman', Times, serif",
+    flexWrap: 'wrap',
+  },
+  link: {
+    color: '#ddd',
+    textDecoration: 'none',
+    fontSize: 'clamp(13px, 1.3vw, 15px)',
+    fontWeight: '500',
+    padding: '8px 10px',
+    borderRadius: '4px',
+    whiteSpace: 'nowrap',
+    transition: 'all 0.3s',
+  },
+  dashboardLink: {
+    background: '#000000',
+    color: '#fff',
+  },
+  dropdown: {
+    position: 'absolute',
+    top: '100%',
+    left: 0,
+    background: '#000',
+    border: '1px solid #333',
+    borderRadius: '6px',
+    padding: '6px 0',
+    minWidth: '200px',
+    zIndex: 2000,
+    boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
+  },
+  dropdownMobile: {
+    padding: '4px 0 4px 16px',
+    borderLeft: '2px solid #a37a39',
+    marginTop: '4px',
+  },
+  catItem: {
+    position: 'relative',
+  },
+  catRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '6px 16px',
+    transition: 'background 0.2s',
+  },
+  catLabel: {
+    color: '#a37a39',
+    fontSize: '13px',
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: '1px',
+    textDecoration: 'none',
+    flex: 1,
+  },
+  arrow: {
+    color: '#666',
+    fontSize: '11px',
+    marginLeft: '8px',
+  },
+  subDropdown: {
+    position: 'absolute',
+    top: 0,
+    left: '100%',
+    background: '#111',
+    border: '1px solid #333',
+    borderRadius: '6px',
+    padding: '6px 0',
+    minWidth: '180px',
+    zIndex: 2001,
+    boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
+  },
+  subDropdownMobile: {
+    paddingLeft: '14px',
+    marginBottom: '4px',
+  },
+  machineLink: {
+    display: 'block',
+    color: '#bbb',
+    textDecoration: 'none',
+    fontSize: '13px',
+    padding: '6px 16px',
+    transition: 'color 0.2s',
+    whiteSpace: 'nowrap',
+  },
+  authGroup: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    flexWrap: 'wrap',
+  },
+  userName: {
+    color: '#a37a39',
+    fontWeight: '600',
+    fontSize: 'clamp(12px, 1.2vw, 14px)',
+  },
+  logoutBtn: {
+    background: 'transparent',
+    border: '1px solid #a37a39',
+    color: '#a37a39',
+    padding: '6px 16px',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: '500',
+    fontSize: '13px',
+  },
+  signupBtn: {
+    background: '#a37a39',
+    color: '#fff',
+    textDecoration: 'none',
+    padding: '8px 20px',
+    borderRadius: '4px',
+    fontWeight: '600',
+    fontSize: 'clamp(13px, 1.3vw, 15px)',
+    whiteSpace: 'nowrap',
+  },
+};
