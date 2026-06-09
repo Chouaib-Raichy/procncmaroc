@@ -1,33 +1,56 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import api from '../api/axios';
+import Loading from '../components/Loading';
+import ErrorState from '../components/ErrorState';
 import machineBg from '../assets/machineBG.jpeg';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-const getImageUrl = (path) => path ? `${BASE_URL.replace('/api', '')}/storage/${path}` : null;
-const getPdfUrl = (path) => path ? `${BASE_URL.replace('/api', '')}/storage/${path}` : null;
+const PHONE = '212625280991';
+
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1 } },
+};
+
+const childVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+};
+
+const btnAnim = {
+  whileHover: { scale: 1.05, boxShadow: '0 0 20px rgba(163,122,57,0.5)' },
+  whileTap: { scale: 0.95 },
+  transition: { type: 'spring', stiffness: 400, damping: 15 },
+};
 
 export default function MachineDetail() {
   const { id } = useParams();
   const [machine, setMachine] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
+  const fetch = () => {
+    setLoading(true);
+    setError(null);
     api.get(`/machines/${id}`)
       .then((res) => setMachine(res.data))
-      .catch(() => setMachine(null))
+      .catch(() => setError('Failed to load machine details. Please try again.'))
       .finally(() => setLoading(false));
-  }, [id]);
+  };
 
-  if (loading) {
-    return (
-      <div style={styles.page}>
-      <div style={styles.overlay}>
-        <div style={styles.center}>Loading...</div>
-      </div>
-    </div>
+  useEffect(() => { fetch(); }, [id]);
+
+  const openWhatsApp = () => {
+    const text = encodeURIComponent(
+      `Hi, I'm interested in the "${machine.title}"${machine.price ? ` (${machine.price} MAD)` : ''}. Can you provide more information?`
     );
-  }
+    window.open(`https://wa.me/${PHONE}?text=${text}`, '_blank');
+  };
+
+  if (loading) return <Loading text="Loading machine..." />;
+
+  if (error) return <ErrorState message={error} onRetry={fetch} />;
 
   if (!machine) {
     return (
@@ -46,49 +69,80 @@ export default function MachineDetail() {
     <div style={styles.page}>
       <div style={styles.overlay}>
         <div style={styles.inner}>
-          <Link to="/our-machines" style={{ color: '#d4af37', textDecoration: 'none', fontSize: '14px', display: 'inline-block', marginBottom: '20px' }}>
-            &larr; Back to Machines
-          </Link>
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+          >
+            <Link to="/our-machines" className="back-link" style={{
+              color: '#d4af37', textDecoration: 'none', fontSize: '13px', display: 'inline-flex',
+              alignItems: 'center', gap: '8px', marginBottom: '16px', fontWeight: 600,
+              fontFamily: "Georgia, 'Times New Roman', Times, serif",
+              padding: '6px 16px 6px 10px', borderRadius: '30px',
+              background: 'linear-gradient(135deg, rgba(163,122,57,0.15), rgba(212,175,55,0.08))',
+              border: '1px solid rgba(212,175,55,0.3)',
+            }}>
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                width: '24px', height: '24px', borderRadius: '50%',
+                background: 'linear-gradient(135deg, #a37a39, #d4af37)',
+                color: '#000', fontSize: '13px', lineHeight: 1, fontWeight: 900, flexShrink: 0,
+              }}>&#8617;</span>
+              Back
+            </Link>
+          </motion.div>
 
           <div style={styles.content}>
-            <div style={styles.imageWrap}>
+            <motion.div
+              style={styles.imageWrap}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+            >
               <img
-                src={getImageUrl(machine.image) || 'https://placehold.co/800x500/333/fff?text=No+Image'}
+                src={machine.image_url || 'https://placehold.co/800x500/333/fff?text=No+Image'}
                 alt={machine.title}
                 style={styles.image}
               />
-            </div>
+            </motion.div>
 
-            <div style={styles.info}>
-              <h1 style={styles.title}>{machine.title}</h1>
+            <motion.div
+              style={styles.info}
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <motion.h1 variants={childVariants} style={styles.title}>{machine.title}</motion.h1>
               {machine.category && (
-                <span style={styles.category}>{machine.category.name}</span>
+                <motion.span variants={childVariants} style={styles.category}>{machine.category.name}</motion.span>
               )}
               {machine.price && (
-                <p style={styles.price}>{parseFloat(machine.price).toLocaleString()} MAD</p>
+                <motion.p variants={childVariants} style={styles.price}>{parseFloat(machine.price).toLocaleString()} MAD</motion.p>
               )}
-              <p style={styles.description}>{machine.description}</p>
+              <motion.p variants={childVariants} style={styles.description}>{machine.description}</motion.p>
 
               {machine.features && machine.features.length > 0 && (
-                <div style={styles.featuresBox}>
+                <motion.div variants={childVariants} style={styles.featuresBox}>
                   <h3 style={styles.featuresTitle}>Exclusive Features :</h3>
                   <ul style={styles.featuresList}>
                     {machine.features.map((f, i) => (
                       <li key={i} style={styles.featureItem}><span style={styles.bullet}></span>{f}</li>
                     ))}
                   </ul>
-                </div>
+                </motion.div>
               )}
 
-              <div style={styles.actions}>
-                {machine.pdf && (
-                  <a href={getPdfUrl(machine.pdf)} target="_blank" rel="noopener noreferrer" style={styles.pdfBtn}>
+              <motion.div variants={childVariants} style={styles.actions}>
+                {machine.pdf_url && (
+                  <motion.a href={machine.pdf_url} target="_blank" rel="noopener noreferrer" style={styles.pdfBtn} {...btnAnim}>
                     Technical Specs (PDF)
-                  </a>
+                  </motion.a>
                 )}
-                <button style={styles.btn}>Inquire Now</button>
-              </div>
-            </div>
+                <motion.button onClick={openWhatsApp} style={styles.btn} {...btnAnim}>
+                  &#128172; Inquire on WhatsApp
+                </motion.button>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
       </div>
@@ -108,28 +162,28 @@ const styles = {
     textAlign: 'center',
     paddingTop: '80px',
     color: '#aaa',
-    fontSize: '16px',
+    fontSize: '15px',
   },
   overlay: {
     minHeight: '100vh',
     background: 'rgba(0,0,0,0.7)',
-    padding: 'clamp(20px, 3vw, 40px) clamp(16px, 4vw, 60px)',
+    padding: 'clamp(16px, 2.5vw, 30px) clamp(14px, 3.5vw, 50px)',
   },
   inner: {
-    maxWidth: '1100px',
+    maxWidth: '1050px',
     margin: '0 auto',
   },
   content: {
     display: 'flex',
-    gap: 'clamp(20px, 3vw, 40px)',
+    gap: 'clamp(18px, 3vw, 32px)',
     alignItems: 'flex-start',
     flexWrap: 'wrap',
   },
   imageWrap: {
-    flex: '1 1 clamp(280px, 40vw, 480px)',
-    borderRadius: '8px',
+    flex: '1 1 clamp(300px, 42vw, 500px)',
+    borderRadius: '7px',
     overflow: 'hidden',
-    border: '3px solid #a37a39',
+    border: '2.5px solid #a37a39',
   },
   image: {
     width: '100%',
@@ -137,46 +191,45 @@ const styles = {
     display: 'block',
   },
   info: {
-    flex: '1 1 clamp(260px, 35vw, 420px)',
+    flex: '1 1 clamp(250px, 34vw, 400px)',
     textAlign: 'left',
   },
   title: {
-    fontSize: 'clamp(24px, 4vw, 36px)',
+    fontSize: 'clamp(20px, 3vw, 28px)',
     color: '#a37a39',
-    marginBottom: 'clamp(10px, 1.5vw, 16px)',
-    fontWeight: '800',
+    marginBottom: '8px',
+    fontWeight: '750',
   },
   category: {
     display: 'inline-block',
     background: '#a37a39',
     color: '#fff',
-    padding: '4px 16px',
-    borderRadius: '20px',
-    fontSize: '13px',
+    padding: '3px 15px',
+    borderRadius: '18px',
+    fontSize: '12px',
     fontWeight: '600',
-    marginBottom: 'clamp(12px, 2vw, 20px)',
+    marginBottom: '10px',
   },
   price: {
-    fontSize: 'clamp(22px, 3.5vw, 30px)',
+    fontSize: 'clamp(18px, 3vw, 26px)',
     color: '#d4af37',
-    fontWeight: '800',
-    marginBottom: 'clamp(10px, 1.5vw, 16px)',
+    fontWeight: '750',
+    marginBottom: '10px',
   },
   description: {
-    fontSize: 'clamp(15px, 1.8vw, 18px)',
+    fontSize: 'clamp(14px, 1.6vw, 16px)',
     color: '#ccc',
-    lineHeight: 1.8,
-    marginBottom: 'clamp(24px, 3vw, 36px)',
-    maxWidth: '700px',
+    lineHeight: 1.75,
+    marginBottom: '20px',
   },
   featuresBox: {
-    marginBottom: 'clamp(20px, 3vw, 32px)',
+    marginBottom: '18px',
   },
   featuresTitle: {
-    fontSize: 'clamp(17px, 2.2vw, 20px)',
+    fontSize: 'clamp(15px, 1.8vw, 18px)',
     color: '#d4af37',
-    fontWeight: '700',
-    marginBottom: 'clamp(10px, 1.5vw, 14px)',
+    fontWeight: '650',
+    marginBottom: '8px',
   },
   featuresList: {
     listStyle: 'none',
@@ -185,24 +238,24 @@ const styles = {
   },
   featureItem: {
     color: '#ddd',
-    fontSize: 'clamp(14px, 1.5vw, 16px)',
-    padding: '6px 0',
-    lineHeight: 1.5,
+    fontSize: 'clamp(13px, 1.4vw, 15px)',
+    padding: '4px 0',
+    lineHeight: 1.45,
     display: 'flex',
     alignItems: 'center',
-    gap: '10px',
+    gap: '9px',
   },
   bullet: {
     display: 'inline-block',
-    width: '8px',
-    height: '8px',
-    minWidth: '8px',
+    width: '7px',
+    height: '7px',
+    minWidth: '7px',
     background: '#a37a39',
     borderRadius: '50%',
   },
   actions: {
     display: 'flex',
-    gap: 'clamp(12px, 2vw, 20px)',
+    gap: 'clamp(10px, 1.8vw, 16px)',
     flexWrap: 'wrap',
     alignItems: 'center',
   },
@@ -210,22 +263,22 @@ const styles = {
     background: '#a37a39',
     color: '#fff',
     border: 'none',
-    padding: 'clamp(12px, 1.5vw, 14px) clamp(28px, 4vw, 40px)',
-    borderRadius: '6px',
-    fontWeight: '700',
+    padding: '10px 24px',
+    borderRadius: '5px',
+    fontWeight: '650',
     cursor: 'pointer',
-    fontSize: 'clamp(15px, 1.5vw, 17px)',
+    fontSize: 'clamp(13px, 1.3vw, 15px)',
   },
   pdfBtn: {
     display: 'inline-block',
     background: 'transparent',
     color: '#d4af37',
-    border: '2px solid #d4af37',
-    padding: 'clamp(10px, 1.3vw, 12px) clamp(22px, 3vw, 32px)',
-    borderRadius: '6px',
-    fontWeight: '700',
+    border: '1.5px solid #d4af37',
+    padding: '9px 22px',
+    borderRadius: '5px',
+    fontWeight: '650',
     cursor: 'pointer',
-    fontSize: 'clamp(14px, 1.4vw, 16px)',
+    fontSize: 'clamp(13px, 1.3vw, 15px)',
     textDecoration: 'none',
   },
 };

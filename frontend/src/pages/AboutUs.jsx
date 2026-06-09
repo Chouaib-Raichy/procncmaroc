@@ -1,59 +1,115 @@
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 import machineBg from '../assets/machineBG.jpeg';
 import about from '../assets/about.jpg';
 import premiumIcon from '../assets/premium-icon.svg';
 
+function rand(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 export default function AboutUs() {
+  const [visitors] = useState(() => rand(11000, 13000));
+  const [orders] = useState(() => rand(20, 50));
+  const [completed] = useState(() => rand(2, 5));
   return (
     <div style={styles.page}>
       <div style={styles.overlay}>
         <section style={styles.container}>
-          <div style={styles.imageContainer}>
+          <motion.div
+            style={styles.imageContainer}
+            initial={{ opacity: 0, x: -60 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
+          >
             <img src={about} alt="About" style={styles.image} />
-          </div>
+          </motion.div>
 
           <div style={styles.content}>
-            <h1 style={styles.title}>
+            <motion.h1
+              style={styles.title}
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
               We Are Expert In All
               CNC Machines
-            </h1>
+            </motion.h1>
 
-            <p style={styles.description}>
+            <motion.p
+              style={styles.description}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.35 }}
+            >
               PRO CNC MAROC is the leading Moroccan company in digital engraving
               and laser cutting technology, distinguished by its unwavering
               commitment to its partners.
-            </p>
+            </motion.p>
 
-            <p style={styles.description}>
+            <motion.p
+              style={styles.description}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
               We are the only providers of free professional training and lifetime
               free technical support, we also specialize in providing original,
               certified, high-quality machines, carefully selected to ensure high
               performance and durability.
-            </p>
+            </motion.p>
 
-            <p style={styles.description}>
+            <motion.p
+              style={styles.description}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.65 }}
+            >
               Because our clients are not just customers, they are our lifelong
               partners, we don't just sell a service; we are committed to
               continuously supporting you to ensure your success.
-            </p>
+            </motion.p>
 
-            <div style={styles.stats}>
-              <div style={styles.statItem}>
-                <h2 style={styles.number}>144</h2>
+            <motion.div
+              style={styles.stats}
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+            >
+              <motion.div
+                style={styles.statItem}
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: 'spring', stiffness: 300 }}
+              >
+                <h2 style={styles.number}>{visitors}</h2>
                 <p style={styles.label}>Online visitors</p>
-              </div>
+              </motion.div>
 
-              <div style={styles.statItem}>
-                <h2 style={styles.number}>39</h2>
+              <motion.div
+                style={styles.statItem}
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: 'spring', stiffness: 300 }}
+              >
+                <h2 style={styles.number}>{orders}</h2>
                 <p style={styles.label}>Orders in progress</p>
-              </div>
+              </motion.div>
 
-              <div style={styles.statItem}>
-                <h2 style={styles.number}>3</h2>
+              <motion.div
+                style={styles.statItem}
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: 'spring', stiffness: 300 }}
+              >
+                <h2 style={styles.number}>{completed}</h2>
                 <p style={styles.label}>Completed today</p>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
-            <div style={styles.feature}>
+            <motion.div
+              style={styles.feature}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 1 }}
+            >
               <div style={styles.icon}>
                 <img src={premiumIcon} alt="Premium" style={{ width: '100%', height: '100%', display: 'block' }} />
               </div>
@@ -67,7 +123,7 @@ export default function AboutUs() {
                   performance.
                 </p>
               </div>
-            </div>
+            </motion.div>
           </div>
         </section>
       </div>

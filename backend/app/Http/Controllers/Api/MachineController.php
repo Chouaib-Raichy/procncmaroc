@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Machine;
+use App\DTOs\MachineDTO;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -16,15 +17,31 @@ class MachineController extends Controller
             ->orderBy('created_at', 'desc');
 
         if (request('all')) {
-            return $query->get();
+            return MachineDTO::collection($query->get());
         }
 
-        return $query->paginate(request('per_page', 9));
+        $paginator = $query->paginate(request('per_page', 9));
+        return MachineDTO::paginated($paginator);
     }
 
     public function all()
     {
-        return Machine::with('category')->orderBy('created_at', 'desc')->get();
+        return MachineDTO::collection(
+            Machine::with('category')->orderBy('created_at', 'desc')->get()
+        );
+    }
+
+    public function trashed()
+    {
+        return MachineDTO::collection(
+            Machine::onlyTrashed()->with('category')->orderBy('created_at', 'desc')->get()
+        );
+    }
+
+    public function restore(Machine $machine)
+    {
+        $machine->restore();
+        return MachineDTO::fromModel($machine->load('category'))->toArray();
     }
 
     public function store(Request $request)
@@ -54,18 +71,21 @@ class MachineController extends Controller
 
         $machine = Machine::create($data);
 
-        return response()->json($machine->load('category'), 201);
+        return response()->json(
+            MachineDTO::fromModel($machine->load('category'))->toArray(),
+            201
+        );
     }
 
     public function show(Machine $machine)
     {
-        return $machine->load('category');
+        return MachineDTO::fromModel($machine->load('category'))->toArray();
     }
 
     public function showPublic(Machine $machine)
     {
         abort_if(!$machine->visible, 404);
-        return $machine->load('category');
+        return MachineDTO::fromModel($machine->load('category'))->toArray();
     }
 
     public function update(Request $request, Machine $machine)
@@ -101,7 +121,7 @@ class MachineController extends Controller
 
         $machine->update($data);
 
-        return response()->json($machine->load('category'));
+        return MachineDTO::fromModel($machine->load('category'))->toArray();
     }
 
     public function destroy(Machine $machine)

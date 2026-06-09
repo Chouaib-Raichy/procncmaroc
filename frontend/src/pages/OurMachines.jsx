@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { getAllMachines, getImageUrl } from '../api/machines';
+import { getAllMachines } from '../api/machines';
+import Loading from '../components/Loading';
+import ErrorState from '../components/ErrorState';
 import { getCategories } from '../api/categories';
 import machineBg from '../assets/machineBG.jpeg';
 
@@ -8,21 +10,25 @@ export default function OurMachines() {
   const [allMachines, setAllMachines] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [catFilter, setCatFilter] = useState('');
   const [page, setPage] = useState(1);
   const perPage = 12;
 
-  useEffect(() => {
+  const fetch = () => {
     setLoading(true);
+    setError(null);
     Promise.all([getAllMachines(), getCategories()])
       .then(([mRes, cRes]) => {
         setAllMachines(mRes.data);
         setCategories(cRes.data);
       })
-      .catch(() => {})
+      .catch(() => setError('Failed to load machines. Please try again.'))
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => { fetch(); }, []);
 
   const filtered = useMemo(() => {
     let result = allMachines;
@@ -33,7 +39,7 @@ export default function OurMachines() {
       );
     }
     if (catFilter) {
-      result = result.filter((m) => String(m.category_id) === catFilter);
+      result = result.filter((m) => String(m.category?.id ?? m.category_id) === catFilter);
     }
     return result;
   }, [allMachines, search, catFilter]);
@@ -47,7 +53,11 @@ export default function OurMachines() {
   }, [safePage, page]);
 
   if (loading) {
-    return <div className="page-section" style={{ textAlign: 'center', paddingTop: '80px' }}>Loading...</div>;
+    return <Loading text="Loading machines..." />;
+  }
+
+  if (error) {
+    return <ErrorState message={error} onRetry={fetch} />;
   }
 
   return (
@@ -89,7 +99,7 @@ export default function OurMachines() {
                 <div key={m.id} style={styles.card} className="machine-card">
                   <div style={styles.imgWrap}>
                     <img
-                      src={getImageUrl(m.image) || 'https://placehold.co/400x250/ccc/333?text=Machine'}
+                      src={m.image_url || 'https://placehold.co/400x250/ccc/333?text=Machine'}
                       alt={m.title}
                       style={styles.img}
                     />

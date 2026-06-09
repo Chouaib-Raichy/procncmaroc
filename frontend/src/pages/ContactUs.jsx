@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import machineBg from '../assets/machineBG.jpeg';
 import api from '../api/axios';
 
@@ -40,35 +41,79 @@ export default function ContactUs() {
   return (
     <div style={styles.page}>
       {/* Hero Banner */}
-      <div style={styles.hero}>
+      <motion.div
+        style={styles.hero}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
         <div style={styles.heroOverlay}>
-          <h1 style={styles.heroTitle}>Contact Us</h1>
-          <p style={styles.heroSubtitle}>Get in touch with our team</p>
+          <motion.h1
+            style={styles.heroTitle}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            Contact Us
+          </motion.h1>
+          <motion.p
+            style={styles.heroSubtitle}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.35 }}
+          >
+            Get in touch with our team
+          </motion.p>
         </div>
-      </div>
+      </motion.div>
 
       <div className="contact-grid" style={styles.content}>
         {/* Left - Contact Info + Form */}
-        <div style={styles.left}>
-          <div className="contact-info-row" style={styles.infoRow}>
-            <div style={styles.infoCard}>
-              <span style={styles.infoIcon}>&#9742;</span>
-              <h4 style={styles.infoLabel}>Phone</h4>
-              <p style={styles.infoText}>+212 XXXXXXXXX</p>
-            </div>
-            <div style={styles.infoCard}>
-              <span style={styles.infoIcon}>&#9993;</span>
-              <h4 style={styles.infoLabel}>Email</h4>
-              <p style={styles.infoText}>contact@procncmaroc.com</p>
-            </div>
-            <div style={styles.infoCard}>
-              <span style={styles.infoIcon}>&#9906;</span>
-              <h4 style={styles.infoLabel}>Address</h4>
-              <p style={styles.infoText}>EL JADIDA, Morocco</p>
-            </div>
-          </div>
+        <motion.div
+          style={styles.left}
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <motion.div
+            className="contact-info-row"
+            style={styles.infoRow}
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: { transition: { staggerChildren: 0.15 } },
+            }}
+          >
+            {[
+              { icon: '☎', label: 'Phone', text: ['+212 625 280 991', '+212 667 198 564'] },
+              { icon: '✉', label: 'Email', text: ['contact@procncmaroc.com'] },
+              { icon: '📍', label: 'Address', text: ['CASABLANCA, Morocco'] },
+            ].map((card, i) => (
+              <motion.div
+                key={i}
+                style={styles.infoCard}
+                variants={{
+                  hidden: { opacity: 0, y: 30 },
+                  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+                }}
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              >
+                <span style={styles.infoIcon}>{card.icon}</span>
+                <h4 style={styles.infoLabel}>{card.label}</h4>
+                {card.text.map((t, j) => (
+                  <p key={j} style={styles.infoText}>{t}</p>
+                ))}
+              </motion.div>
+            ))}
+          </motion.div>
 
-          <form style={styles.form} onSubmit={handleSubmit}>
+          <motion.form
+            style={styles.form}
+            onSubmit={handleSubmit}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
             <div className="contact-name-row" style={styles.nameRow}>
               <div style={styles.inputGroup}>
                 <label style={styles.label}>First Name *</label>
@@ -112,12 +157,21 @@ export default function ContactUs() {
             <button type="submit" style={{...styles.btn, opacity: sending ? 0.6 : 1}} disabled={sending}>
               {sending ? 'Sending...' : 'Send Message'}
             </button>
-          </form>
-        </div>
+          </motion.form>
+        </motion.div>
 
         {/* Right - Map */}
-        <div style={styles.right}>
-          <div style={styles.mapCard}>
+        <motion.div
+          style={styles.right}
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          <motion.div
+            style={styles.mapCard}
+            whileHover={{ scale: 1.01 }}
+            transition={{ type: 'spring', stiffness: 200 }}
+          >
             <h3 style={styles.mapTitle}>Our Location</h3>
             <div style={styles.mapWrap}>
               <iframe
@@ -129,22 +183,36 @@ export default function ContactUs() {
                 loading="lazy"
               />
             </div>
-          </div>
-          <div style={styles.hoursCard}>
+          </motion.div>
+          <motion.div
+            style={styles.hoursCard}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+          >
             <h4 style={styles.hoursTitle}>Working Hours</h4>
-            <div style={styles.hoursRow}><span>Monday – Friday</span><span>8:00 AM – 6:00 PM</span></div>
-            <div style={styles.hoursRow}><span>Saturday</span><span>9:00 AM – 2:00 PM</span></div>
+            <div style={styles.hoursRow}><span>Monday – Saturday</span><span>9:00 AM – 6:00 PM</span></div>
             <div style={styles.hoursRow}><span>Sunday</span><span>Closed</span></div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
 
       {popup && (
-        <div style={styles.popupOverlay}>
-          <div style={styles.popup}>
+        <motion.div
+          style={styles.popupOverlay}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            style={styles.popup}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 300 }}
+          >
             <p style={styles.popupText}>{popup}</p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
     </div>
   );

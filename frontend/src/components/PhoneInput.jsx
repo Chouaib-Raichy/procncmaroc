@@ -1,0 +1,369 @@
+import { useState, useRef, useEffect } from 'react';
+
+const countries = [
+  { code: '+212', label: 'MA', flag: '🇲🇦', name: 'Morocco' },
+  { code: '+213', label: 'DZ', flag: '🇩🇿', name: 'Algeria' },
+  { code: '+216', label: 'TN', flag: '🇹🇳', name: 'Tunisia' },
+  { code: '+218', label: 'LY', flag: '🇱🇾', name: 'Libya' },
+  { code: '+20', label: 'EG', flag: '🇪🇬', name: 'Egypt' },
+  { code: '+221', label: 'SN', flag: '🇸🇳', name: 'Senegal' },
+  { code: '+222', label: 'MR', flag: '🇲🇷', name: 'Mauritania' },
+  { code: '+223', label: 'ML', flag: '🇲🇱', name: 'Mali' },
+  { code: '+224', label: 'GN', flag: '🇬🇳', name: 'Guinea' },
+  { code: '+225', label: 'CI', flag: '🇨🇮', name: "Côte d'Ivoire" },
+  { code: '+226', label: 'BF', flag: '🇧🇫', name: 'Burkina Faso' },
+  { code: '+227', label: 'NE', flag: '🇳🇪', name: 'Niger' },
+  { code: '+228', label: 'TG', flag: '🇹🇬', name: 'Togo' },
+  { code: '+229', label: 'BJ', flag: '🇧🇯', name: 'Benin' },
+  { code: '+230', label: 'MU', flag: '🇲🇺', name: 'Mauritius' },
+  { code: '+231', label: 'LR', flag: '🇱🇷', name: 'Liberia' },
+  { code: '+232', label: 'SL', flag: '🇸🇱', name: 'Sierra Leone' },
+  { code: '+233', label: 'GH', flag: '🇬🇭', name: 'Ghana' },
+  { code: '+234', label: 'NG', flag: '🇳🇬', name: 'Nigeria' },
+  { code: '+235', label: 'TD', flag: '🇹🇩', name: 'Chad' },
+  { code: '+236', label: 'CF', flag: '🇨🇫', name: 'Central African Republic' },
+  { code: '+237', label: 'CM', flag: '🇨🇲', name: 'Cameroon' },
+  { code: '+238', label: 'CV', flag: '🇨🇻', name: 'Cape Verde' },
+  { code: '+239', label: 'ST', flag: '🇸🇹', name: 'São Tomé and Príncipe' },
+  { code: '+240', label: 'GQ', flag: '🇬🇶', name: 'Equatorial Guinea' },
+  { code: '+241', label: 'GA', flag: '🇬🇦', name: 'Gabon' },
+  { code: '+242', label: 'CG', flag: '🇨🇬', name: 'Republic of the Congo' },
+  { code: '+243', label: 'CD', flag: '🇨🇩', name: 'Democratic Republic of the Congo' },
+  { code: '+244', label: 'AO', flag: '🇦🇴', name: 'Angola' },
+  { code: '+245', label: 'GW', flag: '🇬🇼', name: 'Guinea-Bissau' },
+  { code: '+246', label: 'IO', flag: '🇮🇴', name: 'British Indian Ocean Territory' },
+  { code: '+247', label: 'AC', flag: '🇦🇨', name: 'Ascension Island' },
+  { code: '+248', label: 'SC', flag: '🇸🇨', name: 'Seychelles' },
+  { code: '+249', label: 'SD', flag: '🇸🇩', name: 'Sudan' },
+  { code: '+250', label: 'RW', flag: '🇷🇼', name: 'Rwanda' },
+  { code: '+251', label: 'ET', flag: '🇪🇹', name: 'Ethiopia' },
+  { code: '+252', label: 'SO', flag: '🇸🇴', name: 'Somalia' },
+  { code: '+253', label: 'DJ', flag: '🇩🇯', name: 'Djibouti' },
+  { code: '+254', label: 'KE', flag: '🇰🇪', name: 'Kenya' },
+  { code: '+255', label: 'TZ', flag: '🇹🇿', name: 'Tanzania' },
+  { code: '+256', label: 'UG', flag: '🇺🇬', name: 'Uganda' },
+  { code: '+257', label: 'BI', flag: '🇧🇮', name: 'Burundi' },
+  { code: '+258', label: 'MZ', flag: '🇲🇿', name: 'Mozambique' },
+  { code: '+260', label: 'ZM', flag: '🇿🇲', name: 'Zambia' },
+  { code: '+261', label: 'MG', flag: '🇲🇬', name: 'Madagascar' },
+  { code: '+262', label: 'RE', flag: '🇷🇪', name: 'Réunion' },
+  { code: '+263', label: 'ZW', flag: '🇿🇼', name: 'Zimbabwe' },
+  { code: '+264', label: 'NA', flag: '🇳🇦', name: 'Namibia' },
+  { code: '+265', label: 'MW', flag: '🇲🇼', name: 'Malawi' },
+  { code: '+266', label: 'LS', flag: '🇱🇸', name: 'Lesotho' },
+  { code: '+267', label: 'BW', flag: '🇧🇼', name: 'Botswana' },
+  { code: '+268', label: 'SZ', flag: '🇸🇿', name: 'Eswatini' },
+  { code: '+269', label: 'KM', flag: '🇰🇲', name: 'Comoros' },
+  { code: '+27', label: 'ZA', flag: '🇿🇦', name: 'South Africa' },
+  { code: '+290', label: 'SH', flag: '🇸🇭', name: 'Saint Helena' },
+  { code: '+291', label: 'ER', flag: '🇪🇷', name: 'Eritrea' },
+  { code: '+297', label: 'AW', flag: '🇦🇼', name: 'Aruba' },
+  { code: '+298', label: 'FO', flag: '🇫🇴', name: 'Faroe Islands' },
+  { code: '+299', label: 'GL', flag: '🇬🇱', name: 'Greenland' },
+  { code: '+30', label: 'GR', flag: '🇬🇷', name: 'Greece' },
+  { code: '+31', label: 'NL', flag: '🇳🇱', name: 'Netherlands' },
+  { code: '+32', label: 'BE', flag: '🇧🇪', name: 'Belgium' },
+  { code: '+33', label: 'FR', flag: '🇫🇷', name: 'France' },
+  { code: '+34', label: 'ES', flag: '🇪🇸', name: 'Spain' },
+  { code: '+350', label: 'GI', flag: '🇬🇮', name: 'Gibraltar' },
+  { code: '+351', label: 'PT', flag: '🇵🇹', name: 'Portugal' },
+  { code: '+352', label: 'LU', flag: '🇱🇺', name: 'Luxembourg' },
+  { code: '+353', label: 'IE', flag: '🇮🇪', name: 'Ireland' },
+  { code: '+354', label: 'IS', flag: '🇮🇸', name: 'Iceland' },
+  { code: '+355', label: 'AL', flag: '🇦🇱', name: 'Albania' },
+  { code: '+356', label: 'MT', flag: '🇲🇹', name: 'Malta' },
+  { code: '+357', label: 'CY', flag: '🇨🇾', name: 'Cyprus' },
+  { code: '+358', label: 'FI', flag: '🇫🇮', name: 'Finland' },
+  { code: '+359', label: 'BG', flag: '🇧🇬', name: 'Bulgaria' },
+  { code: '+36', label: 'HU', flag: '🇭🇺', name: 'Hungary' },
+  { code: '+370', label: 'LT', flag: '🇱🇹', name: 'Lithuania' },
+  { code: '+371', label: 'LV', flag: '🇱🇻', name: 'Latvia' },
+  { code: '+372', label: 'EE', flag: '🇪🇪', name: 'Estonia' },
+  { code: '+373', label: 'MD', flag: '🇲🇩', name: 'Moldova' },
+  { code: '+374', label: 'AM', flag: '🇦🇲', name: 'Armenia' },
+  { code: '+375', label: 'BY', flag: '🇧🇾', name: 'Belarus' },
+  { code: '+376', label: 'AD', flag: '🇦🇩', name: 'Andorra' },
+  { code: '+377', label: 'MC', flag: '🇲🇨', name: 'Monaco' },
+  { code: '+378', label: 'SM', flag: '🇸🇲', name: 'San Marino' },
+  { code: '+379', label: 'VA', flag: '🇻🇦', name: 'Vatican City' },
+  { code: '+380', label: 'UA', flag: '🇺🇦', name: 'Ukraine' },
+  { code: '+381', label: 'RS', flag: '🇷🇸', name: 'Serbia' },
+  { code: '+382', label: 'ME', flag: '🇲🇪', name: 'Montenegro' },
+  { code: '+383', label: 'XK', flag: '🇽🇰', name: 'Kosovo' },
+  { code: '+385', label: 'HR', flag: '🇭🇷', name: 'Croatia' },
+  { code: '+386', label: 'SI', flag: '🇸🇮', name: 'Slovenia' },
+  { code: '+387', label: 'BA', flag: '🇧🇦', name: 'Bosnia and Herzegovina' },
+  { code: '+389', label: 'MK', flag: '🇲🇰', name: 'North Macedonia' },
+  { code: '+39', label: 'IT', flag: '🇮🇹', name: 'Italy' },
+  { code: '+40', label: 'RO', flag: '🇷🇴', name: 'Romania' },
+  { code: '+41', label: 'CH', flag: '🇨🇭', name: 'Switzerland' },
+  { code: '+420', label: 'CZ', flag: '🇨🇿', name: 'Czech Republic' },
+  { code: '+421', label: 'SK', flag: '🇸🇰', name: 'Slovakia' },
+  { code: '+423', label: 'LI', flag: '🇱🇮', name: 'Liechtenstein' },
+  { code: '+43', label: 'AT', flag: '🇦🇹', name: 'Austria' },
+  { code: '+44', label: 'GB', flag: '🇬🇧', name: 'United Kingdom' },
+  { code: '+45', label: 'DK', flag: '🇩🇰', name: 'Denmark' },
+  { code: '+46', label: 'SE', flag: '🇸🇪', name: 'Sweden' },
+  { code: '+47', label: 'NO', flag: '🇳🇴', name: 'Norway' },
+  { code: '+48', label: 'PL', flag: '🇵🇱', name: 'Poland' },
+  { code: '+49', label: 'DE', flag: '🇩🇪', name: 'Germany' },
+  { code: '+500', label: 'FK', flag: '🇫🇰', name: 'Falkland Islands' },
+  { code: '+501', label: 'BZ', flag: '🇧🇿', name: 'Belize' },
+  { code: '+502', label: 'GT', flag: '🇬🇹', name: 'Guatemala' },
+  { code: '+503', label: 'SV', flag: '🇸🇻', name: 'El Salvador' },
+  { code: '+504', label: 'HN', flag: '🇭🇳', name: 'Honduras' },
+  { code: '+505', label: 'NI', flag: '🇳🇮', name: 'Nicaragua' },
+  { code: '+506', label: 'CR', flag: '🇨🇷', name: 'Costa Rica' },
+  { code: '+507', label: 'PA', flag: '🇵🇦', name: 'Panama' },
+  { code: '+508', label: 'PM', flag: '🇵🇲', name: 'Saint Pierre and Miquelon' },
+  { code: '+509', label: 'HT', flag: '🇭🇹', name: 'Haiti' },
+  { code: '+51', label: 'PE', flag: '🇵🇪', name: 'Peru' },
+  { code: '+52', label: 'MX', flag: '🇲🇽', name: 'Mexico' },
+  { code: '+53', label: 'CU', flag: '🇨🇺', name: 'Cuba' },
+  { code: '+54', label: 'AR', flag: '🇦🇷', name: 'Argentina' },
+  { code: '+55', label: 'BR', flag: '🇧🇷', name: 'Brazil' },
+  { code: '+56', label: 'CL', flag: '🇨🇱', name: 'Chile' },
+  { code: '+57', label: 'CO', flag: '🇨🇴', name: 'Colombia' },
+  { code: '+58', label: 'VE', flag: '🇻🇪', name: 'Venezuela' },
+  { code: '+590', label: 'GP', flag: '🇬🇵', name: 'Guadeloupe' },
+  { code: '+591', label: 'BO', flag: '🇧🇴', name: 'Bolivia' },
+  { code: '+592', label: 'GY', flag: '🇬🇾', name: 'Guyana' },
+  { code: '+593', label: 'EC', flag: '🇪🇨', name: 'Ecuador' },
+  { code: '+594', label: 'GF', flag: '🇬🇫', name: 'French Guiana' },
+  { code: '+595', label: 'PY', flag: '🇵🇾', name: 'Paraguay' },
+  { code: '+596', label: 'MQ', flag: '🇲🇶', name: 'Martinique' },
+  { code: '+597', label: 'SR', flag: '🇸🇷', name: 'Suriname' },
+  { code: '+598', label: 'UY', flag: '🇺🇾', name: 'Uruguay' },
+  { code: '+599', label: 'CW', flag: '🇨🇼', name: 'Curaçao' },
+  { code: '+60', label: 'MY', flag: '🇲🇾', name: 'Malaysia' },
+  { code: '+61', label: 'AU', flag: '🇦🇺', name: 'Australia' },
+  { code: '+62', label: 'ID', flag: '🇮🇩', name: 'Indonesia' },
+  { code: '+63', label: 'PH', flag: '🇵🇭', name: 'Philippines' },
+  { code: '+64', label: 'NZ', flag: '🇳🇿', name: 'New Zealand' },
+  { code: '+65', label: 'SG', flag: '🇸🇬', name: 'Singapore' },
+  { code: '+66', label: 'TH', flag: '🇹🇭', name: 'Thailand' },
+  { code: '+670', label: 'TL', flag: '🇹🇱', name: 'Timor-Leste' },
+  { code: '+672', label: 'NF', flag: '🇳🇫', name: 'Norfolk Island' },
+  { code: '+673', label: 'BN', flag: '🇧🇳', name: 'Brunei' },
+  { code: '+674', label: 'NR', flag: '🇳🇷', name: 'Nauru' },
+  { code: '+675', label: 'PG', flag: '🇵🇬', name: 'Papua New Guinea' },
+  { code: '+676', label: 'TO', flag: '🇹🇴', name: 'Tonga' },
+  { code: '+677', label: 'SB', flag: '🇸🇧', name: 'Solomon Islands' },
+  { code: '+678', label: 'VU', flag: '🇻🇺', name: 'Vanuatu' },
+  { code: '+679', label: 'FJ', flag: '🇫🇯', name: 'Fiji' },
+  { code: '+680', label: 'PW', flag: '🇵🇼', name: 'Palau' },
+  { code: '+681', label: 'WF', flag: '🇼🇫', name: 'Wallis and Futuna' },
+  { code: '+682', label: 'CK', flag: '🇨🇰', name: 'Cook Islands' },
+  { code: '+683', label: 'NU', flag: '🇳🇺', name: 'Niue' },
+  { code: '+685', label: 'WS', flag: '🇼🇸', name: 'Samoa' },
+  { code: '+686', label: 'KI', flag: '🇰🇮', name: 'Kiribati' },
+  { code: '+687', label: 'NC', flag: '🇳🇨', name: 'New Caledonia' },
+  { code: '+688', label: 'TV', flag: '🇹🇻', name: 'Tuvalu' },
+  { code: '+689', label: 'PF', flag: '🇵🇫', name: 'French Polynesia' },
+  { code: '+690', label: 'TK', flag: '🇹🇰', name: 'Tokelau' },
+  { code: '+691', label: 'FM', flag: '🇫🇲', name: 'Micronesia' },
+  { code: '+692', label: 'MH', flag: '🇲🇭', name: 'Marshall Islands' },
+  { code: '+7', label: 'RU', flag: '🇷🇺', name: 'Russia' },
+  { code: '+7', label: 'KZ', flag: '🇰🇿', name: 'Kazakhstan' },
+  { code: '+81', label: 'JP', flag: '🇯🇵', name: 'Japan' },
+  { code: '+82', label: 'KR', flag: '🇰🇷', name: 'South Korea' },
+  { code: '+84', label: 'VN', flag: '🇻🇳', name: 'Vietnam' },
+  { code: '+850', label: 'KP', flag: '🇰🇵', name: 'North Korea' },
+  { code: '+852', label: 'HK', flag: '🇭🇰', name: 'Hong Kong' },
+  { code: '+853', label: 'MO', flag: '🇲🇴', name: 'Macau' },
+  { code: '+855', label: 'KH', flag: '🇰🇭', name: 'Cambodia' },
+  { code: '+856', label: 'LA', flag: '🇱🇦', name: 'Laos' },
+  { code: '+86', label: 'CN', flag: '🇨🇳', name: 'China' },
+  { code: '+880', label: 'BD', flag: '🇧🇩', name: 'Bangladesh' },
+  { code: '+886', label: 'TW', flag: '🇹🇼', name: 'Taiwan' },
+  { code: '+90', label: 'TR', flag: '🇹🇷', name: 'Turkey' },
+  { code: '+91', label: 'IN', flag: '🇮🇳', name: 'India' },
+  { code: '+92', label: 'PK', flag: '🇵🇰', name: 'Pakistan' },
+  { code: '+93', label: 'AF', flag: '🇦🇫', name: 'Afghanistan' },
+  { code: '+94', label: 'LK', flag: '🇱🇰', name: 'Sri Lanka' },
+  { code: '+95', label: 'MM', flag: '🇲🇲', name: 'Myanmar' },
+  { code: '+960', label: 'MV', flag: '🇲🇻', name: 'Maldives' },
+  { code: '+961', label: 'LB', flag: '🇱🇧', name: 'Lebanon' },
+  { code: '+962', label: 'JO', flag: '🇯🇴', name: 'Jordan' },
+  { code: '+963', label: 'SY', flag: '🇸🇾', name: 'Syria' },
+  { code: '+964', label: 'IQ', flag: '🇮🇶', name: 'Iraq' },
+  { code: '+965', label: 'KW', flag: '🇰🇼', name: 'Kuwait' },
+  { code: '+966', label: 'SA', flag: '🇸🇦', name: 'Saudi Arabia' },
+  { code: '+967', label: 'YE', flag: '🇾🇪', name: 'Yemen' },
+  { code: '+968', label: 'OM', flag: '🇴🇲', name: 'Oman' },
+  { code: '+970', label: 'PS', flag: '🇵🇸', name: 'Palestine' },
+  { code: '+971', label: 'AE', flag: '🇦🇪', name: 'UAE' },
+  { code: '+972', label: 'IL', flag: '🇮🇱', name: 'Israel' },
+  { code: '+973', label: 'BH', flag: '🇧🇭', name: 'Bahrain' },
+  { code: '+974', label: 'QA', flag: '🇶🇦', name: 'Qatar' },
+  { code: '+975', label: 'BT', flag: '🇧🇹', name: 'Bhutan' },
+  { code: '+976', label: 'MN', flag: '🇲🇳', name: 'Mongolia' },
+  { code: '+977', label: 'NP', flag: '🇳🇵', name: 'Nepal' },
+  { code: '+98', label: 'IR', flag: '🇮🇷', name: 'Iran' },
+  { code: '+992', label: 'TJ', flag: '🇹🇯', name: 'Tajikistan' },
+  { code: '+993', label: 'TM', flag: '🇹🇲', name: 'Turkmenistan' },
+  { code: '+994', label: 'AZ', flag: '🇦🇿', name: 'Azerbaijan' },
+  { code: '+995', label: 'GE', flag: '🇬🇪', name: 'Georgia' },
+  { code: '+996', label: 'KG', flag: '🇰🇬', name: 'Kyrgyzstan' },
+  { code: '+998', label: 'UZ', flag: '🇺🇿', name: 'Uzbekistan' },
+];
+
+const unique = [];
+const seen = new Set();
+for (const c of countries) {
+  const key = c.code + c.label;
+  if (!seen.has(key)) { seen.add(key); unique.push(c); }
+}
+const morocco = unique.find((c) => c.code === '+212' && c.label === 'MA');
+const rest = unique.filter((c) => !(c.code === '+212' && c.label === 'MA')).sort((a, b) => a.name.localeCompare(b.name));
+const sorted = morocco ? [morocco, ...rest] : rest;
+
+export default function PhoneInput({ value, onChange, style, placeholder, required, onBlur }) {
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState(() => {
+    const match = sorted.find((c) => value?.startsWith(c.code));
+    return match || sorted[0];
+  });
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const handleSelect = (country) => {
+    setSelected(country);
+    setOpen(false);
+    const num = value.replace(/^\+\d+/, '');
+    onChange(country.code + num);
+  };
+
+  const handleNumber = (e) => {
+    const raw = e.target.value.replace(/[^0-9]/g, '');
+    onChange(selected.code + raw);
+  };
+
+  const displayNum = value?.startsWith(selected.code) ? value.slice(selected.code.length) : (value || '');
+
+  return (
+    <div ref={ref} style={{ ...styles.wrapper, ...style }}>
+      <button type="button" style={styles.dropdownBtn} onClick={() => setOpen(!open)}>
+        <span style={styles.flag}>{selected.flag}</span>
+        <span style={styles.codeLabel}>{selected.code}</span>
+        <span style={styles.arrow}>{open ? '▲' : '▼'}</span>
+      </button>
+      <input
+        type="tel"
+        value={displayNum}
+        onChange={handleNumber}
+        onBlur={onBlur}
+        placeholder={placeholder || 'Phone number'}
+        required={required}
+        style={styles.input}
+      />
+      {open && (
+        <div style={styles.menu}>
+          {sorted.map((country) => (
+            <div
+              key={country.code + country.label}
+              style={{
+                ...styles.item,
+                    background: country.code + country.label === selected.code + selected.label ? '#a37a3922' : 'transparent',
+              }}
+              onClick={() => handleSelect(country)}
+            >
+              <span style={styles.flag}>{country.flag}</span>
+              <span style={styles.itemCode}>{country.code}</span>
+              <span style={styles.itemName}>{country.name}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const styles = {
+  wrapper: {
+    display: 'flex',
+    position: 'relative',
+    borderRadius: '5px',
+    overflow: 'visible',
+    border: '1px solid #555',
+    background: '#222',
+  },
+  dropdownBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '0 10px',
+    background: '#1a1a1a',
+    border: 'none',
+    borderRight: '1px solid #444',
+    cursor: 'pointer',
+    color: '#fff',
+    fontSize: '13px',
+    flexShrink: 0,
+    minWidth: '80px',
+    justifyContent: 'center',
+  },
+  flag: {
+    fontSize: '18px',
+    lineHeight: 1,
+  },
+  codeLabel: {
+    color: '#ccc',
+    fontWeight: 600,
+    fontSize: '13px',
+  },
+  arrow: {
+    color: '#888',
+    fontSize: '9px',
+    marginLeft: '2px',
+  },
+  input: {
+    flex: 1,
+    padding: 'clamp(12px, 2vw, 14px)',
+    background: 'transparent',
+    border: 'none',
+    color: '#fff',
+    fontSize: 'clamp(14px, 1.5vw, 16px)',
+    outline: 'none',
+    minWidth: 0,
+  },
+  menu: {
+    position: 'absolute',
+    top: '100%',
+    left: 0,
+    zIndex: 2000,
+    background: '#111',
+    border: '1px solid #444',
+    borderRadius: '6px',
+    maxHeight: '220px',
+    overflowY: 'auto',
+    minWidth: '220px',
+    boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
+    marginTop: '4px',
+  },
+  item: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '8px 12px',
+    cursor: 'pointer',
+    transition: 'background 0.15s',
+  },
+  itemCode: {
+    color: '#a37a39',
+    fontWeight: 600,
+    fontSize: '13px',
+    minWidth: '40px',
+  },
+  itemName: {
+    color: '#aaa',
+    fontSize: '12px',
+  },
+};

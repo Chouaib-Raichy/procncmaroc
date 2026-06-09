@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
@@ -8,10 +9,13 @@ export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [activeCat, setActiveCat] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const ddRef = useRef(null);
+  const userMenuRef = useRef(null);
 
   useEffect(() => {
     api.get('/categories')
@@ -20,10 +24,17 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
+    setImgError(false);
+  }, [user?.avatar_url]);
+
+  useEffect(() => {
     const handleClick = (e) => {
       if (ddRef.current && !ddRef.current.contains(e.target)) {
         setDropdownOpen(false);
         setActiveCat(null);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setUserMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClick);
@@ -45,7 +56,11 @@ export default function Navbar() {
   const active = (path) => location.pathname === path ? { color: '#a37a39' } : {};
 
   return (
-    <nav style={styles.nav}>
+    <motion.nav style={styles.nav}
+      initial={{ y: -80, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+    >
       <Link to="/" style={styles.logo}>
         <span style={styles.logoText}>PRO CNC MAROC</span>
       </Link>
@@ -54,7 +69,7 @@ export default function Navbar() {
       </button>
       <div className={`nav-links${menuOpen ? ' open' : ''}`} style={styles.links}>
         <Link to="/" style={{...styles.link, ...active('/')}} onClick={closeAll}>Home</Link>
-        <Link to="/partner-map" style={{...styles.link, ...active('/partner-map')}} onClick={closeAll}>Partner Map</Link>
+        {user && <Link to="/partner-map" style={{...styles.link, ...active('/partner-map')}} onClick={closeAll}>Partner Map</Link>}
 
         <div ref={ddRef} style={{ position: 'relative' }}
           onMouseEnter={() => { if (!isMobile()) setDropdownOpen(true); }}
@@ -111,15 +126,102 @@ export default function Navbar() {
         </div>
 
         <Link to="/products" style={{...styles.link, ...active('/products')}} onClick={closeAll}>Products</Link>
+        {user && <Link to="/customer-gallery" style={{...styles.link, ...active('/customer-gallery')}} onClick={closeAll}>Customer Gallery</Link>}
         <Link to="/about-us" style={{...styles.link, ...active('/about-us')}} onClick={closeAll}>About Us</Link>
         <Link to="/contact-us" style={{...styles.link, ...active('/contact-us')}} onClick={closeAll}>Contact Us</Link>
-        {user && user.role === 'admin' && (
-          <Link to="/dashboard" className="dashboard-link" style={{ ...styles.link, ...styles.dashboardLink, ...active('/dashboard') }} onClick={closeAll}>Dashboard</Link>
-        )}
         {user ? (
-          <div style={styles.authGroup}>
-            <span style={styles.userName}>{user.name}</span>
-            <button onClick={() => { handleLogout(); closeAll(); }} style={styles.logoutBtn}>Logout</button>
+          <div ref={userMenuRef} style={{ position: 'relative' }}>
+            <div
+              onClick={() => setUserMenuOpen(!userMenuOpen)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer',
+                padding: '4px 8px', borderRadius: '50%', transition: 'opacity 0.2s',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+            >
+              {user.avatar_url && !imgError ? (
+            <img src={user.avatar_url} alt="avatar"
+              onError={() => setImgError(true)}
+              style={{
+                width: '36px', height: '36px', borderRadius: '50%',
+                border: '2px solid #a37a39', objectFit: 'cover',
+              }}
+            />
+          ) : (
+            <div style={{
+              width: '36px', height: '36px', borderRadius: '50%',
+              border: '2px solid #a37a39', background: '#111',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#a37a39', fontSize: '16px', fontWeight: 700,
+            }}>
+              {user.name?.charAt(0).toUpperCase()}
+            </div>
+          )}
+            </div>
+
+            {userMenuOpen && (
+              <div style={{
+                position: 'absolute', top: '100%', right: 0, marginTop: '8px',
+                background: '#000', border: '1px solid #333', borderRadius: '8px',
+                minWidth: '180px', zIndex: 2000, boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
+                padding: '6px 0',
+              }}>
+                <div style={{
+                  padding: '10px 16px', borderBottom: '1px solid #222', color: '#a37a39',
+                  fontSize: '14px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                }}>
+                  {user.name}
+                </div>
+                {user.role === 'admin' && (
+                  <Link to="/dashboard"
+                    onClick={() => { setUserMenuOpen(false); closeAll(); }}
+                    style={{
+                      display: 'block', padding: '10px 16px', color: '#a37a39', textDecoration: 'none',
+                      fontSize: '14px', transition: 'background 0.2s',
+                    }}
+                    onMouseEnter={(e) => e.target.style.background = '#111'}
+                    onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                  >
+                    Dashboard
+                  </Link>
+                )}
+
+                <Link to="/my-gallery"
+                  onClick={() => { setUserMenuOpen(false); closeAll(); }}
+                  style={{
+                    display: 'block', padding: '10px 16px', color: '#ccc', textDecoration: 'none',
+                    fontSize: '14px', transition: 'background 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.target.style.background = '#111'}
+                  onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                >
+                  My Gallery
+                </Link>
+                <Link to="/profile"
+                  onClick={() => { setUserMenuOpen(false); closeAll(); }}
+                  style={{
+                    display: 'block', padding: '10px 16px', color: '#ccc', textDecoration: 'none',
+                    fontSize: '14px', transition: 'background 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.target.style.background = '#111'}
+                  onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                >
+                  My Profile
+                </Link>
+                <button onClick={() => { setUserMenuOpen(false); handleLogout(); closeAll(); }}
+                  style={{
+                    display: 'block', width: '100%', textAlign: 'left', padding: '10px 16px',
+                    color: '#e57373', background: 'none', border: 'none', fontSize: '14px',
+                    cursor: 'pointer', transition: 'background 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.target.style.background = '#111'}
+                  onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                >
+                  Logout
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div style={styles.authGroup}>
@@ -128,7 +230,7 @@ export default function Navbar() {
           </div>
         )}
       </div>
-    </nav>
+    </motion.nav>
   );
 }
 
@@ -176,10 +278,6 @@ const styles = {
     borderRadius: '4px',
     whiteSpace: 'nowrap',
     transition: 'all 0.3s',
-  },
-  dashboardLink: {
-    background: '#000000',
-    color: '#fff',
   },
   dropdown: {
     position: 'absolute',

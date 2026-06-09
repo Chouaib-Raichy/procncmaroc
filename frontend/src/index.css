@@ -1,1 +1,43 @@
 /* Global overrides - intentionally minimal */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.showcase-video-wrap:hover {
+  border-color: rgba(163, 122, 57, 0.8) !important;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6), 0 0 60px rgba(163, 122, 57, 0.35) !important;
+}
+
+.showcase-overlay-content {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.showcase-video-wrap:hover .showcase-overlay-content {
+  opacity: 1;
+}
+
+/* Partner Map - Leaflet overrides */
+.partner-popup .leaflet-popup-content-wrapper {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 12px !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+.partner-popup .leaflet-popup-content {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.partner-popup .leaflet-popup-tip-container {
+  display: none;
+}
+.partner-popup .leaflet-popup-close-button {
+  display: none;
+}
+.leaflet-container {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}

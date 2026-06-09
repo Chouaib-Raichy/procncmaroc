@@ -1,44 +1,347 @@
-import { useState } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import PhoneInput from '../components/PhoneInput';
 import machineBg from '../assets/machineBG.jpeg';
 
+const validators = {
+  name: (v) => !v.trim() ? 'Full name is required' : v.trim().length < 2 ? 'Name must be at least 2 characters' : '',
+  email: (v) => !v.trim() ? 'Email address is required' : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? 'Please enter a valid email address' : '',
+  phone: (v) => !v.trim() ? 'Phone number is required' : '',
+  business_location: (v) => !v.trim() ? 'Business location is required' : '',
+  password: (v) => !v ? 'Password is required' : v.length < 8 || !/[A-Z]/.test(v) || !/[a-z]/.test(v) || !/[0-9]/.test(v) || !/[^A-Za-z0-9]/.test(v) ? 'Must meet all requirements below' : '',
+  password_confirmation: (v, form) => !v ? 'Please confirm your password' : v !== form.password ? 'Passwords do not match' : '',
+};
+
+const requirements = [
+  { label: 'At least 8 characters', test: (v) => v.length >= 8 },
+  { label: 'One uppercase letter', test: (v) => /[A-Z]/.test(v) },
+  { label: 'One lowercase letter', test: (v) => /[a-z]/.test(v) },
+  { label: 'One number', test: (v) => /[0-9]/.test(v) },
+  { label: 'One symbol', test: (v) => /[^A-Za-z0-9]/.test(v) },
+];
+
 export default function Signup() {
-  const [form, setForm] = useState({ name: '', email: '', password: '', password_confirmation: '' });
-  const [error, setError] = useState('');
-  const { register, googleLogin } = useAuth();
+  const [form, setForm] = useState({ name: '', email: '', phone: '', business_location: '', password: '', password_confirmation: '' });
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+  const [serverErrors, setServerErrors] = useState({});
+  const [serverError, setServerError] = useState('');
+  const [sending, setSending] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const { register } = useAuth();
   const navigate = useNavigate();
+  const nameRef = useRef(null);
+
+  useEffect(() => { nameRef.current?.focus(); }, []);
+
+  const capLocation = (str) => str.replace(/\b\w/g, (c) => c.toUpperCase());
+
+  const set = (field, value) => {
+    const next = { ...form, [field]: value };
+    setForm(next);
+    if (touched[field]) {
+      const err = validators[field](value, next);
+      setErrors((prev) => ({ ...prev, [field]: err }));
+    }
+    if (field === 'password' && touched.password_confirmation) {
+      const cfErr = validators.password_confirmation(next.password_confirmation, next);
+      setErrors((prev) => ({ ...prev, password_confirmation: cfErr }));
+    }
+  };
+
+  const blur = (field) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    const err = validators[field](form[field], form);
+    setErrors((prev) => ({ ...prev, [field]: err }));
+  };
+
+  const validate = () => {
+    const errs = {};
+    Object.keys(validators).forEach((field) => {
+      const err = validators[field](form[field], form);
+      if (err) errs[field] = err;
+    });
+    setErrors(errs);
+    setTouched(Object.keys(validators).reduce((a, k) => ({ ...a, [k]: true }), {}));
+    return Object.keys(errs).length === 0;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setServerError('');
+    if (!validate()) return;
+    setSending(true);
     try {
-      await register(form.name, form.email, form.password, form.password_confirmation);
-      navigate('/');
+      await register(form.name, form.email, form.phone, form.business_location, form.password, form.password_confirmation, true);
+      navigate('/complete-registration');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      const data = err.response?.data;
+      const fieldErrs = data?.errors || {};
+      setServerErrors(fieldErrs);
+      setTouched((prev) => ({ ...prev, ...Object.keys(fieldErrs).reduce((a, k) => ({ ...a, [k]: true }), {}) }));
+      setServerError(data?.message || Object.values(fieldErrs).flat().join(', ') || 'Registration failed');
+    } finally {
+      setSending(false);
     }
   };
+
+  const fieldError = (field) => serverErrors[field]?.[0] || errors[field] || '';
+
+  const allValid = useMemo(() => {
+    return Object.keys(validators).every((field) => {
+      return form[field] && !validators[field](form[field], form);
+    });
+  }, [form]);
+
+  const fieldBorder = (field) => {
+    if (!touched[field] && !serverErrors[field]) return '#444';
+    if (errors[field] || serverErrors[field]) return '#e57373';
+    return '#4caf50';
+  };
+
+  const pwChecks = requirements.map((r) => ({ ...r, met: r.test(form.password) }));
 
   return (
     <div style={styles.page}>
       <div style={styles.overlay}>
-        <form style={styles.form} onSubmit={handleSubmit}>
-          <h1 style={styles.title}>Sign Up</h1>
-          {error && <p style={styles.error}>{error}</p>}
-          <input style={styles.input} placeholder="Full Name" value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} required />
-          <input style={styles.input} type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({...form, email: e.target.value})} required />
-          <input style={styles.input} type="password" placeholder="Password" value={form.password} onChange={(e) => setForm({...form, password: e.target.value})} required />
-          <input style={styles.input} type="password" placeholder="Confirm Password" value={form.password_confirmation} onChange={(e) => setForm({...form, password_confirmation: e.target.value})} required />
-          <button style={styles.btn} type="submit">Sign Up</button>
-          <div style={styles.divider}><span style={styles.dividerLine}></span><span style={styles.dividerText}>or</span><span style={styles.dividerLine}></span></div>
-          <button type="button" style={styles.googleBtn} onClick={googleLogin}>
-            <svg style={{width:'18px',height:'18px'}} viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.54 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 0 0 0 24c0 3.77.87 7.35 2.56 10.78l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-            Sign up with Google
-          </button>
+        <motion.form
+          style={styles.form}
+          onSubmit={handleSubmit}
+          noValidate
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <h1 style={styles.title}>Create Account</h1>
+          <p style={styles.subtitle}>Join our community of CNC professionals</p>
+
+          <AnimatePresence>
+            {serverError && (
+              <motion.div
+                style={styles.serverError}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+              >{serverError}</motion.div>
+            )}
+          </AnimatePresence>
+
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>Full Name</label>
+            <div style={styles.inputWrap}>
+              <input
+                ref={nameRef}
+                style={{ ...styles.input, borderColor: fieldBorder('name') }}
+                type="text" placeholder="John Doe"
+                value={form.name}
+                onChange={(e) => set('name', e.target.value)}
+                onBlur={() => blur('name')}
+                autoComplete="name"
+              />
+              <AnimatePresence>
+                {touched.name && !fieldError('name') && form.name && (
+                  <motion.span style={styles.checkIcon} initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>✓</motion.span>
+                )}
+              </AnimatePresence>
+            </div>
+            <AnimatePresence>
+              {touched.name && fieldError('name') && (
+                <motion.p style={styles.fieldError} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>{fieldError('name')}</motion.p>
+              )}
+            </AnimatePresence>
+          </div>
+
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>Email</label>
+            <div style={styles.inputWrap}>
+              <input
+                style={{ ...styles.input, borderColor: fieldBorder('email') }}
+                type="email" placeholder="you@example.com"
+                value={form.email}
+                onChange={(e) => set('email', e.target.value)}
+                onBlur={() => blur('email')}
+                autoComplete="email"
+              />
+              <AnimatePresence>
+                {touched.email && !fieldError('email') && form.email && (
+                  <motion.span style={styles.checkIcon} initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>✓</motion.span>
+                )}
+              </AnimatePresence>
+            </div>
+            <AnimatePresence>
+              {touched.email && fieldError('email') && (
+                <motion.p style={styles.fieldError} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>{fieldError('email')}</motion.p>
+              )}
+            </AnimatePresence>
+          </div>
+
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>Phone</label>
+            <PhoneInput
+              value={form.phone}
+              onChange={(v) => set('phone', v)}
+              onBlur={() => blur('phone')}
+              style={{ width: '100%' }}
+            />
+            <AnimatePresence>
+              {touched.phone && fieldError('phone') && (
+                <motion.p style={styles.fieldError} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>{fieldError('phone')}</motion.p>
+              )}
+            </AnimatePresence>
+          </div>
+
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>Business Location</label>
+            <div style={styles.inputWrap}>
+              <input
+                style={{ ...styles.input, borderColor: fieldBorder('business_location') }}
+                type="text" placeholder="Paste your business location from Google Maps"
+                value={form.business_location}
+                onChange={(e) => set('business_location', capLocation(e.target.value))}
+                onBlur={() => blur('business_location')}
+                autoComplete="country-name"
+              />
+              <AnimatePresence>
+                {touched.business_location && !fieldError('business_location') && form.business_location && (
+                  <motion.span style={styles.checkIcon} initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>✓</motion.span>
+                )}
+              </AnimatePresence>
+            </div>
+            <AnimatePresence>
+              {touched.business_location && fieldError('business_location') && (
+                <motion.p style={styles.fieldError} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>{fieldError('business_location')}</motion.p>
+              )}
+            </AnimatePresence>
+          </div>
+
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>Password</label>
+            <div style={styles.inputWrap}>
+              <input
+                style={{ ...styles.input, borderColor: fieldBorder('password'), paddingRight: '44px' }}
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Create a strong password"
+                value={form.password}
+                onChange={(e) => set('password', e.target.value)}
+                onBlur={() => blur('password')}
+                autoComplete="new-password"
+              />
+              <button
+                type="button" style={styles.togglePassword}
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 12c0 0 3.5-7 9-7s9 7 9 7-3.5 7-9 7-9-7-9-7z" />
+                    <path d="M5 10c0 0 2.5-3 7-3s7 3 7 3" strokeWidth="0.8" opacity="0.35" />
+                    <circle cx="12" cy="12" r="4" />
+                    <circle cx="12" cy="12" r="2" fill="currentColor" />
+                    <circle cx="11" cy="11" r="1" fill="#fff" opacity="0.8" />
+                  </svg>
+                ) : (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 12c0 0 3.5-7 9-7s9 7 9 7-3.5 7-9 7-9-7-9-7z" opacity="0.25" />
+                    <path d="M3 12c0 0 3.5 4 9 4s9-4 9-4" strokeWidth="1.6" />
+                    <path d="M7 14.5l-1 1.8" strokeWidth="1" />
+                    <path d="M10 15.5l-0.6 2" strokeWidth="1" />
+                    <path d="M13 16v2" strokeWidth="1" />
+                    <path d="M16 15.5l0.6 2" strokeWidth="1" />
+                    <path d="M19 14.5l1 1.8" strokeWidth="1" />
+                  </svg>
+                )}
+              </button>
+            </div>
+            <AnimatePresence>
+              {touched.password && fieldError('password') && (
+                <motion.p style={styles.fieldError} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>{fieldError('password')}</motion.p>
+              )}
+            </AnimatePresence>
+            {(touched.password || form.password) && (
+              <motion.div
+                style={styles.checklist}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+              >
+                {pwChecks.map((r, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '2px 0' }}>
+                    <span style={{ color: r.met ? '#4caf50' : '#e57373', fontSize: '12px' }}>{r.met ? '✔' : '✖'}</span>
+                    <span style={{ color: r.met ? '#4caf50' : '#aaa', fontSize: '12px' }}>{r.label}</span>
+                  </div>
+                ))}
+              </motion.div>
+            )}
+          </div>
+
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>Confirm Password</label>
+            <div style={styles.inputWrap}>
+              <input
+                style={{ ...styles.input, borderColor: fieldBorder('password_confirmation'), paddingRight: '44px' }}
+                type={showConfirm ? 'text' : 'password'}
+                placeholder="Re-enter your password"
+                value={form.password_confirmation}
+                onChange={(e) => set('password_confirmation', e.target.value)}
+                onBlur={() => blur('password_confirmation')}
+                autoComplete="new-password"
+              />
+              <button
+                type="button" style={styles.togglePassword}
+                onClick={() => setShowConfirm(!showConfirm)}
+                tabIndex={-1}
+                aria-label={showConfirm ? 'Hide confirmation' : 'Show confirmation'}
+              >
+                {showConfirm ? (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 12c0 0 3.5-7 9-7s9 7 9 7-3.5 7-9 7-9-7-9-7z" opacity="0.25" />
+                    <path d="M3 12c0 0 3.5 4 9 4s9-4 9-4" strokeWidth="1.6" />
+                    <path d="M7 14.5l-1 1.8" strokeWidth="1" />
+                    <path d="M10 15.5l-0.6 2" strokeWidth="1" />
+                    <path d="M13 16v2" strokeWidth="1" />
+                    <path d="M16 15.5l0.6 2" strokeWidth="1" />
+                    <path d="M19 14.5l1 1.8" strokeWidth="1" />
+                  </svg>
+                ) : (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 12c0 0 3.5-7 9-7s9 7 9 7-3.5 7-9 7-9-7-9-7z" />
+                    <path d="M5 10c0 0 2.5-3 7-3s7 3 7 3" strokeWidth="0.8" opacity="0.35" />
+                    <circle cx="12" cy="12" r="4" />
+                    <circle cx="12" cy="12" r="2" fill="currentColor" />
+                    <circle cx="11" cy="11" r="1" fill="#fff" opacity="0.8" />
+                  </svg>
+                )}
+              </button>
+            </div>
+            <AnimatePresence>
+              {touched.password_confirmation && fieldError('password_confirmation') && (
+                <motion.p style={styles.fieldError} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>{fieldError('password_confirmation')}</motion.p>
+              )}
+            </AnimatePresence>
+          </div>
+
+          <motion.button
+            style={{ ...styles.btn, opacity: (!allValid || sending) ? 0.5 : 1 }}
+            type="submit"
+            disabled={!allValid || sending}
+            whileHover={allValid && !sending ? { scale: 1.02 } : {}}
+            whileTap={allValid && !sending ? { scale: 0.98 } : {}}
+          >
+            {sending ? (
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <span style={styles.spinner} />
+                Creating account...
+              </span>
+            ) : 'Create Account'}
+          </motion.button>
+
           <p style={styles.text}>
-            Already have an account? <Link to="/login" style={styles.link}>Login</Link>
+            Already have an account? <Link to="/login" style={styles.link}>Sign in</Link>
           </p>
-        </form>
+        </motion.form>
       </div>
     </div>
   );
@@ -61,51 +364,114 @@ const styles = {
     padding: '20px',
   },
   form: {
-    background: 'linear-gradient(#111, #000)',
-    padding: 'clamp(24px, 5vw, 40px)',
-    borderRadius: '10px',
-    boxShadow: '0 5px 20px rgba(0,0,0,0.5)',
-    width: 'min(100%, 400px)',
+    background: 'linear-gradient(145deg, #111, #000)',
+    padding: 'clamp(28px, 5vw, 44px)',
+    borderRadius: '12px',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+    width: 'min(100%, 460px)',
     border: '1px solid #a37a39',
   },
   title: {
-    fontSize: 'clamp(22px, 4vw, 28px)',
+    fontSize: 'clamp(24px, 4vw, 30px)',
     color: '#d4af37',
-    marginBottom: 'clamp(20px, 3vw, 30px)',
+    marginBottom: '4px',
     textAlign: 'center',
+  },
+  subtitle: {
+    color: '#888',
+    textAlign: 'center',
+    fontSize: '14px',
+    marginBottom: 'clamp(24px, 3vw, 32px)',
+  },
+  fieldGroup: {
+    marginBottom: 'clamp(14px, 2vw, 20px)',
+  },
+  label: {
+    color: '#ccc',
+    fontSize: '13px',
+    fontWeight: '600',
+    display: 'block',
+    marginBottom: '6px',
+  },
+  inputWrap: {
+    position: 'relative',
   },
   input: {
     width: '100%',
     padding: 'clamp(12px, 2vw, 14px)',
-    marginBottom: 'clamp(14px, 2vw, 20px)',
-    borderRadius: '5px',
-    border: '1px solid #555',
-    background: '#222',
+    borderRadius: '8px',
+    border: '1.5px solid #444',
+    background: '#1a1a1a',
     color: '#fff',
-    fontSize: 'clamp(14px, 1.5vw, 16px)',
+    fontSize: 'clamp(14px, 1.5vw, 15px)',
     boxSizing: 'border-box',
     outline: 'none',
+    transition: 'border-color 0.2s, box-shadow 0.2s',
+  },
+  checkIcon: {
+    position: 'absolute',
+    right: '14px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    color: '#4caf50',
+    fontSize: '16px',
+    fontWeight: 700,
+  },
+  togglePassword: {
+    position: 'absolute',
+    right: '10px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '18px',
+    padding: '4px',
+    lineHeight: 1,
+    color: '#a37a39',
   },
   btn: {
     width: '100%',
-    background: '#a37a39',
+    background: 'linear-gradient(135deg, #a37a39, #c8952e)',
     color: '#fff',
     border: 'none',
-    padding: 'clamp(12px, 2vw, 14px)',
-    borderRadius: '5px',
-    fontSize: 'clamp(14px, 2vw, 16px)',
-    fontWeight: '600',
+    padding: 'clamp(13px, 2vw, 15px)',
+    borderRadius: '8px',
+    fontSize: 'clamp(15px, 2vw, 17px)',
+    fontWeight: '700',
     cursor: 'pointer',
+    letterSpacing: '0.5px',
+    marginTop: 'clamp(4px, 1vw, 8px)',
   },
-  error: {
-    color: '#ff6b6b',
+  serverError: {
+    background: 'rgba(198,40,40,0.15)',
+    border: '1px solid #c62828',
+    borderRadius: '6px',
+    padding: '10px 14px',
+    marginBottom: '16px',
+    color: '#ef9a9a',
+    fontSize: '13px',
     textAlign: 'center',
-    marginBottom: 'clamp(12px, 2vw, 20px)',
-    fontSize: '14px',
+    overflow: 'hidden',
+  },
+  fieldError: {
+    color: '#e57373',
+    fontSize: '12px',
+    marginTop: '6px',
+    marginLeft: '2px',
+    overflow: 'hidden',
+  },
+  checklist: {
+    marginTop: '8px',
+    padding: '8px 10px',
+    background: 'rgba(0,0,0,0.3)',
+    borderRadius: '6px',
+    border: '1px solid #2a2a2a',
+    overflow: 'hidden',
   },
   text: {
     textAlign: 'center',
-    marginTop: 'clamp(14px, 2vw, 20px)',
+    marginTop: 'clamp(18px, 2.5vw, 24px)',
     color: '#fff',
     fontSize: 'clamp(13px, 1.5vw, 15px)',
   },
@@ -114,34 +480,13 @@ const styles = {
     textDecoration: 'none',
     fontWeight: '600',
   },
-  divider: {
-    display: 'flex',
-    alignItems: 'center',
-    margin: 'clamp(16px, 2vw, 24px) 0',
-  },
-  dividerLine: {
-    flex: 1,
-    height: '1px',
-    background: '#444',
-  },
-  dividerText: {
-    color: '#888',
-    fontSize: '13px',
-    padding: '0 12px',
-  },
-  googleBtn: {
-    width: '100%',
-    background: '#fff',
-    color: '#333',
-    border: '1px solid #ddd',
-    padding: 'clamp(12px, 2vw, 14px)',
-    borderRadius: '5px',
-    fontSize: 'clamp(14px, 2vw, 16px)',
-    fontWeight: '600',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px',
+  spinner: {
+    width: '18px',
+    height: '18px',
+    border: '2px solid rgba(255,255,255,0.3)',
+    borderTopColor: '#fff',
+    borderRadius: '50%',
+    animation: 'spin 0.6s linear infinite',
+    display: 'inline-block',
   },
 };
