@@ -25,6 +25,8 @@ class ProfileController extends Controller
             'email' => 'sometimes|nullable|string|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'sometimes|nullable|string|max:20|unique:users,phone,' . $user->id,
             'business_location' => 'sometimes|nullable|string|max:255',
+            'city' => 'sometimes|nullable|string|max:100',
+            'country' => 'sometimes|nullable|string|max:100',
             'password' => 'sometimes|nullable|string|min:8|confirmed',
             'password_confirmation' => 'sometimes|nullable|string',
             'avatar' => 'sometimes|file|mimes:jpeg,png,jpg,gif,webp|max:51200',
@@ -39,6 +41,8 @@ class ProfileController extends Controller
             $user->latitude = $coords['lat'];
             $user->longitude = $coords['lng'];
         }
+        if ($request->filled('city')) $user->city = $request->city;
+        if ($request->filled('country')) $user->country = $request->country;
         if ($request->filled('password')) $user->password = Hash::make($request->password);
 
         if ($request->hasFile('avatar')) {

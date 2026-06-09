@@ -46,6 +46,7 @@ export default function PublicProfile() {
           {u.email && <p style={styles.info}>&#9993; {u.email}</p>}
           {u.phone && <p style={styles.info}>&#9742; {u.phone}</p>}
           {u.business_location && <p style={styles.info}>&#9906; {u.business_location}</p>}
+          {u.city && u.country && <p style={styles.info}>&#127758; {u.city}, {u.country}</p>}
           {data.posts_count > 0 && (
             <Link to="/customer-gallery" style={styles.galleryLink}>
               View Gallery Posts ({data.posts_count})

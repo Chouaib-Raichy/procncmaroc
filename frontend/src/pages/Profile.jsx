@@ -10,6 +10,8 @@ export default function Profile() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [businessLocation, setBusinessLocation] = useState('');
+  const [city, setCity] = useState('');
+  const [country, setCountry] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [avatar, setAvatar] = useState(null);
@@ -24,6 +26,8 @@ export default function Profile() {
       setEmail(user.email || '');
       setPhone(user.phone || '');
       setBusinessLocation(user.business_location || '');
+      setCity(user.city || '');
+      setCountry(user.country || '');
     }
   }, [user]);
 
@@ -47,6 +51,8 @@ export default function Profile() {
       if (email !== user.email) fd.append('email', email);
       if (phone !== (user.phone || '')) fd.append('phone', phone);
       if (businessLocation !== (user.business_location || '')) fd.append('business_location', businessLocation);
+      if (city !== (user.city || '')) fd.append('city', city);
+      if (country !== (user.country || '')) fd.append('country', country);
       if (password) {
         fd.append('password', password);
         fd.append('password_confirmation', passwordConfirmation);
@@ -143,6 +149,16 @@ export default function Profile() {
             <div style={{ marginBottom: '18px' }}>
               <label style={{ color: '#a37a39', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Business Location</label>
               <input value={businessLocation} onChange={(e) => setBusinessLocation(e.target.value)} required style={inputStyle} />
+            </div>
+
+            <div style={{ marginBottom: '18px' }}>
+              <label style={{ color: '#a37a39', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>City</label>
+              <input value={city} onChange={(e) => setCity(e.target.value)} required style={inputStyle} />
+            </div>
+
+            <div style={{ marginBottom: '18px' }}>
+              <label style={{ color: '#a37a39', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Country</label>
+              <input value={country} onChange={(e) => setCountry(e.target.value)} required style={inputStyle} />
             </div>
 
             <div style={{ marginBottom: '18px' }}>
