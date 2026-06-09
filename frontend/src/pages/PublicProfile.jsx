@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { getPartner } from '../api/partners';
 import ErrorState from '../components/ErrorState';
 import machineBg from '../assets/machineBG.jpeg';
@@ -18,7 +19,16 @@ export default function PublicProfile() {
 
   useEffect(() => { fetch(); }, [id]);
 
-  if (loading) return <div style={styles.wrapper}><div style={styles.loader} /></div>;
+  if (loading) return (
+    <div style={styles.wrapper}>
+      <div style={styles.card}>
+        <div style={{ ...styles.bg, background: '#111' }} />
+        <div style={{ textAlign: 'center', padding: '40px 20px 50px' }}>
+          <div style={styles.loader} />
+        </div>
+      </div>
+    </div>
+  );
 
   if (error) return <ErrorState message={error} onRetry={fetch} />;
 
@@ -32,30 +42,76 @@ export default function PublicProfile() {
 
   return (
     <div style={styles.wrapper}>
-      <div style={styles.card}>
+      <motion.div
+        style={styles.card}
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <div style={{ ...styles.bg, backgroundImage: `url(${u.profile_bg_url || machineBg})` }} />
         <div style={styles.bgOverlay} />
         <div style={styles.content}>
-          <div style={styles.avatarWrap}>
+          <motion.div
+            style={styles.avatarWrap}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
+          >
             {u.avatar_url ? (
               <img src={u.avatar_url} alt={u.name} style={styles.avatar} />
             ) : (
               <div style={styles.avatarPlaceholder}>{u.name?.charAt(0).toUpperCase()}</div>
             )}
-          </div>
-          <h1 style={styles.name}>{u.name}</h1>
-          <p style={styles.role}>{u.role === 'admin' ? 'Administrator' : 'Member'}</p>
-          {u.email && <p style={styles.info}>&#9993; {u.email}</p>}
-          {u.phone && <p style={styles.info}>&#9742; {u.phone}</p>}
-          {u.business_location && <p style={styles.info}>&#9906; {u.business_location}</p>}
-          {u.city && u.country && <p style={styles.info}>&#127758; {u.city}, {u.country}</p>}
+          </motion.div>
+
+          <motion.h1 style={styles.name} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>{u.name}</motion.h1>
+          <motion.p style={styles.role} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}>{u.role === 'admin' ? 'Administrator' : 'Member'}</motion.p>
+
+          <motion.div style={styles.divider} initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ delay: 0.4 }} />
+
+          <motion.div style={styles.infoGrid} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}>
+            {u.email && (
+              <div style={styles.infoItem}>
+                <span style={styles.infoIcon}>&#9993;</span>
+                <span style={styles.infoLabel}>Email</span>
+                <span style={styles.infoValue}>{u.email}</span>
+              </div>
+            )}
+            {u.phone && (
+              <div style={styles.infoItem}>
+                <span style={styles.infoIcon}>&#9742;</span>
+                <span style={styles.infoLabel}>Phone</span>
+                <span style={styles.infoValue}>{u.phone}</span>
+              </div>
+            )}
+            {u.business_location && (
+              <div style={styles.infoItem}>
+                <span style={styles.infoIcon}>&#9906;</span>
+                <span style={styles.infoLabel}>Business</span>
+                <span style={styles.infoValue}>{u.business_location}</span>
+              </div>
+            )}
+            {u.city && u.country && (
+              <div style={styles.infoItem}>
+                <span style={styles.infoIcon}>&#127758;</span>
+                <span style={styles.infoLabel}>Location</span>
+                <span style={styles.infoValue}>{u.city}, {u.country}</span>
+              </div>
+            )}
+          </motion.div>
+
           {data.posts_count > 0 && (
-            <Link to="/customer-gallery" style={styles.galleryLink}>
-              View Gallery Posts ({data.posts_count})
-            </Link>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+              <Link to="/customer-gallery" style={styles.galleryLink}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
+                </svg>
+                Gallery ({data.posts_count} {data.posts_count === 1 ? 'post' : 'posts'})
+              </Link>
+            </motion.div>
           )}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -69,21 +125,20 @@ const styles = {
     fontFamily: "Georgia, 'Times New Roman', Times, serif",
   },
   loader: {
-    width: '36px', height: '36px',
+    width: '36px', height: '36px', margin: '0 auto',
     border: '3px solid #333', borderTopColor: '#a37a39',
     borderRadius: '50%', animation: 'spin 0.8s linear infinite',
   },
   card: {
-    maxWidth: '480px', width: '100%',
-    background: 'linear-gradient(135deg, #111, #1a1a1a)',
+    maxWidth: '520px', width: '100%',
+    background: 'linear-gradient(135deg, #0f0f0f, #1a1a1a)',
     border: '1px solid #a37a39',
     borderRadius: '20px',
     overflow: 'hidden',
-    position: 'relative',
-    boxShadow: '0 0 40px #a37a3922, 0 0 80px #a37a3911',
+    boxShadow: '0 0 60px rgba(163,122,57,0.12), 0 20px 60px rgba(0,0,0,0.5)',
   },
   bg: {
-    height: 'clamp(140px, 20vw, 200px)',
+    height: 'clamp(150px, 22vw, 220px)',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     position: 'relative',
@@ -91,50 +146,67 @@ const styles = {
   bgOverlay: {
     position: 'absolute',
     top: 0, left: 0, right: 0,
-    height: 'clamp(140px, 20vw, 200px)',
-    background: 'linear-gradient(to bottom, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0.8) 100%)',
+    height: 'clamp(150px, 22vw, 220px)',
+    background: 'linear-gradient(to bottom, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.85) 100%)',
   },
   content: {
-    padding: '0 clamp(20px, 3vw, 32px) clamp(28px, 4vw, 40px)',
+    padding: '0 clamp(24px, 4vw, 40px) clamp(32px, 4vw, 48px)',
     textAlign: 'center',
     position: 'relative',
     zIndex: 1,
-    marginTop: '-50px',
+    marginTop: '-55px',
   },
   avatarWrap: {
-    width: '100px', height: '100px', margin: '0 auto 16px',
+    width: '110px', height: '110px', margin: '0 auto 18px',
     borderRadius: '50%',
     border: '3px solid #a37a39',
     overflow: 'hidden',
     background: '#111',
+    boxShadow: '0 0 0 3px rgba(163,122,57,0.2), 0 8px 32px rgba(0,0,0,0.4)',
   },
-  avatar: {
-    width: '100%', height: '100%', objectFit: 'cover',
-  },
+  avatar: { width: '100%', height: '100%', objectFit: 'cover' },
   avatarPlaceholder: {
     width: '100%', height: '100%',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     background: 'linear-gradient(135deg, #a37a39, #c8952e)',
-    color: '#000',
-    fontSize: '40px', fontWeight: 'bold',
+    color: '#000', fontSize: '44px', fontWeight: 'bold',
   },
   name: {
-    color: '#d4af37', fontSize: 'clamp(22px, 3vw, 28px)',
+    color: '#d4af37', fontSize: 'clamp(24px, 3vw, 30px)',
     fontWeight: '700', margin: '0 0 4px',
   },
   role: {
-    color: '#666', fontSize: '13px', margin: '0 0 16px',
-    textTransform: 'uppercase', letterSpacing: '1px',
+    color: '#555', fontSize: '13px', margin: '0 0 20px',
+    textTransform: 'uppercase', letterSpacing: '1.5px',
   },
-  info: {
-    color: '#ccc', fontSize: '14px', margin: '8px 0',
+  divider: {
+    height: '1px',
+    background: 'linear-gradient(90deg, transparent, #a37a39, transparent)',
+    margin: '0 0 24px',
+    transformOrigin: 'center',
   },
+  infoGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gap: '12px',
+    textAlign: 'left',
+  },
+  infoItem: {
+    background: 'rgba(0,0,0,0.3)',
+    border: '1px solid #222',
+    borderRadius: '10px',
+    padding: '14px 16px',
+  },
+  infoIcon: { fontSize: '18px', display: 'block', marginBottom: '4px' },
+  infoLabel: { fontSize: '11px', color: '#666', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '2px' },
+  infoValue: { fontSize: '13px', color: '#ccc', fontWeight: '600' },
   galleryLink: {
-    display: 'inline-block', marginTop: '16px',
-    padding: '10px 24px',
+    display: 'inline-flex', alignItems: 'center', marginTop: '20px',
+    padding: '12px 28px',
     background: 'linear-gradient(135deg, #a37a39, #c8952e)',
-    color: '#fff', textDecoration: 'none',
-    borderRadius: '8px', fontWeight: '700',
+    color: '#000', textDecoration: 'none',
+    borderRadius: '10px', fontWeight: '700',
     fontSize: '14px',
+    transition: 'transform 0.2s',
   },
 };

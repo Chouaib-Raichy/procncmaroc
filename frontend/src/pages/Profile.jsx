@@ -1,19 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { Navigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import PhoneInput from '../components/PhoneInput';
 import Loading from '../components/Loading';
 
+const fadeUp = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 } };
+
 export default function Profile() {
   const { user, loading, updateProfile } = useAuth();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [businessLocation, setBusinessLocation] = useState('');
-  const [city, setCity] = useState('');
-  const [country, setCountry] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const [tab, setTab] = useState('info');
+  const [form, setForm] = useState({ name: '', email: '', phone: '', business_location: '', city: '', country: '', password: '', password_confirmation: '' });
   const [avatar, setAvatar] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [profileBg, setProfileBg] = useState(null);
@@ -24,32 +21,14 @@ export default function Profile() {
   const bgRef = useRef(null);
 
   useEffect(() => {
-    if (user) {
-      setName(user.name || '');
-      setEmail(user.email || '');
-      setPhone(user.phone || '');
-      setBusinessLocation(user.business_location || '');
-      setCity(user.city || '');
-      setCountry(user.country || '');
-    }
+    if (user) setForm((f) => ({ ...f, name: user.name || '', email: user.email || '', phone: user.phone || '', business_location: user.business_location || '', city: user.city || '', country: user.country || '' }));
   }, [user]);
 
   if (loading) return <Loading text="Loading profile..." />;
   if (!user) return <Navigate to="/login" replace />;
 
-  const handleAvatar = (e) => {
-    const f = e.target.files[0];
-    if (!f) return;
-    setAvatar(f);
-    setAvatarPreview(URL.createObjectURL(f));
-  };
-
-  const handleBg = (e) => {
-    const f = e.target.files[0];
-    if (!f) return;
-    setProfileBg(f);
-    setProfileBgPreview(URL.createObjectURL(f));
-  };
+  const handleAvatar = (e) => { const f = e.target.files[0]; if (f) { setAvatar(f); setAvatarPreview(URL.createObjectURL(f)); } };
+  const handleBg = (e) => { const f = e.target.files[0]; if (f) { setProfileBg(f); setProfileBgPreview(URL.createObjectURL(f)); } };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,74 +36,73 @@ export default function Profile() {
     setMsg(null);
     try {
       const fd = new FormData();
-      if (name !== user.name) fd.append('name', name);
-      if (email !== user.email) fd.append('email', email);
-      if (phone !== (user.phone || '')) fd.append('phone', phone);
-      if (businessLocation !== (user.business_location || '')) fd.append('business_location', businessLocation);
-      if (city !== (user.city || '')) fd.append('city', city);
-      if (country !== (user.country || '')) fd.append('country', country);
-      if (password) {
-        fd.append('password', password);
-        fd.append('password_confirmation', passwordConfirmation);
-      }
+      if (form.name !== user.name) fd.append('name', form.name);
+      if (form.email !== user.email) fd.append('email', form.email);
+      if (form.phone !== (user.phone || '')) fd.append('phone', form.phone);
+      if (form.business_location !== (user.business_location || '')) fd.append('business_location', form.business_location);
+      if (form.city !== (user.city || '')) fd.append('city', form.city);
+      if (form.country !== (user.country || '')) fd.append('country', form.country);
+      if (form.password) { fd.append('password', form.password); fd.append('password_confirmation', form.password_confirmation); }
       if (avatar) fd.append('avatar', avatar);
       if (profileBg) fd.append('profile_bg', profileBg);
-      const res = await updateProfile(fd);
-      setMsg({ type: 'success', text: 'Profile updated successfully!' });
-      setPassword('');
-      setPasswordConfirmation('');
-      setAvatar(null);
-      setProfileBg(null);
+      await updateProfile(fd);
+      setMsg({ type: 'success', text: 'Profile updated successfully' });
+      setForm((p) => ({ ...p, password: '', password_confirmation: '' }));
+      setAvatar(null); setProfileBg(null);
       if (avatarPreview) URL.revokeObjectURL(avatarPreview);
       if (profileBgPreview) URL.revokeObjectURL(profileBgPreview);
-      setAvatarPreview(null);
-      setProfileBgPreview(null);
+      setAvatarPreview(null); setProfileBgPreview(null);
     } catch (err) {
-      const data = err.response?.data;
-      const msgText = data?.message || Object.values(data?.errors || {}).flat().join(', ') || 'Update failed';
-      setMsg({ type: 'error', text: msgText });
-    } finally {
-      setSaving(false);
-    }
+      const d = err.response?.data;
+      setMsg({ type: 'error', text: d?.message || Object.values(d?.errors || {}).flat().join(', ') || 'Update failed' });
+    } finally { setSaving(false); }
   };
 
   const currentAvatar = avatarPreview || user.avatar_url;
   const currentBg = profileBgPreview || user.profile_bg_url;
+  const fields = [
+    { key: 'name', label: 'Full Name', placeholder: 'John Doe', autoComplete: 'name' },
+    { key: 'email', label: 'Email Address', type: 'email', placeholder: 'you@example.com', autoComplete: 'email' },
+    { key: 'phone', label: 'Phone Number', component: 'phone' },
+    { key: 'business_location', label: 'Business Location', placeholder: 'Paste your business location from Google Maps', autoComplete: 'country-name' },
+    { key: 'city', label: 'City', placeholder: 'Casablanca', autoComplete: 'address-level2' },
+    { key: 'country', label: 'Country', placeholder: 'Morocco', autoComplete: 'country-name' },
+  ];
 
   return (
     <div style={pageWrap}>
       <div style={container}>
         {/* Cover */}
-        <div style={coverWrap}>
-          <div style={{ ...cover, backgroundImage: `url(${currentBg || 'https://placehold.co/1200x400/1a1a1a/a37a39?text=PRO+CNC+MAROC'})` }} />
+        <motion.div style={coverWrap} {...fadeUp} transition={{ duration: 0.5 }}>
+          <div style={{ ...cover, backgroundImage: `url(${currentBg || 'https://placehold.co/1200x400/1a1a1a/333?text=+ '})` }} />
           <div style={coverOverlay} />
-          <button style={coverBtn} onClick={() => bgRef.current?.click()} title="Change cover">
+          <motion.button style={coverBtn} onClick={() => bgRef.current?.click()} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
               <circle cx="12" cy="13" r="4" />
             </svg>
-          </button>
+          </motion.button>
           <input ref={bgRef} type="file" accept="image/*" onChange={handleBg} style={{ display: 'none' }} />
           <div style={avatarWrap}>
-            <div style={avatarInner} onClick={() => avatarRef.current?.click()}>
+            <motion.div style={avatarInner} onClick={() => avatarRef.current?.click()} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               {currentAvatar ? (
                 <img src={currentAvatar} alt="" style={avatarImg} />
               ) : (
                 <div style={avatarPlaceholder}>{user.name?.charAt(0).toUpperCase()}</div>
               )}
               <div style={avatarBadge}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
                   <circle cx="12" cy="13" r="4" />
                 </svg>
               </div>
-            </div>
+            </motion.div>
             <input ref={avatarRef} type="file" accept="image/*" onChange={handleAvatar} style={{ display: 'none' }} />
           </div>
-        </div>
+        </motion.div>
 
         {/* Info card */}
-        <div style={infoCard}>
+        <motion.div style={infoCard} {...fadeUp} transition={{ duration: 0.5, delay: 0.1 }}>
           <h1 style={infoName}>{user.name}</h1>
           <p style={infoRole}>{user.role === 'admin' ? 'Administrator' : 'Member'}</p>
           <div style={infoMeta}>
@@ -132,261 +110,206 @@ export default function Profile() {
             {user.phone && <span style={infoTag}>&#9742; {user.phone}</span>}
             {user.city && user.country && <span style={infoTag}>&#127758; {user.city}, {user.country}</span>}
           </div>
-        </div>
+        </motion.div>
 
-        {/* Edit form */}
-        <div style={formCard}>
-          <h2 style={formTitle}>Edit Profile</h2>
+        {/* Tabs */}
+        <motion.div style={tabBar} {...fadeUp} transition={{ duration: 0.4, delay: 0.2 }}>
+          {['info', 'security'].map((t) => (
+            <button key={t} style={tabItem(t === tab)} onClick={() => setTab(t)}>
+              {t === 'info' ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+                </svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              )}
+              {t === 'info' ? 'Profile Information' : 'Security'}
+            </button>
+          ))}
+        </motion.div>
 
-          {msg && (
-            <div style={{
-              padding: '12px 16px', borderRadius: '6px', marginBottom: '20px',
-              background: msg.type === 'success' ? '#0d2a0d' : '#2a0d0d',
-              border: `1px solid ${msg.type === 'success' ? '#2e7d32' : '#c62828'}`,
-              color: msg.type === 'success' ? '#81c784' : '#ef9a9a', fontSize: '14px',
-            }}>
-              {msg.text}
-            </div>
-          )}
+        {/* Form */}
+        <motion.div style={formCard} {...fadeUp} transition={{ duration: 0.4, delay: 0.3 }}>
+          <AnimatePresence>
+            {msg && (
+              <motion.div
+                style={{ ...msgBox, background: msg.type === 'success' ? '#0d2a0d' : '#2a0d0d', borderColor: msg.type === 'success' ? '#2e7d32' : '#c62828', color: msg.type === 'success' ? '#81c784' : '#ef9a9a' }}
+                initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+              >
+                <span style={{ marginRight: '8px', fontSize: '16px' }}>{msg.type === 'success' ? '✓' : '✕'}</span>
+                {msg.text}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <form onSubmit={handleSubmit}>
-            <div style={formGrid}>
-              <div style={formCol}>
-                <label style={fieldLabel}>Full Name</label>
-                <input value={name} onChange={(e) => setName(e.target.value)} required style={fieldInput} />
-              </div>
-              <div style={formCol}>
-                <label style={fieldLabel}>Email</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={fieldInput} />
-              </div>
-              <div style={formCol}>
-                <label style={fieldLabel}>Phone</label>
-                <PhoneInput value={phone} onChange={(v) => setPhone(v)} style={{ width: '100%' }} />
-              </div>
-              <div style={formCol}>
-                <label style={fieldLabel}>Business Location</label>
-                <input value={businessLocation} onChange={(e) => setBusinessLocation(e.target.value)} required style={fieldInput} />
-              </div>
-              <div style={formCol}>
-                <label style={fieldLabel}>City</label>
-                <input value={city} onChange={(e) => setCity(e.target.value)} required style={fieldInput} />
-              </div>
-              <div style={formCol}>
-                <label style={fieldLabel}>Country</label>
-                <input value={country} onChange={(e) => setCountry(e.target.value)} required style={fieldInput} />
-              </div>
-              <div style={formCol}>
-                <label style={fieldLabel}>New Password (optional)</label>
-                <input type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} style={fieldInput} />
-              </div>
-              <div style={formCol}>
-                <label style={fieldLabel}>Confirm Password</label>
-                <input type="password" autoComplete="new-password" value={passwordConfirmation} onChange={(e) => setPasswordConfirmation(e.target.value)} style={fieldInput} />
-              </div>
-            </div>
+            {tab === 'info' && (
+              <motion.div key="info" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <div style={formGrid}>
+                  {fields.map((f) => (
+                    <div key={f.key} style={fieldWrap}>
+                      <label style={fieldLabel}>{f.label}</label>
+                      {f.component === 'phone' ? (
+                        <PhoneInput value={form.phone} onChange={(v) => setForm((p) => ({ ...p, phone: v }))} style={{ width: '100%' }} />
+                      ) : (
+                        <input
+                          type={f.type || 'text'}
+                          value={form[f.key]}
+                          onChange={(e) => setForm((p) => ({ ...p, [f.key]: e.target.value }))}
+                          placeholder={f.placeholder}
+                          autoComplete={f.autoComplete}
+                          style={fieldInput}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
 
-            <button type="submit" disabled={saving} style={saveBtn(saving)}>
-              {saving ? 'Saving...' : 'Save Changes'}
-            </button>
+            {tab === 'security' && (
+              <motion.div key="security" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <div style={formGrid}>
+                  <div style={fieldWrap}>
+                    <label style={fieldLabel}>New Password</label>
+                    <input type="password" autoComplete="new-password" value={form.password} onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))} placeholder="Leave blank to keep current" style={fieldInput} />
+                  </div>
+                  <div style={fieldWrap}>
+                    <label style={fieldLabel}>Confirm Password</label>
+                    <input type="password" autoComplete="new-password" value={form.password_confirmation} onChange={(e) => setForm((p) => ({ ...p, password_confirmation: e.target.value }))} placeholder="Re-enter new password" style={fieldInput} />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            <motion.button
+              type="submit" disabled={saving}
+              style={saveBtn(saving)}
+              whileHover={!saving ? { scale: 1.01 } : {}}
+              whileTap={!saving ? { scale: 0.99 } : {}}
+            >
+              {saving ? (
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <span style={spinner} /> Saving...
+                </span>
+              ) : 'Save Changes'}
+            </motion.button>
           </form>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
 }
 
 const pageWrap = {
-  minHeight: '100vh',
-  background: '#000',
+  minHeight: '100vh', background: '#000',
   fontFamily: "Georgia, 'Times New Roman', Times, serif",
 };
-
 const container = {
-  maxWidth: '860px',
-  margin: '0 auto',
+  maxWidth: '860px', margin: '0 auto',
   padding: 'clamp(16px, 3vw, 40px)',
 };
-
 const coverWrap = {
-  position: 'relative',
-  borderRadius: '16px 16px 0 0',
-  overflow: 'hidden',
+  position: 'relative', borderRadius: '16px 16px 0 0', overflow: 'hidden',
   height: 'clamp(180px, 25vw, 300px)',
 };
-
 const cover = {
-  width: '100%',
-  height: '100%',
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-  transition: 'background-image 0.3s',
+  width: '100%', height: '100%', backgroundSize: 'cover', backgroundPosition: 'center',
+  transition: 'background-image 0.5s ease',
 };
-
 const coverOverlay = {
-  position: 'absolute',
-  inset: 0,
-  background: 'linear-gradient(to bottom, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0.7) 100%)',
+  position: 'absolute', inset: 0,
+  background: 'linear-gradient(to bottom, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.75) 100%)',
 };
-
 const coverBtn = {
-  position: 'absolute',
-  top: '12px',
-  right: '12px',
-  background: 'rgba(0,0,0,0.6)',
-  border: '1px solid rgba(255,255,255,0.15)',
-  color: '#fff',
-  borderRadius: '8px',
-  padding: '8px',
-  cursor: 'pointer',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  zIndex: 2,
-  transition: '0.2s',
+  position: 'absolute', top: '14px', right: '14px',
+  background: 'rgba(0,0,0,0.55)', border: '1px solid rgba(255,255,255,0.12)',
+  color: '#fff', borderRadius: '10px', padding: '9px', cursor: 'pointer',
+  display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2,
+  backdropFilter: 'blur(6px)',
 };
-
 const avatarWrap = {
-  position: 'absolute',
-  bottom: '-50px',
-  left: 'clamp(20px, 4vw, 40px)',
-  zIndex: 3,
+  position: 'absolute', bottom: '-52px', left: 'clamp(20px, 4vw, 40px)', zIndex: 3,
 };
-
 const avatarInner = {
-  width: 'clamp(90px, 12vw, 120px)',
-  height: 'clamp(90px, 12vw, 120px)',
-  borderRadius: '50%',
-  border: '4px solid #a37a39',
-  overflow: 'hidden',
-  cursor: 'pointer',
-  position: 'relative',
-  background: '#111',
+  width: 'clamp(96px, 13vw, 128px)', height: 'clamp(96px, 13vw, 128px)',
+  borderRadius: '50%', border: '4px solid #a37a39', overflow: 'hidden',
+  cursor: 'pointer', position: 'relative', background: '#111',
+  boxShadow: '0 0 0 2px rgba(163,122,57,0.3), 0 8px 32px rgba(0,0,0,0.5)',
 };
-
-const avatarImg = {
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover',
-};
-
+const avatarImg = { width: '100%', height: '100%', objectFit: 'cover' };
 const avatarPlaceholder = {
-  width: '100%',
-  height: '100%',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  background: 'linear-gradient(135deg, #a37a39, #c8952e)',
-  color: '#000',
-  fontSize: 'clamp(36px, 5vw, 48px)',
-  fontWeight: 'bold',
+  width: '100%', height: '100%', display: 'flex', alignItems: 'center',
+  justifyContent: 'center', background: 'linear-gradient(135deg, #a37a39, #c8952e)',
+  color: '#000', fontSize: 'clamp(38px, 5vw, 52px)', fontWeight: 'bold',
 };
-
 const avatarBadge = {
-  position: 'absolute',
-  bottom: '4px',
-  right: '4px',
-  background: '#a37a39',
-  borderRadius: '50%',
-  width: '28px',
-  height: '28px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  color: '#000',
+  position: 'absolute', bottom: '4px', right: '4px',
+  background: '#a37a39', borderRadius: '50%',
+  width: '30px', height: '30px', display: 'flex',
+  alignItems: 'center', justifyContent: 'center',
+  boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
 };
-
 const infoCard = {
   background: 'linear-gradient(145deg, #0d0d0d, #161616)',
-  border: '1px solid #2a2a2a',
-  borderTop: 'none',
+  border: '1px solid #2a2a2a', borderTop: 'none',
   borderRadius: '0 0 12px 12px',
-  padding: 'clamp(60px, 8vw, 70px) clamp(20px, 3vw, 40px) clamp(20px, 3vw, 32px)',
+  padding: 'clamp(60px, 8vw, 72px) clamp(20px, 3vw, 40px) clamp(18px, 2.5vw, 28px)',
   marginBottom: 'clamp(16px, 2vw, 24px)',
 };
-
-const infoName = {
-  color: '#d4af37',
-  fontSize: 'clamp(22px, 3vw, 28px)',
-  fontWeight: '700',
-  margin: '0 0 4px',
+const infoName = { color: '#d4af37', fontSize: 'clamp(24px, 3vw, 30px)', fontWeight: '700', margin: '0 0 4px' };
+const infoRole = { color: '#555', fontSize: '13px', margin: '0 0 16px', textTransform: 'uppercase', letterSpacing: '1.5px' };
+const infoMeta = { display: 'flex', flexWrap: 'wrap', gap: '16px' };
+const infoTag = { color: '#999', fontSize: '13px' };
+const tabBar = {
+  display: 'flex', gap: '4px', marginBottom: 'clamp(16px, 2vw, 24px)',
+  background: '#0a0a0a', borderRadius: '10px', padding: '4px',
+  border: '1px solid #222',
 };
-
-const infoRole = {
-  color: '#666',
-  fontSize: '14px',
-  margin: '0 0 14px',
-  textTransform: 'uppercase',
-  letterSpacing: '1px',
-};
-
-const infoMeta = {
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: '12px',
-};
-
-const infoTag = {
-  color: '#aaa',
-  fontSize: '13px',
-};
-
+const tabItem = (active) => ({
+  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+  padding: '12px 16px', border: 'none', borderRadius: '8px',
+  cursor: 'pointer', fontSize: '14px', fontWeight: active ? '700' : '500',
+  background: active ? 'linear-gradient(135deg, #a37a39, #c8952e)' : 'transparent',
+  color: active ? '#000' : '#888',
+  transition: 'all 0.25s ease',
+});
 const formCard = {
-  background: '#0a0a0a',
-  border: '1px solid #2a2a2a',
-  borderRadius: '12px',
-  padding: 'clamp(20px, 3vw, 36px)',
+  background: '#0a0a0a', border: '1px solid #2a2a2a',
+  borderRadius: '12px', padding: 'clamp(20px, 3vw, 36px)',
 };
-
-const formTitle = {
-  color: '#a37a39',
-  fontSize: 'clamp(18px, 2.5vw, 22px)',
-  fontWeight: '700',
-  margin: '0 0 clmap(20px, 3vw, 28px)',
-  paddingBottom: '16px',
-  borderBottom: '1px solid #222',
+const msgBox = {
+  padding: '12px 16px', borderRadius: '8px', marginBottom: '20px',
+  border: '1px solid', fontSize: '14px', display: 'flex', alignItems: 'center',
 };
-
 const formGrid = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+  display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
   gap: 'clamp(14px, 2vw, 20px)',
 };
-
-const formCol = {
-  marginBottom: '4px',
-};
-
-const fieldLabel = {
-  color: '#a37a39',
-  fontSize: '13px',
-  fontWeight: '600',
-  display: 'block',
-  marginBottom: '6px',
-};
-
+const fieldWrap = { marginBottom: '4px' };
+const fieldLabel = { color: '#a37a39', fontSize: '13px', fontWeight: '600', display: 'block', marginBottom: '6px' };
 const fieldInput = {
-  width: '100%',
-  padding: '12px 14px',
-  borderRadius: '6px',
-  border: '1px solid #333',
-  background: '#111',
-  color: '#fff',
-  fontSize: '14px',
-  outline: 'none',
-  boxSizing: 'border-box',
-  transition: 'border-color 0.2s',
+  width: '100%', padding: '12px 14px', borderRadius: '8px',
+  border: '1px solid #333', background: '#111', color: '#fff',
+  fontSize: '14px', outline: 'none', boxSizing: 'border-box',
+  transition: 'border-color 0.2s, box-shadow 0.2s',
 };
-
 const saveBtn = (saving) => ({
-  width: '100%',
-  padding: '14px',
+  width: '100%', padding: '14px',
   marginTop: 'clamp(20px, 3vw, 28px)',
   background: 'linear-gradient(135deg, #a37a39, #d4af37)',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '6px',
-  fontSize: '16px',
-  fontWeight: '700',
+  color: '#fff', border: 'none', borderRadius: '8px',
+  fontSize: '16px', fontWeight: '700',
   cursor: saving ? 'not-allowed' : 'pointer',
   opacity: saving ? 0.7 : 1,
+  transition: 'opacity 0.2s',
 });
+const spinner = {
+  width: '18px', height: '18px',
+  border: '2px solid rgba(255,255,255,0.3)',
+  borderTopColor: '#fff', borderRadius: '50%',
+  animation: 'spin 0.6s linear infinite',
+  display: 'inline-block',
+};
