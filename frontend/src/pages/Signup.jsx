@@ -10,6 +10,8 @@ const validators = {
   email: (v) => !v.trim() ? 'Email address is required' : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? 'Please enter a valid email address' : '',
   phone: (v) => !v.trim() ? 'Phone number is required' : '',
   business_location: (v) => !v.trim() ? 'Business location is required' : '',
+  city: (v) => !v.trim() ? 'City is required' : v.trim().length < 2 ? 'City must be at least 2 characters' : '',
+  country: (v) => !v.trim() ? 'Country is required' : v.trim().length < 2 ? 'Country must be at least 2 characters' : '',
   password: (v) => !v ? 'Password is required' : v.length < 8 || !/[A-Z]/.test(v) || !/[a-z]/.test(v) || !/[0-9]/.test(v) || !/[^A-Za-z0-9]/.test(v) ? 'Must meet all requirements below' : '',
   password_confirmation: (v, form) => !v ? 'Please confirm your password' : v !== form.password ? 'Passwords do not match' : '',
 };
@@ -23,7 +25,7 @@ const requirements = [
 ];
 
 export default function Signup() {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', business_location: '', password: '', password_confirmation: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', business_location: '', city: '', country: '', password: '', password_confirmation: '' });
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [serverErrors, setServerErrors] = useState({});
@@ -75,7 +77,7 @@ export default function Signup() {
     if (!validate()) return;
     setSending(true);
     try {
-      await register(form.name, form.email, form.phone, form.business_location, form.password, form.password_confirmation, true);
+      await register(form.name, form.email, form.phone, form.business_location, form.city, form.country, form.password, form.password_confirmation, true);
       navigate('/complete-registration');
     } catch (err) {
       const data = err.response?.data;
@@ -213,6 +215,54 @@ export default function Signup() {
             <AnimatePresence>
               {touched.business_location && fieldError('business_location') && (
                 <motion.p style={styles.fieldError} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>{fieldError('business_location')}</motion.p>
+              )}
+            </AnimatePresence>
+          </div>
+
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>City</label>
+            <div style={styles.inputWrap}>
+              <input
+                style={{ ...styles.input, borderColor: fieldBorder('city') }}
+                type="text" placeholder="Casablanca"
+                value={form.city}
+                onChange={(e) => set('city', capLocation(e.target.value))}
+                onBlur={() => blur('city')}
+                autoComplete="address-level2"
+              />
+              <AnimatePresence>
+                {touched.city && !fieldError('city') && form.city && (
+                  <motion.span style={styles.checkIcon} initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>✓</motion.span>
+                )}
+              </AnimatePresence>
+            </div>
+            <AnimatePresence>
+              {touched.city && fieldError('city') && (
+                <motion.p style={styles.fieldError} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>{fieldError('city')}</motion.p>
+              )}
+            </AnimatePresence>
+          </div>
+
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>Country</label>
+            <div style={styles.inputWrap}>
+              <input
+                style={{ ...styles.input, borderColor: fieldBorder('country') }}
+                type="text" placeholder="Morocco"
+                value={form.country}
+                onChange={(e) => set('country', capLocation(e.target.value))}
+                onBlur={() => blur('country')}
+                autoComplete="country-name"
+              />
+              <AnimatePresence>
+                {touched.country && !fieldError('country') && form.country && (
+                  <motion.span style={styles.checkIcon} initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>✓</motion.span>
+                )}
+              </AnimatePresence>
+            </div>
+            <AnimatePresence>
+              {touched.country && fieldError('country') && (
+                <motion.p style={styles.fieldError} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>{fieldError('country')}</motion.p>
               )}
             </AnimatePresence>
           </div>
