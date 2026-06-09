@@ -248,7 +248,7 @@ const container = {
 };
 const coverWrap = {
   position: 'relative', borderRadius: '16px 16px 0 0', overflow: 'hidden',
-  height: 'clamp(180px, 25vw, 300px)',
+  height: 'clamp(120px, 18vw, 200px)',
 };
 const cover = {
   width: '100%', height: '100%', backgroundSize: 'cover', backgroundPosition: 'center',
@@ -266,19 +266,19 @@ const coverBtn = {
   backdropFilter: 'blur(6px)',
 };
 const avatarWrap = {
-  position: 'absolute', bottom: '-52px', left: 'clamp(20px, 4vw, 40px)', zIndex: 3,
+  position: 'absolute', bottom: '-80px', left: 'clamp(20px, 4vw, 40px)', zIndex: 3,
 };
 const avatarInner = {
-  width: 'clamp(96px, 13vw, 128px)', height: 'clamp(96px, 13vw, 128px)',
+  width: 'clamp(110px, 15vw, 140px)', height: 'clamp(110px, 15vw, 140px)',
   borderRadius: '50%', border: '4px solid #a37a39', overflow: 'hidden',
   cursor: 'pointer', position: 'relative', background: '#111',
-  boxShadow: '0 0 0 2px rgba(163,122,57,0.3), 0 8px 32px rgba(0,0,0,0.5)',
+  boxShadow: '0 0 0 3px rgba(163,122,57,0.25), 0 12px 40px rgba(0,0,0,0.6)',
 };
 const avatarImg = { width: '100%', height: '100%', objectFit: 'cover' };
 const avatarPlaceholder = {
   width: '100%', height: '100%', display: 'flex', alignItems: 'center',
   justifyContent: 'center', background: 'linear-gradient(135deg, #a37a39, #c8952e)',
-  color: '#000', fontSize: 'clamp(38px, 5vw, 52px)', fontWeight: 'bold',
+  color: '#000', fontSize: 'clamp(44px, 6vw, 58px)', fontWeight: 'bold',
 };
 const avatarBadge = {
   position: 'absolute', bottom: '4px', right: '4px',
@@ -291,7 +291,7 @@ const infoCard = {
   background: 'linear-gradient(145deg, #0d0d0d, #161616)',
   border: '1px solid #2a2a2a', borderTop: 'none',
   borderRadius: '0 0 12px 12px',
-  padding: 'clamp(60px, 8vw, 72px) clamp(20px, 3vw, 40px) clamp(18px, 2.5vw, 28px)',
+  padding: 'clamp(90px, 12vw, 110px) clamp(20px, 3vw, 40px) clamp(18px, 2.5vw, 28px)',
   marginBottom: 'clamp(16px, 2vw, 24px)',
 };
 const infoName = { color: '#d4af37', fontSize: 'clamp(24px, 3vw, 30px)', fontWeight: '700', margin: '0 0 4px' };
