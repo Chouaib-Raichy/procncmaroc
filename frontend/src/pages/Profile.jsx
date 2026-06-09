@@ -112,6 +112,41 @@ export default function Profile() {
           </div>
         </motion.div>
 
+        {/* Bio & Business Images */}
+        {user.business_bio && (
+          <motion.div style={imagesCard} {...fadeUp} transition={{ duration: 0.4, delay: 0.15 }}>
+            <div style={imagesHeader}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a37a39" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" />
+              </svg>
+              <span style={imagesTitle}>Bio</span>
+            </div>
+            <p style={{ color: '#aaa', fontSize: '14px', lineHeight: 1.7, margin: 0 }}>{user.business_bio}</p>
+          </motion.div>
+        )}
+
+        {user.business_images_url?.length > 0 && (
+          <motion.div style={imagesCard} {...fadeUp} transition={{ duration: 0.4, delay: 0.15 }}>
+            <div style={imagesHeader}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a37a39" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
+              </svg>
+              <span style={imagesTitle}>Business Gallery ({user.business_images_url.length})</span>
+            </div>
+            <div style={imagesGrid}>
+              {user.business_images_url.map((url, i) => (
+                <motion.div
+                  key={i} style={imagesItem}
+                  whileHover={{ scale: 1.03 }}
+                  onClick={() => window.open(url, '_blank')}
+                >
+                  <img src={url} alt={`Business image ${i + 1}`} style={imagesImg} />
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
         {/* Tabs */}
         <motion.div style={tabBar} {...fadeUp} transition={{ duration: 0.4, delay: 0.2 }}>
           {['info', 'security'].map((t) => (
@@ -312,4 +347,23 @@ const spinner = {
   borderTopColor: '#fff', borderRadius: '50%',
   animation: 'spin 0.6s linear infinite',
   display: 'inline-block',
+};
+const imagesCard = {
+  background: '#0a0a0a', border: '1px solid #2a2a2a',
+  borderRadius: '12px', padding: 'clamp(16px, 2vw, 24px)',
+  marginBottom: 'clamp(16px, 2vw, 24px)',
+};
+const imagesHeader = { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' };
+const imagesTitle = { color: '#a37a39', fontSize: '15px', fontWeight: '700' };
+const imagesGrid = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+  gap: '10px',
+};
+const imagesItem = {
+  borderRadius: '8px', overflow: 'hidden', cursor: 'pointer',
+  border: '1px solid #2a2a2a', background: '#111',
+};
+const imagesImg = {
+  width: '100%', height: '140px', objectFit: 'cover', display: 'block',
 };
