@@ -13,9 +13,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
-#[Fillable(['name', 'email', 'phone', 'business_location', 'city', 'country', 'latitude', 'longitude', 'password', 'role', 'avatar', 'is_approved', 'business_images', 'business_bio'])]
+#[Fillable(['name', 'email', 'phone', 'business_location', 'city', 'country', 'latitude', 'longitude', 'password', 'role', 'avatar', 'profile_bg', 'is_approved', 'business_images', 'business_bio'])]
 #[Hidden(['password', 'remember_token'])]
-#[Appends(['avatar_url', 'business_images_url'])]
+#[Appends(['avatar_url', 'profile_bg_url', 'business_images_url'])]
 class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<UserFactory> */
@@ -63,6 +63,11 @@ class User extends Authenticatable implements JWTSubject
     public function getAvatarUrlAttribute(): ?string
     {
         return $this->avatar ? url('storage/' . $this->avatar) : null;
+    }
+
+    public function getProfileBgUrlAttribute(): ?string
+    {
+        return $this->profile_bg ? url('storage/' . $this->profile_bg) : null;
     }
 
     public function getBusinessImagesUrlAttribute(): ?array

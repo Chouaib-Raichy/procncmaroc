@@ -33,7 +33,8 @@ export default function PublicProfile() {
   return (
     <div style={styles.wrapper}>
       <div style={styles.card}>
-        <div style={styles.bg} />
+        <div style={{ ...styles.bg, backgroundImage: `url(${u.profile_bg_url || machineBg})` }} />
+        <div style={styles.bgOverlay} />
         <div style={styles.content}>
           <div style={styles.avatarWrap}>
             {u.avatar_url ? (
@@ -43,6 +44,7 @@ export default function PublicProfile() {
             )}
           </div>
           <h1 style={styles.name}>{u.name}</h1>
+          <p style={styles.role}>{u.role === 'admin' ? 'Administrator' : 'Member'}</p>
           {u.email && <p style={styles.info}>&#9993; {u.email}</p>}
           {u.phone && <p style={styles.info}>&#9742; {u.phone}</p>}
           {u.business_location && <p style={styles.info}>&#9906; {u.business_location}</p>}
@@ -81,24 +83,30 @@ const styles = {
     boxShadow: '0 0 40px #a37a3922, 0 0 80px #a37a3911',
   },
   bg: {
-    height: '140px',
-    background: `url(${machineBg}) center/cover no-repeat`,
-    borderBottom: '1px solid #a37a39',
+    height: 'clamp(140px, 20vw, 200px)',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    position: 'relative',
+  },
+  bgOverlay: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0,
+    height: 'clamp(140px, 20vw, 200px)',
+    background: 'linear-gradient(to bottom, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0.8) 100%)',
   },
   content: {
-    padding: 'clamp(20px, 3vw, 32px)',
+    padding: '0 clamp(20px, 3vw, 32px) clamp(28px, 4vw, 40px)',
     textAlign: 'center',
     position: 'relative',
+    zIndex: 1,
     marginTop: '-50px',
   },
   avatarWrap: {
-    width: '100px', height: '100px',
+    width: '100px', height: '100px', margin: '0 auto 16px',
     borderRadius: '50%',
     border: '3px solid #a37a39',
     overflow: 'hidden',
-    margin: '0 auto 16px',
     background: '#111',
-    boxShadow: '0 0 20px #a37a3944',
   },
   avatar: {
     width: '100%', height: '100%', objectFit: 'cover',
@@ -106,23 +114,27 @@ const styles = {
   avatarPlaceholder: {
     width: '100%', height: '100%',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    color: '#a37a39', fontSize: '36px', fontWeight: 700, background: '#1a1a1a',
+    background: 'linear-gradient(135deg, #a37a39, #c8952e)',
+    color: '#000',
+    fontSize: '40px', fontWeight: 'bold',
   },
   name: {
     color: '#d4af37', fontSize: 'clamp(22px, 3vw, 28px)',
-    fontWeight: 700, margin: '0 0 12px',
+    fontWeight: '700', margin: '0 0 4px',
+  },
+  role: {
+    color: '#666', fontSize: '13px', margin: '0 0 16px',
+    textTransform: 'uppercase', letterSpacing: '1px',
   },
   info: {
-    color: '#aaa', fontSize: 'clamp(13px, 1.2vw, 15px)',
-    margin: '6px 0', lineHeight: 1.5,
+    color: '#ccc', fontSize: '14px', margin: '8px 0',
   },
   galleryLink: {
-    display: 'inline-block', marginTop: '20px',
+    display: 'inline-block', marginTop: '16px',
     padding: '10px 24px',
     background: 'linear-gradient(135deg, #a37a39, #c8952e)',
-    color: '#000', fontWeight: 700,
-    borderRadius: '8px', textDecoration: 'none',
-    fontSize: 'clamp(13px, 1.1vw, 15px)',
-    transition: 'filter 0.2s',
+    color: '#fff', textDecoration: 'none',
+    borderRadius: '8px', fontWeight: '700',
+    fontSize: '14px',
   },
 };

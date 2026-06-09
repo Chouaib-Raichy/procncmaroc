@@ -30,6 +30,7 @@ class ProfileController extends Controller
             'password' => 'sometimes|nullable|string|min:8|confirmed',
             'password_confirmation' => 'sometimes|nullable|string',
             'avatar' => 'sometimes|file|mimes:jpeg,png,jpg,gif,webp|max:51200',
+            'profile_bg' => 'sometimes|file|mimes:jpeg,png,jpg,gif,webp|max:51200',
         ]);
 
         if ($request->filled('name')) $user->name = $request->name;
@@ -48,6 +49,11 @@ class ProfileController extends Controller
         if ($request->hasFile('avatar')) {
             if ($user->avatar) Storage::disk('public')->delete($user->avatar);
             $user->avatar = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        if ($request->hasFile('profile_bg')) {
+            if ($user->profile_bg) Storage::disk('public')->delete($user->profile_bg);
+            $user->profile_bg = $request->file('profile_bg')->store('profile-bgs', 'public');
         }
 
         $user->save();
