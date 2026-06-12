@@ -24,6 +24,7 @@ import Profile from './pages/Profile';
 import PublicProfile from './pages/PublicProfile';
 import CompleteRegistration from './pages/CompleteRegistration';
 import PendingApproval from './pages/PendingApproval';
+import TermsOfUse from './pages/TermsOfUse';
 import NotFound from './pages/NotFound';
 import { trackVisit } from './api/visitors';
 import './App.css';
@@ -70,12 +71,12 @@ function AppContent() {
       <main className="main-content">
         <Routes>
           <Route path="/" element={<PublicPage><Home /></PublicPage>} />
-          <Route path="/partner-map" element={<ProtectedRoute approved><ErrorBoundary><PartnerMap /></ErrorBoundary></ProtectedRoute>} />
+          <Route path="/partner-map" element={<PublicPage><ErrorBoundary><PartnerMap /></ErrorBoundary></PublicPage>} />
           <Route path="/our-machines" element={<PublicPage><ErrorBoundary><OurMachines /></ErrorBoundary></PublicPage>} />
           <Route path="/products" element={<PublicPage><ErrorBoundary><Products /></ErrorBoundary></PublicPage>} />
           <Route path="/about-us" element={<PublicPage><ErrorBoundary><AboutUs /></ErrorBoundary></PublicPage>} />
           <Route path="/contact-us" element={<PublicPage><ErrorBoundary><ContactUs /></ErrorBoundary></PublicPage>} />
-          <Route path="/customer-gallery" element={<ProtectedRoute approved><ErrorBoundary><CustomerGallery /></ErrorBoundary></ProtectedRoute>} />
+          <Route path="/customer-gallery" element={<PublicPage><ErrorBoundary><CustomerGallery /></ErrorBoundary></PublicPage>} />
           <Route path="/machines/:id" element={<PublicPage><ErrorBoundary><MachineDetail /></ErrorBoundary></PublicPage>} />
           <Route path="/profile/:id" element={<PublicPage><ErrorBoundary><PublicProfile /></ErrorBoundary></PublicPage>} />
           <Route path="/login" element={<Login />} />
@@ -84,6 +85,7 @@ function AppContent() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/complete-registration" element={<CompleteRegistration />} />
           <Route path="/pending-approval" element={<PendingApproval />} />
+          <Route path="/terms" element={<TermsOfUse />} />
           <Route path="/profile" element={<ProtectedRoute approved><ErrorBoundary><Profile /></ErrorBoundary></ProtectedRoute>} />
           <Route path="/my-gallery" element={<ProtectedRoute approved><ErrorBoundary><MyGallery /></ErrorBoundary></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute approved><ErrorBoundary><Dashboard /></ErrorBoundary></ProtectedRoute>} />

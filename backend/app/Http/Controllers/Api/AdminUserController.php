@@ -54,15 +54,15 @@ class AdminUserController extends Controller
         ]);
     }
 
-    public function pending()
+    public function pending(Request $request)
     {
         $users = User::where('is_approved', false)
             ->where('role', 'user')
             ->whereNotNull('business_bio')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
 
-        return UserDTO::collection($users);
+        return UserDTO::paginated($users);
     }
 
     public function approve($id)

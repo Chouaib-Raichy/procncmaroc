@@ -89,15 +89,9 @@ export default function ResetPassword() {
           <div style={{ marginBottom: '18px' }}>
             <label style={styles.label}>Email</label>
             <input
-              style={{
-                ...styles.input,
-                borderColor: touched.email && errors.email ? '#ff6b6b' : touched.email && !errors.email ? '#4caf50' : '#555',
-              }}
-              type="email" value={form.email}
-              onChange={(e) => handleChange('email', e.target.value)}
-              onBlur={() => handleBlur('email')} required
+              style={{ ...styles.input, ...styles.inputReadonly }}
+              type="email" value={form.email} readOnly
             />
-            {touched.email && errors.email && <p style={styles.fieldError}>{errors.email}</p>}
           </div>
 
           <div style={{ marginBottom: '12px' }}>
@@ -179,6 +173,9 @@ const styles = {
     background: '#222', color: '#fff',
     fontSize: 'clamp(14px, 1.5vw, 16px)',
     boxSizing: 'border-box', outline: 'none',
+  },
+  inputReadonly: {
+    opacity: 0.6, cursor: 'not-allowed', borderColor: '#333',
   },
   btn: {
     width: '100%', background: '#a37a39', color: '#fff',

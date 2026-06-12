@@ -69,7 +69,7 @@ export default function Navbar() {
       </button>
       <div className={`nav-links${menuOpen ? ' open' : ''}`} style={styles.links}>
         <Link to="/" style={{...styles.link, ...active('/')}} onClick={closeAll}>Home</Link>
-        {user && <Link to="/partner-map" style={{...styles.link, ...active('/partner-map')}} onClick={closeAll}>Partner Map</Link>}
+        <Link to="/partner-map" style={{...styles.link, ...active('/partner-map')}} onClick={closeAll}>Partner Map</Link>
 
         <div ref={ddRef} style={{ position: 'relative' }}
           onMouseEnter={() => { if (!isMobile()) setDropdownOpen(true); }}
@@ -126,7 +126,7 @@ export default function Navbar() {
         </div>
 
         <Link to="/products" style={{...styles.link, ...active('/products')}} onClick={closeAll}>Products</Link>
-        {user && <Link to="/customer-gallery" style={{...styles.link, ...active('/customer-gallery')}} onClick={closeAll}>Customer Gallery</Link>}
+        <Link to="/customer-gallery" style={{...styles.link, ...active('/customer-gallery')}} onClick={closeAll}>Customer Gallery</Link>
         <Link to="/about-us" style={{...styles.link, ...active('/about-us')}} onClick={closeAll}>About Us</Link>
         <Link to="/contact-us" style={{...styles.link, ...active('/contact-us')}} onClick={closeAll}>Contact Us</Link>
         {user ? (

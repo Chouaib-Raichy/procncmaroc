@@ -19,6 +19,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'entreprise_name' => 'nullable|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'phone' => 'required|string|max:20|unique:users',
             'business_location' => 'required|string|max:255',
@@ -27,10 +28,11 @@ class AuthController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/[A-Z]/', 'regex:/[a-z]/', 'regex:/[0-9]/', 'regex:/[^A-Za-z0-9]/'],
         ]);
 
-        $coords = self::geocode($request->business_location);
+        $coords = self::geocode($request->business_location, $request->city, $request->country);
 
         $user = User::create([
             'name' => $request->name,
+            'entreprise_name' => $request->entreprise_name,
             'email' => $request->email,
             'phone' => $request->phone,
             'business_location' => $request->business_location,
@@ -135,13 +137,50 @@ class AuthController extends Controller
         return response()->json(['message' => __($status)], 400);
     }
 
-    public static function geocode(string $location): array
+    public static function geocode(string $location, ?string $city = null, ?string $country = null): array
+    {
+        $coords = self::parseGoogleMapsUrl($location);
+        if ($coords !== null) return $coords;
+
+        $queries = array_filter([$location, trim("$city $country"), $country]);
+        foreach ($queries as $q) {
+            $result = self::nominatimGeocode($q);
+            if ($result !== null) return $result;
+        }
+
+        return ['lat' => null, 'lng' => null];
+    }
+
+    private static function parseGoogleMapsUrl(string $url): ?array
+    {
+        if (!str_contains($url, 'google')) return null;
+
+        if (preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', $url, $m)) {
+            return ['lat' => (float) $m[1], 'lng' => (float) $m[2]];
+        }
+
+        if (preg_match('/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/', $url, $m)) {
+            return ['lat' => (float) $m[1], 'lng' => (float) $m[2]];
+        }
+
+        if (preg_match('/[?&]ll=(-?\d+\.\d+),(-?\d+\.\d+)/', $url, $m)) {
+            return ['lat' => (float) $m[1], 'lng' => (float) $m[2]];
+        }
+
+        if (preg_match('#/place/[^@]+@(-?\d+\.\d+),(-?\d+\.\d+)#', $url, $m)) {
+            return ['lat' => (float) $m[1], 'lng' => (float) $m[2]];
+        }
+
+        return null;
+    }
+
+    private static function nominatimGeocode(string $query): ?array
     {
         try {
             $response = Http::withoutVerifying()
                 ->withHeaders(['User-Agent' => 'PROCNCMAROC/1.0 (procncmaroc.com)'])
                 ->timeout(5)->get('https://nominatim.openstreetmap.org/search', [
-                'q' => $location,
+                'q' => $query,
                 'format' => 'json',
                 'limit' => 1,
             ]);
@@ -153,7 +192,6 @@ class AuthController extends Controller
                 ];
             }
         } catch (\Exception) {}
-
-        return ['lat' => null, 'lng' => null];
+        return null;
     }
 }

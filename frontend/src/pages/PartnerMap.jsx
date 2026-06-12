@@ -11,35 +11,30 @@ const GOLD = '#a37a39';
 
 function makeIcon(avatarUrl, name, active) {
   const initial = name ? name.charAt(0).toUpperCase() : '?';
-  const avatarHtml = avatarUrl
-    ? `<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;display:block" />`
-    : `<div style="width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;background:linear-gradient(135deg,#c0392b,#8e1f1a)">${initial}</div>`;
-
   const sz = active ? 46 : 40;
   const circR = active ? 17 : 14;
   const circCx = active ? 23 : 20;
   const circCy = active ? 20 : 17;
-  const avatarSz = active ? 30 : 24;
-  const avatarTop = active ? 5 : 5;
 
-  const pinSvg = `<svg width="${sz}" height="${sz + 14}" viewBox="0 0 ${sz} ${sz + 14}" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 ${active ? 3 : 2}px ${active ? 8 : 5}px rgba(180,40,40,${active ? 0.7 : 0.5}))">
+  const pinSvg = `<svg width="${sz}" height="${sz + 14}" viewBox="0 0 ${sz} ${sz + 14}" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="filter:drop-shadow(0 ${active ? 3 : 2}px ${active ? 8 : 5}px rgba(180,40,40,${active ? 0.7 : 0.5}))">
     <defs>
       <radialGradient id="g${active ? 'a' : 'b'}" cx="35%" cy="25%" r="70%">
         <stop offset="0%" stop-color="${active ? '#ff6b6b' : '#ff5555'}"/>
         <stop offset="45%" stop-color="${active ? '#e74c3c' : '#c0392b'}"/>
         <stop offset="100%" stop-color="${active ? '#a93226' : '#922b21'}"/>
       </radialGradient>
+      <clipPath id="c${active ? 'a' : 'b'}">
+        <circle cx="${circCx}" cy="${circCy}" r="${circR - 1.5}"/>
+      </clipPath>
     </defs>
     <path d="M${circCx} ${sz + 13}C${circCx} ${sz + 13} ${3} ${circCy + 16} ${3} ${circCy}C${3} ${circCy - circR + 2} ${circCx - circR} ${2} ${circCx} ${2}C${circCx + circR} ${2} ${sz - 3} ${circCy - circR + 2} ${sz - 3} ${circCy}C${sz - 3} ${circCy + 16} ${circCx} ${sz + 13} ${circCx} ${sz + 13}Z" fill="url(#g${active ? 'a' : 'b'})" stroke="${active ? '#fff' : 'rgba(255,255,255,0.5)'}" stroke-width="${active ? 2 : 1.5}"/>
-    <circle cx="${circCx}" cy="${circCy}" r="${circR}" fill="#1a1a1a" stroke="${active ? '#fff' : 'rgba(255,255,255,0.5)'}" stroke-width="${active ? 2 : 1.5}"/>
+    <circle cx="${circCx}" cy="${circCy}" r="${circR}" fill="${avatarUrl ? '#1a1a1a' : 'none'}" stroke="${active ? '#fff' : 'rgba(255,255,255,0.5)'}" stroke-width="${active ? 2 : 1.5}"/>
+    ${avatarUrl ? `<image href="${avatarUrl}" x="${circCx - circR + 1.5}" y="${circCy - circR + 1.5}" width="${(circR - 1.5) * 2}" height="${(circR - 1.5) * 2}" clip-path="url(#c${active ? 'a' : 'b'})" preserveAspectRatio="xMidYMid slice"/>` : `<text x="${circCx}" y="${circCy + 5}" text-anchor="middle" fill="#fff" font-size="${circR}" font-weight="700" font-family="Georgia,serif">${initial}</text>`}
   </svg>`;
 
   return L.divIcon({
     className: '',
-    html: `<div style="position:relative;display:flex;align-items:center;justify-content:center;width:${sz}px;height:${sz + 14}px">
-      ${pinSvg}
-      <div style="position:absolute;top:${avatarTop}px;left:50%;transform:translateX(-50%);border-radius:50%;overflow:hidden;width:${avatarSz}px;height:${avatarSz}px;border:2px solid rgba(255,255,255,0.9);box-shadow:0 0 6px rgba(0,0,0,0.5)">${avatarHtml}</div>
-    </div>`,
+    html: `<div style="display:flex;align-items:center;justify-content:center;width:${sz}px;height:${sz + 14}px">${pinSvg}</div>`,
     iconSize: [sz, sz + 14],
     iconAnchor: [sz / 2, sz + 14],
   });
@@ -59,7 +54,6 @@ function popupHtml(p, navigate) {
         }
       </div>
       <div style="color:#d4af37;font-size:14px;font-weight:700;margin-bottom:2px">${p.name}</div>
-      ${p.business_location ? `<div style="color:#aaa;font-size:11px">&#9906; ${p.business_location}</div>` : ''}
       <div style="color:#666;font-size:10px;margin-top:6px;font-style:italic">Click to view profile</div>
     </div>
   </div>`;
@@ -79,13 +73,24 @@ export default function PartnerMap() {
     return () => { delete window.__partnerNav; };
   }, [navigate]);
 
-  const fetch = () => {
+  const loadPartners = () => {
     setLoading(true);
     setError(null);
     getPartners().then((res) => setPartners(res.data)).catch(() => setError('Failed to load partners. Please try again.')).finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetch(); }, []);
+  useEffect(() => { loadPartners(); }, []);
+
+  const extractCoords = (p) => {
+    if (p.latitude && p.longitude) return [p.latitude, p.longitude];
+
+    const url = p.business_location || '';
+    if (url.includes('google')) {
+      const m = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) || url.match(/[?&](?:q|ll)=(-?\d+\.\d+),(-?\d+\.\d+)/);
+      if (m) return [parseFloat(m[1]), parseFloat(m[2])];
+    }
+    return null;
+  };
 
   useEffect(() => {
     if (loading || partners.length === 0) return;
@@ -105,6 +110,11 @@ export default function PartnerMap() {
         attribution: 'Esri',
       }).addTo(mapInstance.current);
 
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19,
+        attribution: 'Esri',
+      }).addTo(mapInstance.current);
+
       mapInstance.current.zoomControl.setPosition('topright');
     }
 
@@ -114,8 +124,10 @@ export default function PartnerMap() {
     markersRef.current = [];
 
     partners.forEach((p) => {
-      const lat = p.latitude || (30 + (p.id * 7.3) % 30 - 15);
-      const lng = p.longitude || ((p.id * 13.7) % 360 - 180);
+      const coords = extractCoords(p);
+      if (!coords) return;
+
+      const [lat, lng] = coords;
 
       const marker = L.marker([lat, lng], {
         icon: makeIcon(p.avatar_url, p.name, false),
@@ -167,7 +179,7 @@ export default function PartnerMap() {
             <div style={styles.loaderWrap}>
               <div style={{ textAlign: 'center' }}>
                 <p style={{ color: '#ff6b6b', marginBottom: '12px' }}>{error}</p>
-                <button onClick={fetch} style={styles.retryBtn}>Try Again</button>
+                <button onClick={loadPartners} style={styles.retryBtn}>Try Again</button>
               </div>
             </div>
           )}

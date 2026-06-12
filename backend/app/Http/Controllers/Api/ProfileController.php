@@ -38,7 +38,7 @@ class ProfileController extends Controller
         if ($request->filled('phone')) $user->phone = $request->phone;
         if ($request->filled('business_location')) {
             $user->business_location = $request->business_location;
-            $coords = AuthController::geocode($request->business_location);
+            $coords = AuthController::geocode($request->business_location, $request->city, $request->country);
             $user->latitude = $coords['lat'];
             $user->longitude = $coords['lng'];
         }

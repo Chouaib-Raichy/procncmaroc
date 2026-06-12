@@ -5,12 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/generate-cities.mjs && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate-cities": "node scripts/generate-cities.mjs"
   },
   "dependencies": {
     "axios": "^1.16.1",
+    "cities.json": "^1.1.59",
     "framer-motion": "^12.40.0",
     "leaflet": "^1.9.4",
     "react": "^19.2.6",

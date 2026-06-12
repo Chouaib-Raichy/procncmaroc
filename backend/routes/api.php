@@ -59,6 +59,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/admin/messages', [ContactController::class, 'index']);
 
         Route::get('/admin/visitors', [StatsController::class, 'getVisitors']);
+        Route::get('/admin/stats/summary', [StatsController::class, 'summary']);
 
         Route::get('/admin/gallery', [GalleryPostController::class, 'adminIndex']);
         Route::get('/admin/gallery/trashed', [GalleryPostController::class, 'adminTrashed']);

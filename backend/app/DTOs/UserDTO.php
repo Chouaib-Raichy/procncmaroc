@@ -10,6 +10,7 @@ class UserDTO extends DTO
     public function __construct(
         public readonly int $id,
         public readonly string $name,
+        public readonly ?string $entreprise_name,
         public readonly ?string $email,
         public readonly ?string $phone,
         public readonly ?string $business_location,
@@ -36,6 +37,7 @@ class UserDTO extends DTO
         return new self(
             id: $user->id,
             name: $user->name,
+            entreprise_name: $user->entreprise_name,
             email: $user->email,
             phone: $user->phone,
             business_location: $user->business_location,
@@ -61,6 +63,7 @@ class UserDTO extends DTO
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'entreprise_name' => $this->entreprise_name,
             'email' => $this->email,
             'phone' => $this->phone,
             'business_location' => $this->business_location,

@@ -4,7 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\PageView;
+use App\Models\User;
+use App\Models\Machine;
+use App\Models\Contact;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StatsController extends Controller
 {
@@ -38,6 +42,35 @@ class StatsController extends Controller
         $visitors = PageView::orderBy('visited_at', 'desc')->paginate($perPage);
 
         return response()->json($visitors);
+    }
+
+    public function summary()
+    {
+        $totalUsers = User::count();
+        $pendingUsers = User::where('is_approved', false)->where('role', 'user')->whereNotNull('business_bio')->count();
+        $totalMachines = Machine::count();
+        $totalMessages = Contact::count();
+        $totalVisits = PageView::count();
+        $visitsToday = PageView::whereDate('visited_at', today())->count();
+        $uniqueVisitors = PageView::distinct('ip_address')->count('ip_address');
+
+        $visitsPerDay = PageView::select(DB::raw('DATE(visited_at) as date'), DB::raw('count(*) as count'))
+            ->where('visited_at', '>=', now()->subDays(7))
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->map(fn($r) => ['date' => $r->date, 'count' => $r->count]);
+
+        return response()->json([
+            'total_users' => $totalUsers,
+            'pending_users' => $pendingUsers,
+            'total_machines' => $totalMachines,
+            'total_messages' => $totalMessages,
+            'total_visits' => $totalVisits,
+            'visits_today' => $visitsToday,
+            'unique_visitors' => $uniqueVisitors,
+            'visits_per_day' => $visitsPerDay,
+        ]);
     }
 
     private function geolocate($ip)

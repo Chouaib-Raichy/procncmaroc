@@ -13,7 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
-#[Fillable(['name', 'email', 'phone', 'business_location', 'city', 'country', 'latitude', 'longitude', 'password', 'role', 'avatar', 'profile_bg', 'is_approved', 'business_images', 'business_bio'])]
+#[Fillable(['name', 'entreprise_name', 'email', 'phone', 'business_location', 'city', 'country', 'latitude', 'longitude', 'password', 'role', 'avatar', 'profile_bg', 'is_approved', 'business_images', 'business_bio'])]
 #[Hidden(['password', 'remember_token'])]
 #[Appends(['avatar_url', 'profile_bg_url', 'business_images_url'])]
 class User extends Authenticatable implements JWTSubject

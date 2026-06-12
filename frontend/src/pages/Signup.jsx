@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -7,13 +7,15 @@ import machineBg from '../assets/machineBG.jpeg';
 
 const validators = {
   name: (v) => !v.trim() ? 'Full name is required' : v.trim().length < 2 ? 'Name must be at least 2 characters' : '',
+  entreprise_name: (v) => '',
   email: (v) => !v.trim() ? 'Email address is required' : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? 'Please enter a valid email address' : '',
   phone: (v) => !v.trim() ? 'Phone number is required' : '',
   business_location: (v) => !v.trim() ? 'Business location is required' : '',
-  city: (v) => !v.trim() ? 'City is required' : v.trim().length < 2 ? 'City must be at least 2 characters' : '',
-  country: (v) => !v.trim() ? 'Country is required' : v.trim().length < 2 ? 'Country must be at least 2 characters' : '',
+  city: (v) => !v ? 'City is required' : '',
+  country: (v) => !v ? 'Country is required' : '',
   password: (v) => !v ? 'Password is required' : v.length < 8 || !/[A-Z]/.test(v) || !/[a-z]/.test(v) || !/[0-9]/.test(v) || !/[^A-Za-z0-9]/.test(v) ? 'Must meet all requirements below' : '',
   password_confirmation: (v, form) => !v ? 'Please confirm your password' : v !== form.password ? 'Passwords do not match' : '',
+  terms: (v) => !v ? 'You must accept the Terms of Use' : '',
 };
 
 const requirements = [
@@ -25,7 +27,7 @@ const requirements = [
 ];
 
 export default function Signup() {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', business_location: '', city: '', country: '', password: '', password_confirmation: '' });
+  const [form, setForm] = useState({ name: '', entreprise_name: '', email: '', phone: '', business_location: '', city: '', country: '', password: '', password_confirmation: '', terms: false });
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [serverErrors, setServerErrors] = useState({});
@@ -33,25 +35,41 @@ export default function Signup() {
   const [sending, setSending] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [countryList, setCountryList] = useState([]);
+  const [countryIndex, setCountryIndex] = useState(null);
+  const [cityList, setCityList] = useState([]);
+  const [loadingCities, setLoadingCities] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
   const nameRef = useRef(null);
 
   useEffect(() => { nameRef.current?.focus(); }, []);
 
+  useEffect(() => {
+    fetch('/data/cities/_index.json')
+      .then((r) => r.json())
+      .then((idx) => {
+        setCountryIndex(idx);
+        setCountryList(Object.keys(idx).sort((a, b) => a.localeCompare(b)));
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!form.country || !countryIndex) { setCityList([]); return; }
+    setLoadingCities(true);
+    const iso = countryIndex[form.country];
+    if (!iso) { setLoadingCities(false); setCityList([]); return; }
+    fetch(`/data/cities/${iso}.json`)
+      .then((r) => r.json())
+      .then((cities) => { setCityList(cities); setLoadingCities(false); })
+      .catch(() => { setCityList([]); setLoadingCities(false); });
+  }, [form.country, countryIndex]);
+
   const capLocation = (str) => str.replace(/\b\w/g, (c) => c.toUpperCase());
 
   const set = (field, value) => {
-    const next = { ...form, [field]: value };
-    setForm(next);
-    if (touched[field]) {
-      const err = validators[field](value, next);
-      setErrors((prev) => ({ ...prev, [field]: err }));
-    }
-    if (field === 'password' && touched.password_confirmation) {
-      const cfErr = validators.password_confirmation(next.password_confirmation, next);
-      setErrors((prev) => ({ ...prev, password_confirmation: cfErr }));
-    }
+    setForm((prev) => ({ ...prev, [field]: value }));
   };
 
   const blur = (field) => {
@@ -77,7 +95,7 @@ export default function Signup() {
     if (!validate()) return;
     setSending(true);
     try {
-      await register(form.name, form.email, form.phone, form.business_location, form.city, form.country, form.password, form.password_confirmation, true);
+      await register(form.name, form.entreprise_name, form.email, form.phone, form.business_location, form.city, form.country, form.password, form.password_confirmation, true);
       navigate('/complete-registration');
     } catch (err) {
       const data = err.response?.data;
@@ -94,7 +112,7 @@ export default function Signup() {
 
   const allValid = useMemo(() => {
     return Object.keys(validators).every((field) => {
-      return form[field] && !validators[field](form[field], form);
+      return validators[field](form[field], form) === '';
     });
   }, [form]);
 
@@ -152,6 +170,30 @@ export default function Signup() {
             <AnimatePresence>
               {touched.name && fieldError('name') && (
                 <motion.p style={styles.fieldError} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>{fieldError('name')}</motion.p>
+              )}
+            </AnimatePresence>
+          </div>
+
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>Entreprise Name</label>
+            <div style={styles.inputWrap}>
+              <input
+                style={{ ...styles.input, borderColor: fieldBorder('entreprise_name') }}
+                type="text" placeholder="Your company name"
+                value={form.entreprise_name}
+                onChange={(e) => set('entreprise_name', e.target.value)}
+                onBlur={() => blur('entreprise_name')}
+                autoComplete="organization"
+              />
+              <AnimatePresence>
+                {touched.entreprise_name && !fieldError('entreprise_name') && form.entreprise_name && (
+                  <motion.span style={styles.checkIcon} initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>✓</motion.span>
+                )}
+              </AnimatePresence>
+            </div>
+            <AnimatePresence>
+              {touched.entreprise_name && fieldError('entreprise_name') && (
+                <motion.p style={styles.fieldError} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>{fieldError('entreprise_name')}</motion.p>
               )}
             </AnimatePresence>
           </div>
@@ -220,49 +262,60 @@ export default function Signup() {
           </div>
 
           <div style={styles.fieldGroup}>
-            <label style={styles.label}>City</label>
+            <label style={styles.label}>Country</label>
             <div style={styles.inputWrap}>
-              <input
-                style={{ ...styles.input, borderColor: fieldBorder('city') }}
-                type="text" placeholder="Casablanca"
-                value={form.city}
-                onChange={(e) => set('city', capLocation(e.target.value))}
-                onBlur={() => blur('city')}
-                autoComplete="address-level2"
-              />
+              <select
+                style={{ ...styles.input, borderColor: fieldBorder('country'), appearance: 'none', cursor: 'pointer' }}
+                value={form.country}
+                onChange={(e) => { set('country', e.target.value); set('city', ''); }}
+                onBlur={() => blur('country')}
+              >
+                <option value="">{countryList.length ? 'Select your country' : 'Loading...'}</option>
+                {countryList.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
               <AnimatePresence>
-                {touched.city && !fieldError('city') && form.city && (
-                  <motion.span style={styles.checkIcon} initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>✓</motion.span>
+                {touched.country && !fieldError('country') && form.country && (
+                  <motion.span style={{ ...styles.checkIcon, right: '32px' }} initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>✓</motion.span>
                 )}
               </AnimatePresence>
+              <span style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', color: '#888', pointerEvents: 'none', fontSize: '12px' }}>▼</span>
             </div>
             <AnimatePresence>
-              {touched.city && fieldError('city') && (
-                <motion.p style={styles.fieldError} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>{fieldError('city')}</motion.p>
+              {touched.country && fieldError('country') && (
+                <motion.p style={styles.fieldError} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>{fieldError('country')}</motion.p>
               )}
             </AnimatePresence>
           </div>
 
           <div style={styles.fieldGroup}>
-            <label style={styles.label}>Country</label>
+            <label style={styles.label}>City</label>
             <div style={styles.inputWrap}>
-              <input
-                style={{ ...styles.input, borderColor: fieldBorder('country') }}
-                type="text" placeholder="Morocco"
-                value={form.country}
-                onChange={(e) => set('country', capLocation(e.target.value))}
-                onBlur={() => blur('country')}
-                autoComplete="country-name"
-              />
+              <select
+                style={{ ...styles.input, borderColor: fieldBorder('city'), appearance: 'none', cursor: form.country ? 'pointer' : 'not-allowed' }}
+                value={form.city}
+                onChange={(e) => set('city', e.target.value)}
+                onBlur={() => blur('city')}
+                disabled={!form.country || loadingCities}
+              >
+                <option value="">
+                  {loadingCities ? 'Loading cities...' : form.country ? `Select city (${cityList.length})` : 'Select a country first'}
+                </option>
+                {cityList.map((city) => (
+                  <option key={city} value={city}>{city}</option>
+                ))}
+              </select>
               <AnimatePresence>
-                {touched.country && !fieldError('country') && form.country && (
-                  <motion.span style={styles.checkIcon} initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>✓</motion.span>
+                {touched.city && !fieldError('city') && form.city && (
+                  <motion.span style={{ ...styles.checkIcon, right: '32px' }} initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>✓</motion.span>
                 )}
               </AnimatePresence>
+              {form.country && <span style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', color: '#888', pointerEvents: 'none', fontSize: '12px' }}>▼</span>}
             </div>
             <AnimatePresence>
-              {touched.country && fieldError('country') && (
-                <motion.p style={styles.fieldError} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>{fieldError('country')}</motion.p>
+              {touched.city && fieldError('city') && (
+                <motion.p style={styles.fieldError} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>{fieldError('city')}</motion.p>
               )}
             </AnimatePresence>
           </div>
@@ -371,6 +424,26 @@ export default function Signup() {
                 <motion.p style={styles.fieldError} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>{fieldError('password_confirmation')}</motion.p>
               )}
             </AnimatePresence>
+          </div>
+
+          <div style={styles.termsWrapper}>
+            <label style={styles.termsLabel}>
+              <input
+                type="checkbox"
+                checked={form.terms}
+                onChange={(e) => {
+                  setForm((prev) => ({ ...prev, terms: e.target.checked }));
+                  setTouched((prev) => ({ ...prev, terms: true }));
+                }}
+                style={styles.termsCheckbox}
+              />
+              <span style={styles.termsText}>
+                I accept the <Link to="/terms" target="_blank" style={styles.termsLink}>Terms of Use</Link>
+              </span>
+            </label>
+            {touched.terms && fieldError('terms') && (
+              <p style={styles.fieldError}>{fieldError('terms')}</p>
+            )}
           </div>
 
           <motion.button
@@ -538,5 +611,32 @@ const styles = {
     borderRadius: '50%',
     animation: 'spin 0.6s linear infinite',
     display: 'inline-block',
+  },
+  termsWrapper: {
+    margin: '18px 0 4px',
+    overflow: 'hidden',
+  },
+  termsLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    cursor: 'pointer',
+  },
+  termsCheckbox: {
+    width: '18px',
+    height: '18px',
+    accentColor: '#a37a39',
+    cursor: 'pointer',
+    flexShrink: 0,
+  },
+  termsText: {
+    color: '#ccc',
+    fontSize: '13px',
+    lineHeight: 1.5,
+  },
+  termsLink: {
+    color: '#d4af37',
+    textDecoration: 'underline',
+    fontWeight: 600,
   },
 };
