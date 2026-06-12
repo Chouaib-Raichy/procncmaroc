@@ -18,7 +18,7 @@
 
 **PRO CNC MAROC** is a full-stack web platform for a Moroccan CNC machine dealership. It provides a public-facing storefront to showcase CNC routers, CO2 lasers, and industrial machinery alongside a comprehensive admin dashboard for managing inventory, users, orders, and site content.
 
-The platform features a **multi-step registration flow** requiring admin approval, a **satellite partner map** with Leaflet + ESRI imagery, a **customer gallery** with threaded comments and likes, **visitor tracking** with IP geolocation, and a **DTO-based API layer** ensuring consistent responses across all endpoints.
+The platform features a **multi-step registration flow** requiring admin approval, a **satellite partner map** with Leaflet + ESRI imagery, a **customer gallery** with threaded comments and likes, **visitor tracking** with IP geolocation, a **DTO-based API layer** ensuring consistent API responses, and a **professional admin dashboard** with real-time analytics.
 
 ---
 
@@ -37,6 +37,7 @@ The platform features a **multi-step registration flow** requiring admin approva
 | **Animations** | Framer Motion 12 |
 | **HTTP Client** | Axios |
 | **Routing** | React Router DOM 7 |
+| **Email** | Gmail SMTP with custom HTML templates |
 
 ---
 
@@ -51,23 +52,28 @@ The platform features a **multi-step registration flow** requiring admin approva
 - **Customer Gallery** — User-submitted gallery posts (1-5 images), threaded comments, likes (requires login)
 - **Partner Map** — Satellite map with red teardrop pins showing registered business partners (requires login)
 - **Machine Detail** — Full specifications, features list, WhatsApp direct inquiry link
+- **Public Profile** — Two-column layout with cover photo, avatar, info icons (WhatsApp, Google Maps), gallery carousel, full-screen lightbox
+- **Terms of Use** — Professionally designed legal page with staggered fade-in sections, gold accents
 
 ### Authentication & User Management
 - **JWT-based auth** (login, register, logout)
 - **Multi-step registration**: Signup → Complete registration (bio + up to 6 images) → Pending admin approval → Full site access
-- **Password reset** with email notification (always returns 200 for security)
+- **Enterprise name** — Optional field on signup, displayed throughout profile and admin dashboard
+- **Password reset** with professional HTML email template (gold/dark themed, personalized greeting)
 - **Remember me** (localStorage vs sessionStorage)
-- **Form validation**: Live field-level validation, password strength checklist (min 8, uppercase, lowercase, number, symbol), animated error banners
+- **Form validation**: Live field-level validation, password strength checklist (min 8, uppercase, lowercase, number, symbol), animated error banners, terms of use checkbox
 - **International phone input** with flag + dial codes (default +212 Morocco)
+- **Forgot password** — Email field is read-only on reset page (pre-filled from URL)
 
 ### Dashboard (Admin)
-- **Users Manager** — List all users, view profile, ban/unban
-- **Machines Manager** — CRUD + visibility toggle + soft delete/restore
-- **Categories Manager** — CRUD + soft delete/restore
-- **Pending Registrations** — Card-based approval/rejection with lightbox image preview, skeleton loading, framer-motion
-- **Messages Manager** — View contact form submissions
-- **Visitors** — Real visitor tracking with IP, location (city/country), page visited, timestamp, device icon; paginated
-- **Gallery Manager** — Admin oversight of all gallery posts
+- **Overview** — Real-time analytics dashboard with 7 stat cards (total users, pending, machines, messages, total visits, visits today, unique visitors), SVG icons, staggered framer-motion entrance, colored gradient accents, hover lift effects, and a bar chart for visits per day with hover tooltips
+- **Users Manager** — Table with staggered row animations, admin lock icons, check/X status badges, hover row highlight, motion buttons, profile modal with avatar
+- **Machines Manager** — CRUD + visibility toggle + soft delete/restore, loading skeleton, row animations, enhanced empty state
+- **Categories Manager** — CRUD + soft delete/restore, loading skeleton, gold machine count, row animations
+- **Pending Registrations** — Card-based approval/rejection with lightbox image preview, skeleton loading, staggered card entrance, hover lift, motion pagination (10 per page)
+- **Messages Manager** — Table with staggered animations, "Read all" with modal (fade + scale), loading skeleton
+- **Visitors** — Real visitor tracking with IP, location (city/country), page visited, timestamp, SVG device icons (desktop/mobile/tablet/bot), paginated
+- **Sidebar** — Collapsible navigation with active tab highlighting
 
 ### Gallery System
 - Users create posts with 1–5 images, title, description, business location, phone
@@ -78,7 +84,8 @@ The platform features a **multi-step registration flow** requiring admin approva
 ### Visitor Tracking
 - `POST /api/track-visit` — Records page URL, IP address, user agent, referrer
 - Server-side IP geolocation via ip-api.com (city/country)
-- Paginated admin view (50 per page) with device type icons (desktop/mobile/tablet/bot)
+- Paginated admin view (50 per page) with SVG device type icons
+- Analytics endpoint: `GET /api/admin/stats/summary` — aggregate counts + visits per day
 
 ### DTO Layer
 Consistent API responses via Data Transfer Objects:
@@ -223,7 +230,9 @@ procncmaroc/
 │   │   │   │       ├── PartnerController.php   # Partner map data
 │   │   │   │       ├── ProfileController.php   # User profile + complete registration
 │   │   │   │       ├── AdminUserController.php
-│   │   │   │       └── StatsController.php     # Visitor tracking
+│   │   │   │       └── StatsController.php     # Visitor tracking + analytics summary
+│   │   ├── Notifications/
+│   │   │   └── ResetPasswordNotification.php   # Custom HTML email with gold theme
 │   │   └── Models/
 │   │       ├── User.php
 │   │       ├── Machine.php
@@ -282,8 +291,12 @@ procncmaroc/
 │   │   │   ├── MyGallery.jsx
 │   │   │   ├── Profile.jsx
 │   │   │   ├── PublicProfile.jsx
-│   │   │   ├── Dashboard.jsx                  # Admin dashboard (single page, 6 tabs)
+│   │   │   ├── TermsOfUse.jsx                # Professional terms page with framer-motion
+│   │   │   ├── Dashboard.jsx                  # Admin dashboard (single page, 7 tabs)
 │   │   │   └── NotFound.jsx
+│   │   ├── assets/
+│   │   │   ├── whatsapp_icon.svg               # WhatsApp contact icon
+│   │   │   └── google_maps_icon.svg            # Google Maps contact icon
 │   │   ├── App.jsx                            # Root with routing + auth guards
 │   │   └── App.css                            # Global styles
 │   └── index.html
@@ -353,9 +366,10 @@ procncmaroc/
 | GET    | `/api/admin/users/{id}` | User detail |
 | POST   | `/api/admin/users/{id}/toggle-ban` | Ban/unban user |
 | POST   | `/api/admin/users/{id}/restore` | Restore soft-deleted user |
-| GET    | `/api/admin/users/pending/list` | Pending approval users |
+| GET    | `/api/admin/users/pending/list` | Pending approval users (paginated, 10/page) |
 | POST   | `/api/admin/users/{id}/approve` | Approve user |
 | DELETE | `/api/admin/users/{id}/reject` | Reject + force-delete user |
+| GET    | `/api/admin/stats/summary` | Analytics overview (counts + visits per day) |
 
 ---
 
@@ -373,6 +387,14 @@ procncmaroc/
 | `CACHE_STORE` | Cache driver | `file` |
 | `MAIL_MAILER` | Mail driver | `log` (dev) |
 | `APP_URL` | Application URL | `http://localhost:8000` |
+| `MAIL_MAILER` | Mail driver | `smtp` |
+| `MAIL_HOST` | SMTP host | `smtp.gmail.com` |
+| `MAIL_PORT` | SMTP port | `587` |
+| `MAIL_USERNAME` | SMTP username | *(Gmail address)* |
+| `MAIL_PASSWORD` | SMTP password | *(Gmail App Password)* |
+| `MAIL_ENCRYPTION` | SMTP encryption | `tls` |
+| `MAIL_FROM_ADDRESS` | Sender email | *(sender address)* |
+| `MAIL_FROM_NAME` | Sender name | `PRO CNC MAROC` |
 
 ---
 
@@ -387,6 +409,10 @@ procncmaroc/
 - **ip-api.com for geolocation** — Free, no API key required; falls back gracefully
 - **Inline styles with `clamp()`** — Responsive design without excessive media queries
 - **Dynamic import for PageTracker** — Visitor tracking doesn't block initial page load
+- **Custom HTML email templates** — Full control over branding and layout vs Laravel's default markdown mail
+- **Gmail SMTP with App Password** — Secure email sending without third-party mail services
+- **Loadable skeletons** — Content-shaped placeholders during data fetch instead of generic spinners
+- **SVG icons over emoji** — Consistent rendering across all platforms and browsers
 
 ---
 
