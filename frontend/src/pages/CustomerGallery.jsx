@@ -388,58 +388,64 @@ export default function CustomerGallery() {
 
                   <ImageCarousel images={post.images_url} title={post.title} onImageClick={(url) => setFullImg(url)} />
 
-                      <div style={styles.cardBody}>
-                      <div style={styles.cardHeader}>
-                        <h3 style={styles.cardTitle}>{post.title}</h3>
-                        {post.business_location && (
-                          <motion.a
-                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(post.business_location)}`}
-                            target="_blank" rel="noopener noreferrer"
-                            style={styles.gmapsBtn} title="View on Google Maps"
-                            whileHover={{ background: 'rgba(79,195,247,0.18)', borderColor: 'rgba(79,195,247,0.5)' }}
-                            whileTap={{ scale: 0.9 }}
-                          >
-                            <MapPinIcon />
-                          </motion.a>
-                        )}
-                      </div>
-                      <div style={styles.descWrap}>
-                        <p style={{
-                          ...styles.cardDesc,
-                          WebkitLineClamp: descExpanded[post.id] ? 'unset' : 6,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                          display: '-webkit-box',
-                        }}>{post.description}</p>
-                        {post.description && post.description.length > 120 && (
-                          <motion.button
-                            style={styles.viewMoreBtn}
-                            onClick={() => setDescExpanded((prev) => ({ ...prev, [post.id]: !prev[post.id] }))}
-                            whileTap={{ scale: 0.95 }}
-                          >
-                            {descExpanded[post.id] ? 'Show less' : 'View more'}
-                          </motion.button>
-                        )}
-                      </div>
+                  <div style={styles.cardBody}>
+                    <div style={styles.cardHeader}>
+                      <h3 style={styles.cardTitle}>{post.title}</h3>
+                      {post.business_location && (
+                        <motion.a
+                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(post.business_location)}`}
+                          target="_blank" rel="noopener noreferrer"
+                          style={styles.gmapsBtn} title="View on Google Maps"
+                          whileHover={{ background: 'rgba(79,195,247,0.18)', borderColor: 'rgba(79,195,247,0.5)' }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <MapPinIcon />
+                        </motion.a>
+                      )}
+                    </div>
+                    <div style={styles.descWrap}>
+                      <p style={{
+                        ...styles.cardDesc,
+                        WebkitLineClamp: descExpanded[post.id] ? 'unset' : 6,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        display: '-webkit-box',
+                      }}>{post.description}</p>
+                      {post.description && post.description.length > 120 && (
+                        <motion.button
+                          style={styles.viewMoreBtn}
+                          onClick={() => setDescExpanded((prev) => ({ ...prev, [post.id]: !prev[post.id] }))}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          {descExpanded[post.id] ? 'Show less' : 'View more'}
+                        </motion.button>
+                      )}
+                    </div>
+                  </div>
 
-                      <div style={styles.actionBar}>
-                        <motion.button
-                          style={styles.actionBtn}
-                          onClick={() => handleLike(post.id)}
-                          whileTap={{ scale: 0.85 }}
-                        >
-                          <HeartIcon filled={likes[post.id]?.liked} />
-                          <span style={{ color: likes[post.id]?.liked ? '#e74c3c' : '#aaa' }}>{likes[post.id]?.count || 0}</span>
-                        </motion.button>
-                        <motion.button
-                          style={styles.actionBtn}
-                          onClick={() => setExpanded((prev) => ({ ...prev, [post.id]: !prev[post.id] }))}
-                          whileTap={{ scale: 0.85 }}
-                        >
-                          <CommentIcon />
-                          <span>{post._commentCount ?? post.comments_count ?? 0}</span>
-                        </motion.button>
-                      </div>
+                  <div style={styles.actionBar}>
+                    <motion.button
+                      style={{
+                        ...styles.actionBtn,
+                        color: likes[post.id]?.liked ? '#e74c3c' : '#ccc',
+                      }}
+                      onClick={() => handleLike(post.id)}
+                      whileHover={{ background: 'rgba(231,76,60,0.08)' }}
+                      whileTap={{ scale: 0.8 }}
+                    >
+                      <HeartIcon filled={likes[post.id]?.liked} />
+                      <span>{likes[post.id]?.count || 0}</span>
+                    </motion.button>
+                    <motion.button
+                      style={styles.actionBtn}
+                      onClick={() => setExpanded((prev) => ({ ...prev, [post.id]: !prev[post.id] }))}
+                      whileHover={{ background: 'rgba(255,255,255,0.06)' }}
+                      whileTap={{ scale: 0.8 }}
+                    >
+                      <CommentIcon />
+                      <span>{post._commentCount ?? post.comments_count ?? 0}</span>
+                    </motion.button>
+                  </div>
 
                     <AnimatePresence>
                       {expanded[post.id] && (
@@ -455,8 +461,7 @@ export default function CustomerGallery() {
                         </motion.div>
                       )}
                     </AnimatePresence>
-                  </div>
-                </motion.div>
+                  </motion.div>
               ))}
             </motion.div>
           )}
@@ -644,14 +649,15 @@ const styles = {
     lineHeight: 1.7,
   },
   actionBar: {
-    display: 'flex', gap: '20px', paddingTop: '12px',
+    display: 'flex', gap: '6px', padding: '10px 14px 12px',
     borderTop: '1px solid rgba(255,255,255,0.06)',
   },
   actionBtn: {
-    background: 'transparent', border: 'none', color: '#aaa',
-    fontSize: '13px', cursor: 'pointer', padding: '6px 0',
-    display: 'flex', alignItems: 'center', gap: '6px',
-    fontWeight: 600,
+    background: 'transparent', border: 'none', color: '#ccc',
+    fontSize: '13px', cursor: 'pointer', padding: '6px 14px 6px 10px',
+    display: 'flex', alignItems: 'center', gap: '7px',
+    fontWeight: 500, borderRadius: '8px',
+    transition: 'background 0.15s',
   },
   userBar: {
     display: 'flex', alignItems: 'center', gap: '10px',
