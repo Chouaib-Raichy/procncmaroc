@@ -18,20 +18,8 @@ const CommentIcon = () => (
 );
 
 const MapPinIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4fc3f7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4fc3f7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
-  </svg>
-);
-
-const PhoneIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4fc3f7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-  </svg>
-);
-
-const MailIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4fc3f7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" />
   </svg>
 );
 
@@ -293,6 +281,7 @@ export default function CustomerGallery() {
   const [error, setError] = useState(null);
   const [fullImg, setFullImg] = useState(null);
   const [expanded, setExpanded] = useState({});
+  const [descExpanded, setDescExpanded] = useState({});
   const [likes, setLikes] = useState({});
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -399,49 +388,58 @@ export default function CustomerGallery() {
 
                   <ImageCarousel images={post.images_url} title={post.title} onImageClick={(url) => setFullImg(url)} />
 
-                  <div style={styles.cardBody}>
-                    <h3 style={styles.cardTitle}>{post.title}</h3>
-                    <p style={styles.cardDesc}>{post.description}</p>
+                      <div style={styles.cardBody}>
+                      <div style={styles.cardHeader}>
+                        <h3 style={styles.cardTitle}>{post.title}</h3>
+                        {post.business_location && (
+                          <motion.a
+                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(post.business_location)}`}
+                            target="_blank" rel="noopener noreferrer"
+                            style={styles.gmapsBtn} title="View on Google Maps"
+                            whileHover={{ background: 'rgba(79,195,247,0.18)', borderColor: 'rgba(79,195,247,0.5)' }}
+                            whileTap={{ scale: 0.9 }}
+                          >
+                            <MapPinIcon />
+                          </motion.a>
+                        )}
+                      </div>
+                      <div style={styles.descWrap}>
+                        <p style={{
+                          ...styles.cardDesc,
+                          WebkitLineClamp: descExpanded[post.id] ? 'unset' : 6,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          display: '-webkit-box',
+                        }}>{post.description}</p>
+                        {post.description && post.description.length > 120 && (
+                          <motion.button
+                            style={styles.viewMoreBtn}
+                            onClick={() => setDescExpanded((prev) => ({ ...prev, [post.id]: !prev[post.id] }))}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            {descExpanded[post.id] ? 'Show less' : 'View more'}
+                          </motion.button>
+                        )}
+                      </div>
 
-                    <div style={styles.metaBox}>
-                      {post.business_location && (
-                        <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(post.business_location)}`} target="_blank" rel="noopener noreferrer" style={styles.metaLink}>
-                          <MapPinIcon />
-                          <span>{post.business_location}</span>
-                        </a>
-                      )}
-                      {post.contact_phone && (
-                        <a href={`https://wa.me/${post.contact_phone?.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" style={styles.metaLink} title="Open WhatsApp">
-                          <PhoneIcon />
-                          <span>{post.contact_phone}</span>
-                        </a>
-                      )}
-                      {post.user?.email && (
-                        <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(post.user.email)}`} target="_blank" rel="noopener noreferrer" style={styles.metaLink} title="Send email">
-                          <MailIcon />
-                          <span>{post.user.email}</span>
-                        </a>
-                      )}
-                    </div>
-
-                    <div style={styles.actionBar}>
-                      <motion.button
-                        style={styles.actionBtn}
-                        onClick={() => handleLike(post.id)}
-                        whileTap={{ scale: 0.85 }}
-                      >
-                        <HeartIcon filled={likes[post.id]?.liked} />
-                        <span style={{ color: likes[post.id]?.liked ? '#e74c3c' : '#aaa' }}>{likes[post.id]?.count || 0}</span>
-                      </motion.button>
-                      <motion.button
-                        style={styles.actionBtn}
-                        onClick={() => setExpanded((prev) => ({ ...prev, [post.id]: !prev[post.id] }))}
-                        whileTap={{ scale: 0.85 }}
-                      >
-                        <CommentIcon />
-                        <span>{post._commentCount ?? post.comments_count ?? 0}</span>
-                      </motion.button>
-                    </div>
+                      <div style={styles.actionBar}>
+                        <motion.button
+                          style={styles.actionBtn}
+                          onClick={() => handleLike(post.id)}
+                          whileTap={{ scale: 0.85 }}
+                        >
+                          <HeartIcon filled={likes[post.id]?.liked} />
+                          <span style={{ color: likes[post.id]?.liked ? '#e74c3c' : '#aaa' }}>{likes[post.id]?.count || 0}</span>
+                        </motion.button>
+                        <motion.button
+                          style={styles.actionBtn}
+                          onClick={() => setExpanded((prev) => ({ ...prev, [post.id]: !prev[post.id] }))}
+                          whileTap={{ scale: 0.85 }}
+                        >
+                          <CommentIcon />
+                          <span>{post._commentCount ?? post.comments_count ?? 0}</span>
+                        </motion.button>
+                      </div>
 
                     <AnimatePresence>
                       {expanded[post.id] && (
@@ -618,26 +616,36 @@ const styles = {
     transition: 'all 0.3s',
   },
   cardBody: { padding: 'clamp(14px, 2vw, 20px)' },
+  cardHeader: {
+    display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+    gap: '10px', marginBottom: '8px',
+  },
   cardTitle: {
     color: '#d4af37', fontSize: 'clamp(16px, 1.5vw, 18px)',
-    fontWeight: 700, marginBottom: '6px',
+    fontWeight: 700, flex: 1, minWidth: 0,
+  },
+  gmapsBtn: {
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    width: '34px', height: '34px', borderRadius: '8px', flexShrink: 0,
+    background: 'rgba(79,195,247,0.08)',
+    border: '1px solid rgba(79,195,247,0.25)',
+    transition: 'all 0.2s', marginTop: '2px',
+    textDecoration: 'none',
+  },
+  descWrap: { marginBottom: '16px' },
+  viewMoreBtn: {
+    background: 'transparent', border: 'none',
+    color: '#4fc3f7', fontSize: '12px', fontWeight: 600, cursor: 'pointer',
+    padding: '4px 0 0', textDecoration: 'underline',
+    textUnderlineOffset: '2px',
   },
   cardDesc: {
-    color: '#aaa', fontSize: 'clamp(13px, 1.2vw, 14px)',
-    lineHeight: 1.7, marginBottom: '14px',
-  },
-  metaBox: {
-    display: 'flex', flexDirection: 'column', gap: '5px',
-    padding: '10px 12px', background: 'rgba(0,0,0,0.35)',
-    borderRadius: '8px', border: '1px solid #222', marginBottom: '12px',
-  },
-  metaLink: {
-    display: 'inline-flex', alignItems: 'center', gap: '6px',
-    color: '#4fc3f7', fontSize: '12px', textDecoration: 'none',
-    lineHeight: 1.5,
+    color: '#999', fontSize: 'clamp(13px, 1.2vw, 14px)',
+    lineHeight: 1.7,
   },
   actionBar: {
-    display: 'flex', gap: '20px', marginBottom: '4px',
+    display: 'flex', gap: '20px', paddingTop: '12px',
+    borderTop: '1px solid rgba(255,255,255,0.06)',
   },
   actionBtn: {
     background: 'transparent', border: 'none', color: '#aaa',
