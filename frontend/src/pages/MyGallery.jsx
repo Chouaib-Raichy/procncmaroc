@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import PhoneInput from '../components/PhoneInput';
 import ConfirmModal from '../components/ConfirmModal';
-import { getComments, addComment, togglePostLike, getPostLikes } from '../api/gallery';
+import { getComments, addComment, replyToComment, togglePostLike, toggleCommentLike, getPostLikes } from '../api/gallery';
 import api from '../api/axios';
 import machineBg from '../assets/machineBG.jpeg';
 
@@ -159,6 +159,25 @@ function CommentSection({ postId, user, onCommentCountChange }) {
       setComments((prev) => [res.data, ...prev]);
       setBody('');
       onCommentCountChange?.(comments.length + 1);
+    } catch {}
+  };
+
+  const handleReply = async (commentId, text) => {
+    try {
+      const res = await replyToComment(commentId, text);
+      setComments((prev) => prev.map((c) => c.id === commentId ? { ...c, replies: [...(c.replies || []), res.data] } : c));
+    } catch {}
+  };
+
+  const handleLike = async (commentId) => {
+    try {
+      const res = await toggleCommentLike(commentId);
+      const { liked, likes_count } = res.data;
+      setComments((prev) => prev.map((c) => {
+        if (c.id === commentId) return { ...c, is_liked_by_user: liked, likes_count };
+        if (c.replies?.some((r) => r.id === commentId)) return { ...c, replies: c.replies.map((r) => r.id === commentId ? { ...r, is_liked_by_user: liked, likes_count } : r) };
+        return c;
+      }));
     } catch {}
   };
 
