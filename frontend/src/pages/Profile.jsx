@@ -218,7 +218,7 @@ export default function Profile() {
             <div ref={dropdownRef} style={{ position: 'absolute', top: '16px', right: 'clamp(16px, 3vw, 28px)', zIndex: 5 }}>
               <motion.button
                 style={s.settingsBtn}
-                onClick={() => setSettingsDropdown(!settingsDropdown)}
+                onClick={(e) => { e.stopPropagation(); setSettingsDropdown(!settingsDropdown); }}
                 whileTap={{ scale: 0.95 }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
