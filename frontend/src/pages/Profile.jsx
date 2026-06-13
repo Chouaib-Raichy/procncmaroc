@@ -163,7 +163,7 @@ export default function Profile() {
     { key: 'name', label: 'Full Name', placeholder: 'John Doe', autoComplete: 'name' },
     { key: 'email', label: 'Email', type: 'email', placeholder: 'you@example.com', autoComplete: 'email' },
     { key: 'phone', label: 'Phone', component: 'phone' },
-    { key: 'business_location', label: 'Business Location', placeholder: 'Paste from Google Maps', autoComplete: 'country-name' },
+    { key: 'business_location', label: 'Business Location', placeholder: 'Google Maps link or address', autoComplete: 'country-name' },
   ];
 
   return (

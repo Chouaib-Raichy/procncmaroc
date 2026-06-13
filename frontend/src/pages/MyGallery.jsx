@@ -335,7 +335,7 @@ export default function MyGallery() {
                   </div>
                   <div style={styles.formField}>
                     <label style={styles.fieldLabel}>Business Location</label>
-                    <input style={styles.input} placeholder="Paste from Google Maps" value={form.business_location} onChange={(e) => setForm({ ...form, business_location: e.target.value })} required />
+                    <input style={styles.input} placeholder="Google Maps link or address" value={form.business_location} onChange={(e) => setForm({ ...form, business_location: e.target.value })} required />
                   </div>
                 </div>
                 <div style={styles.formField}>

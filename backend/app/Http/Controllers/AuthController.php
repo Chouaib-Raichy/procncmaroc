@@ -153,7 +153,24 @@ class AuthController extends Controller
 
     private static function parseGoogleMapsUrl(string $url): ?array
     {
-        if (!str_contains($url, 'google')) return null;
+        if (!str_contains($url, 'google') && !str_contains($url, 'goo.gl')) return null;
+
+        if (str_contains($url, 'goo.gl')) {
+            try {
+                $ch = curl_init($url);
+                curl_setopt_array($ch, [
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_HEADER => true,
+                    CURLOPT_NOBODY => true,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_TIMEOUT => 5,
+                ]);
+                curl_exec($ch);
+                $redirectUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+                curl_close($ch);
+                if ($redirectUrl && $redirectUrl !== $url) $url = $redirectUrl;
+            } catch (\Exception) {}
+        }
 
         if (preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', $url, $m)) {
             return ['lat' => (float) $m[1], 'lng' => (float) $m[2]];
