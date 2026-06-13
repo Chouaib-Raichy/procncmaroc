@@ -24,7 +24,6 @@ class UserDTO extends DTO
         public readonly bool $is_approved,
         public readonly ?array $business_images_url,
         public readonly ?string $business_bio,
-        public readonly bool $show_contact,
 
         public readonly ?string $last_activity_at,
         public readonly ?string $banned_at,
@@ -52,7 +51,6 @@ class UserDTO extends DTO
             is_approved: $user->is_approved ?? false,
             business_images_url: $user->business_images_url,
             business_bio: $user->business_bio,
-            show_contact: $user->show_contact ?? true,
 
             last_activity_at: $user->last_activity_at?->toISOString(),
             banned_at: $user->banned_at?->toISOString(),
@@ -79,7 +77,6 @@ class UserDTO extends DTO
             'is_approved' => $this->is_approved,
             'business_images_url' => $this->business_images_url,
             'business_bio' => $this->business_bio,
-            'show_contact' => $this->show_contact,
 
             'last_activity_at' => $this->last_activity_at,
             'banned_at' => $this->banned_at,

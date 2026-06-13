@@ -15,7 +15,8 @@ import {
   deleteCategory,
 } from '../api/categories';
 import { getMessages } from '../api/contacts';
-import { getUsers, toggleBanUser, getPendingUsers, approveUser, rejectUser, toggleContactVisibility } from '../api/users';
+import { getUsers, toggleBanUser, getPendingUsers, approveUser, rejectUser } from '../api/users';
+import { getSettings, toggleSetting } from '../api/settings';
 import { getVisitors, getStatsSummary } from '../api/visitors';
 import { motion, AnimatePresence } from 'framer-motion';
 import ConfirmModal from '../components/ConfirmModal';
@@ -346,18 +347,21 @@ function UsersManager() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewingUser, setViewingUser] = useState(null);
+  const [siteSettings, setSiteSettings] = useState({ show_whatsapp: '1', show_maps: '1', show_email: '1' });
 
   const load = () => { getUsers().then((res) => setUsers(res.data)).catch(() => {}).finally(() => setLoading(false)); };
   useEffect(() => { load(); }, []);
+  useEffect(() => { getSettings().then((r) => setSiteSettings(r.data)).catch(() => {}); }, []);
+
+  const handleToggleSetting = async (key) => {
+    try { const r = await toggleSetting(key); setSiteSettings((p) => ({ ...p, [key]: r.data.value })); } catch (e) { alert(e.response?.data?.message || 'Error'); }
+  };
 
   const handleToggleBan = async (id) => {
     try { await toggleBanUser(id); load(); } catch (e) { alert(e.response?.data?.message || 'Error'); }
   };
 
   const handleViewProfile = (u) => setViewingUser(u);
-  const handleToggleContact = async (id) => {
-    try { await toggleContactVisibility(id); load(); } catch (e) { alert(e.response?.data?.message || 'Error'); }
-  };
 
   if (loading) {
     return (
@@ -391,6 +395,34 @@ function UsersManager() {
         <div>
           <h2 style={sectionTitle}>Registered Users</h2>
           <p style={{ color: '#777', fontSize: '13px', margin: '4px 0 0' }}>{users.length} total users</p>
+        </div>
+        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+          <span style={{ color: '#888', fontSize: '12px', fontWeight: 600 }}>Contact:</span>
+          {[
+            { key: 'show_whatsapp', label: 'WA', onColor: '#25D366', offColor: '#555' },
+            { key: 'show_maps', label: 'Maps', onColor: '#4285F4', offColor: '#555' },
+            { key: 'show_email', label: 'Email', onColor: '#d4af37', offColor: '#555' },
+          ].map(({ key, label, onColor, offColor }) => (
+            <motion.button
+              key={key}
+              onClick={() => handleToggleSetting(key)}
+              style={{
+                ...smallBtn,
+                background: siteSettings[key] === '1' ? onColor : offColor,
+                opacity: siteSettings[key] === '1' ? 1 : 0.5,
+                minWidth: '48px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '3px',
+                fontSize: '11px',
+              }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {label}
+            </motion.button>
+          ))}
         </div>
       </div>
       <div style={{ overflowX: 'auto', marginTop: '12px' }}>
@@ -469,15 +501,6 @@ function UsersManager() {
                         {u.banned_at ? 'Unban' : 'Ban'}
                       </motion.button>
                     )}
-                    <motion.button
-                      style={{ ...smallBtn, background: u.show_contact === false ? '#e67e22' : '#8e44ad', display:'inline-flex', alignItems:'center', gap:'4px' }}
-                      onClick={() => handleToggleContact(u.id)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
-                      {u.show_contact === false ? 'Show Contact' : 'Hide Contact'}
-                    </motion.button>
                   </div>
                 </td>
               </motion.tr>

@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\GalleryCommentController;
 use App\Http\Controllers\Api\GalleryPostController;
 use App\Http\Controllers\Api\MachineController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\SiteSettingController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,7 @@ Route::get('/partners', [App\Http\Controllers\Api\PartnerController::class, 'ind
 Route::get('/partners/{id}', [App\Http\Controllers\Api\PartnerController::class, 'show']);
 Route::post('/track-visit', [StatsController::class, 'trackVisit']);
 Route::get('/resolve-url', [AuthController::class, 'resolveLocation']);
+Route::get('/settings', [SiteSettingController::class, 'index']);
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -75,7 +77,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/admin/users/{id}/restore', [AdminUserController::class, 'restore']);
         Route::get('/admin/users/pending/list', [AdminUserController::class, 'pending']);
         Route::post('/admin/users/{id}/approve', [AdminUserController::class, 'approve']);
-        Route::post('/admin/users/{id}/toggle-contact', [AdminUserController::class, 'toggleContactVisibility']);
         Route::delete('/admin/users/{id}/reject', [AdminUserController::class, 'reject']);
+
+        Route::post('/admin/settings/{key}/toggle', [SiteSettingController::class, 'toggle']);
     });
 });

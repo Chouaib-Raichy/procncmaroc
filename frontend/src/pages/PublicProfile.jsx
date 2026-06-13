@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getPartner } from '../api/partners';
+import { getSettings } from '../api/settings';
 import ErrorState from '../components/ErrorState';
 import machineBg from '../assets/machineBG.jpeg';
 import SEO from '../components/SEO';
@@ -55,6 +56,7 @@ export default function PublicProfile() {
   const [error, setError] = useState(null);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [lightboxImg, setLightboxImg] = useState(null);
+  const [siteSettings, setSiteSettings] = useState({ show_whatsapp: '1', show_maps: '1', show_email: '1' });
 
   useEffect(() => {
     if (!lightboxImg) return;
@@ -62,6 +64,8 @@ export default function PublicProfile() {
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [lightboxImg]);
+
+  useEffect(() => { getSettings().then((r) => setSiteSettings(r.data)).catch(() => {}); }, []);
 
   const fetch = () => {
     setLoading(true);
@@ -207,28 +211,26 @@ export default function PublicProfile() {
               </div>
             )}
 
-            {u.show_contact !== false && (
-              <div style={styles.contactSection}>
-                <div style={styles.contactLabel}>Contact</div>
-                <div style={styles.contactButtons}>
-                  {u.phone && (
-                    <a href={`https://wa.me/${u.phone.replace(/[^\d+]/g, '')}`} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#25D366', color: '#25D366' }}>
-                      <WhatsAppIcon /> WhatsApp
-                    </a>
-                  )}
-                  {u.business_location && (
-                    <a href={mapsLink(u.business_location)} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#4285F4', color: '#4285F4' }}>
-                      <MapsIcon /> Google Maps
-                    </a>
-                  )}
-                  {u.email && (
-                    <a href={`mailto:${u.email}`} style={{ ...styles.contactBtn, borderColor: '#d4af37', color: '#d4af37' }}>
-                      <MailIcon /> Email
-                    </a>
-                  )}
-                </div>
+            <div style={styles.contactSection}>
+              <div style={styles.contactLabel}>Contact</div>
+              <div style={styles.contactButtons}>
+                {u.phone && siteSettings.show_whatsapp && (
+                  <a href={`https://wa.me/${u.phone.replace(/[^\d+]/g, '')}`} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#25D366', color: '#25D366' }}>
+                    <WhatsAppIcon /> WhatsApp
+                  </a>
+                )}
+                {u.business_location && siteSettings.show_maps && (
+                  <a href={mapsLink(u.business_location)} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#4285F4', color: '#4285F4' }}>
+                    <MapsIcon /> Google Maps
+                  </a>
+                )}
+                {u.email && siteSettings.show_email && (
+                  <a href={`mailto:${u.email}`} style={{ ...styles.contactBtn, borderColor: '#d4af37', color: '#d4af37' }}>
+                    <MailIcon /> Email
+                  </a>
+                )}
               </div>
-            )}
+            </div>
           </motion.div>
 
           <motion.div style={styles.rightCol} {...fadeUp(0.45)}>

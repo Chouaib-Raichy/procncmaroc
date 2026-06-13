@@ -76,17 +76,6 @@ class AdminUserController extends Controller
         ]);
     }
 
-    public function toggleContactVisibility($id)
-    {
-        $user = User::withTrashed()->findOrFail($id);
-        $user->update(['show_contact' => !$user->show_contact]);
-
-        return response()->json([
-            'message' => $user->show_contact ? 'Contact section visible' : 'Contact section hidden',
-            'user' => UserDTO::fromModel($user)->toArray(),
-        ]);
-    }
-
     public function reject($id)
     {
         $user = User::findOrFail($id);

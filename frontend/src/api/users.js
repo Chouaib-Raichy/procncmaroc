@@ -6,4 +6,3 @@ export const toggleBanUser = (id) => api.post(`/admin/users/${id}/toggle-ban`);
 export const getPendingUsers = (page = 1) => api.get(`/admin/users/pending/list?page=${page}`);
 export const approveUser = (id) => api.post(`/admin/users/${id}/approve`);
 export const rejectUser = (id) => api.delete(`/admin/users/${id}/reject`);
-export const toggleContactVisibility = (id) => api.post(`/admin/users/${id}/toggle-contact`);
