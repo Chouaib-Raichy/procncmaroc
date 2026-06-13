@@ -5,6 +5,7 @@ import Loading from '../components/Loading';
 import ErrorState from '../components/ErrorState';
 import { getCategories } from '../api/categories';
 import machineBg from '../assets/machineBG.jpeg';
+import SEO from '../components/SEO';
 
 export default function OurMachines() {
   const [allMachines, setAllMachines] = useState([]);
@@ -62,6 +63,7 @@ export default function OurMachines() {
 
   return (
     <div style={styles.pageWrapper}>
+      <SEO title="Nos Machines" description="Découvrez notre gamme complète de machines CNC professionnelles au Maroc : fraiseuses, découpeuses laser, graveuses et imprimantes 3D." canonicalUrl="/our-machines" />
       <div style={styles.overlay}>
         <div style={styles.titleWrap}>
           <h1 style={styles.title}>Our Machines</h1>

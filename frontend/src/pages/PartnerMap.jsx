@@ -6,6 +6,7 @@ import machineBg from '../assets/machineBG.jpeg';
 import showcaseBg from '../assets/showcase_bg.png';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import SEO from '../components/SEO';
 
 const GOLD = '#a37a39';
 
@@ -162,6 +163,7 @@ export default function PartnerMap() {
 
   return (
     <div style={styles.page}>
+      <SEO title="Carte des Partenaires" description="Trouvez un partenaire PRO CNC MAROC près de chez vous au Maroc. Réseau de professionnels en machines CNC et usinage." canonicalUrl="/partner-map" />
       <div style={styles.overlay}>
         <motion.h1 style={styles.title} initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>Partner Map</motion.h1>
         <motion.p style={styles.sub} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>Our trusted partners around the world</motion.p>

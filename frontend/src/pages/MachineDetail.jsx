@@ -5,6 +5,7 @@ import api from '../api/axios';
 import Loading from '../components/Loading';
 import ErrorState from '../components/ErrorState';
 import machineBg from '../assets/machineBG.jpeg';
+import SEO from '../components/SEO';
 
 const PHONE = '212625280991';
 
@@ -48,13 +49,14 @@ export default function MachineDetail() {
     window.open(`https://wa.me/${PHONE}?text=${text}`, '_blank');
   };
 
-  if (loading) return <Loading text="Loading machine..." />;
+  if (loading) return <><SEO title="Machine CNC | PRO CNC MAROC" /><Loading text="Loading machine..." /></>;
 
-  if (error) return <ErrorState message={error} onRetry={fetch} />;
+  if (error) return <><SEO title="Machine CNC | PRO CNC MAROC" /><ErrorState message={error} onRetry={fetch} /></>;
 
   if (!machine) {
     return (
       <div style={styles.page}>
+        <SEO title="Machine CNC | PRO CNC MAROC" />
         <div style={styles.overlay}>
           <div style={styles.center}>
             <h2 style={{ color: '#fff' }}>Machine not found</h2>
@@ -67,6 +69,7 @@ export default function MachineDetail() {
 
   return (
     <div style={styles.page}>
+      <SEO title={machine.title + ' | PRO CNC MAROC'} description={machine.description} canonicalUrl={'/machines/' + id} />
       <div style={styles.overlay}>
         <div style={styles.inner}>
           <motion.div

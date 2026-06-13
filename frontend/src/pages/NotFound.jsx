@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import machineBg from '../assets/machineBG.jpeg';
+import SEO from '../components/SEO';
 
 export default function NotFound() {
   return (
     <div style={styles.page}>
+      <SEO title="Page Non Trouvée" description="La page que vous cherchez n'existe pas ou a été déplacée." />
       <div style={styles.overlay}>
         <div style={styles.card}>
           <h1 style={styles.code}>404</h1>

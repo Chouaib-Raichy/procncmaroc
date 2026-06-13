@@ -1,11 +1,13 @@
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Loading from './components/Loading';
+import SEO from './components/SEO';
 import Home from './pages/Home';
 import PartnerMap from './pages/PartnerMap';
 import OurMachines from './pages/OurMachines';
@@ -66,6 +68,7 @@ function AppContent() {
   if (loading) return <Loading text="Loading..." />;
   return (
     <div className="app">
+      <SEO />
       <Navbar />
       <PageTracker />
       <main className="main-content">
@@ -99,13 +102,15 @@ function AppContent() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <ToastProvider>
-          <AppContent />
-        </ToastProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <ToastProvider>
+            <AppContent />
+          </ToastProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </HelmetProvider>
   );
 }
 

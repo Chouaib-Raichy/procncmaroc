@@ -6,6 +6,7 @@ import ErrorState from '../components/ErrorState';
 import machineBg from '../assets/machineBG.jpeg';
 import whatsappIcon from '../assets/whatsapp_icon.svg';
 import googleMapsIcon from '../assets/google_maps_icon.svg';
+import SEO from '../components/SEO';
 
 export default function PublicProfile() {
   const { id } = useParams();
@@ -32,6 +33,7 @@ export default function PublicProfile() {
 
   if (loading) return (
     <div style={styles.wrapper}>
+      <SEO title="Profil | PRO CNC MAROC" />
       <div style={styles.card}>
         <div style={{ ...styles.cover, background: '#111' }} />
         <div style={{ textAlign: 'center', padding: '60px 20px' }}><div style={styles.loader} /></div>
@@ -39,10 +41,11 @@ export default function PublicProfile() {
     </div>
   );
 
-  if (error) return <ErrorState message={error} onRetry={fetch} />;
+  if (error) return <><SEO title="Profil | PRO CNC MAROC" /><ErrorState message={error} onRetry={fetch} /></>;
 
   if (!data?.user) return (
     <div style={styles.wrapper}>
+      <SEO title="Profil | PRO CNC MAROC" />
       <p style={{ color: '#999', textAlign: 'center', paddingTop: '80px' }}>User not found</p>
     </div>
   );
@@ -52,6 +55,7 @@ export default function PublicProfile() {
 
   return (
     <div style={styles.wrapper}>
+      <SEO title={u.name + ' | PRO CNC MAROC'} description={u.business_bio || ('Profil de ' + u.name)} canonicalUrl={'/profile/' + id} />
       <motion.div style={styles.card} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <div style={styles.twoCol}>
           <div style={styles.leftCol}>

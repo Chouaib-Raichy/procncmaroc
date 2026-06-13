@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import machineBg from '../assets/machineBG.jpeg';
 import about from '../assets/about.jpg';
 import premiumIcon from '../assets/premium-icon.svg';
+import SEO from '../components/SEO';
 
 function rand(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -14,6 +15,7 @@ export default function AboutUs() {
   const [completed] = useState(() => rand(2, 5));
   return (
     <div style={styles.page}>
+      <SEO title="À Propos" description="Découvrez PRO CNC MAROC, votre expert en machines CNC et usinage de précision au Maroc. Notre équipe vous accompagne dans vos projets d'industrie et d'artisanat." canonicalUrl="/about-us" />
       <div style={styles.overlay}>
         <section style={styles.container}>
           <motion.div

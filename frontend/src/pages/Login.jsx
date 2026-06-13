@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import machineBg from '../assets/machineBG.jpeg';
+import SEO from '../components/SEO';
 
 const validators = {
   email: (v) => {
@@ -98,6 +99,7 @@ export default function Login() {
 
   return (
     <div style={styles.page}>
+      <SEO title="Connexion" description="Connectez-vous à votre compte PRO CNC MAROC pour accéder à vos commandes et services." canonicalUrl="/login" />
       <div style={styles.overlay}>
         <motion.form
           style={styles.form}

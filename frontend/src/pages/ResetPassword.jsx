@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import api from '../api/axios';
 import machineBg from '../assets/machineBG.jpeg';
+import SEO from '../components/SEO';
 
 const requirements = [
   { label: 'At least 8 characters', test: (v) => v.length >= 8 },
@@ -81,6 +82,7 @@ export default function ResetPassword() {
 
   return (
     <div style={styles.page}>
+      <SEO title="Réinitialisation du Mot de Passe" description="Réinitialisez votre mot de passe PRO CNC MAROC." canonicalUrl="/reset-password" />
       <div style={styles.overlay}>
         <form style={styles.form} onSubmit={handleSubmit}>
           <h1 style={styles.title}>Reset Password</h1>

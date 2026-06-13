@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import machineBg from '../assets/machineBG.jpeg';
 import api from '../api/axios';
+import SEO from '../components/SEO';
 
 export default function ContactUs() {
   const [form, setForm] = useState({
@@ -40,6 +41,7 @@ export default function ContactUs() {
 
   return (
     <div style={styles.page}>
+      <SEO title="Contact" description="Contactez PRO CNC MAROC pour toute question sur nos machines CNC, services d'usinage, découpe laser et gravure au Maroc." canonicalUrl="/contact-us" />
       {/* Hero Banner */}
       <motion.div
         style={styles.hero}

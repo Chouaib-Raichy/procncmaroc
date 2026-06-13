@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import PhoneInput from '../components/PhoneInput';
 import machineBg from '../assets/machineBG.jpeg';
+import SEO from '../components/SEO';
 
 const validators = {
   name: (v) => !v.trim() ? 'Full name is required' : v.trim().length < 2 ? 'Name must be at least 2 characters' : '',
@@ -126,6 +127,7 @@ export default function Signup() {
 
   return (
     <div style={styles.page}>
+      <SEO title="Inscription" description="Créez votre compte PRO CNC MAROC et rejoignez notre réseau de professionnels de l'usinage CNC au Maroc." canonicalUrl="/signup" />
       <div style={styles.overlay}>
         <motion.form
           style={styles.form}
