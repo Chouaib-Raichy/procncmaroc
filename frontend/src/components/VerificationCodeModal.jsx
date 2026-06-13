@@ -16,8 +16,11 @@ export default function VerificationCodeModal({ email, onVerified, onClose }) {
   const [timer, setTimer] = useState(600);
   const [canResend, setCanResend] = useState(false);
   const inputsRef = useRef([]);
+  const sentRef = useRef(false);
 
   const sendCode = useCallback(async () => {
+    if (sentRef.current) return;
+    sentRef.current = true;
     setSending(true);
     setError(null);
     setTimer(600);
@@ -158,7 +161,7 @@ export default function VerificationCodeModal({ email, onVerified, onClose }) {
               {canResend ? (
                 <motion.button
                   style={s.resendBtn}
-                  onClick={sendCode}
+                  onClick={() => { sentRef.current = false; sendCode(); }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
