@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { getComments, addComment, replyToComment, togglePostLike, toggleCommentLike } from '../api/gallery';
+import { getComments, addComment, replyToComment, togglePostLike, toggleCommentLike, getPostLikes } from '../api/gallery';
 import api from '../api/axios';
 import machineBg from '../assets/machineBG.jpeg';
 import SEO from '../components/SEO';
@@ -284,6 +284,8 @@ export default function CustomerGallery() {
   const [expanded, setExpanded] = useState({});
   const [descExpanded, setDescExpanded] = useState({});
   const [likes, setLikes] = useState({});
+  const [showLikesPopover, setShowLikesPopover] = useState(null);
+  const [likesUsers, setLikesUsers] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -313,6 +315,19 @@ export default function CustomerGallery() {
 
   const updateCommentCount = (postId, count) => {
     setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, _commentCount: count } : p));
+  };
+
+  const openLikes = async (postId) => {
+    if (showLikesPopover === postId) {
+      setShowLikesPopover(null);
+      setLikesUsers(null);
+      return;
+    }
+    try {
+      const res = await getPostLikes(postId);
+      setLikesUsers(res.data);
+      setShowLikesPopover(postId);
+    } catch {}
   };
 
   return (
@@ -426,27 +441,50 @@ export default function CustomerGallery() {
                   </div>
 
                   <div style={styles.actionBar}>
-                    <motion.button
-                      style={{
-                        ...styles.actionBtn,
-                        color: likes[post.id]?.liked ? '#e74c3c' : '#ccc',
-                      }}
-                      onClick={() => handleLike(post.id)}
-                      whileHover={{ background: 'rgba(231,76,60,0.08)' }}
-                      whileTap={{ scale: 0.8 }}
-                    >
-                      <HeartIcon filled={likes[post.id]?.liked} />
-                      <span>{likes[post.id]?.count || 0}</span>
-                    </motion.button>
-                    <motion.button
-                      style={styles.actionBtn}
-                      onClick={() => setExpanded((prev) => ({ ...prev, [post.id]: !prev[post.id] }))}
-                      whileHover={{ background: 'rgba(255,255,255,0.06)' }}
-                      whileTap={{ scale: 0.8 }}
-                    >
-                      <CommentIcon />
-                      <span>{post._commentCount ?? post.comments_count ?? 0}</span>
-                    </motion.button>
+                    <div style={styles.actionBarLeft}>
+                      <motion.button
+                        style={{ ...styles.actionBtn, color: likes[post.id]?.liked ? '#e74c3c' : '#ccc' }}
+                        onClick={() => handleLike(post.id)}
+                        whileHover={{ background: 'rgba(231,76,60,0.08)' }}
+                        whileTap={{ scale: 0.8 }}
+                      >
+                        <HeartIcon filled={likes[post.id]?.liked} />
+                      </motion.button>
+                      <motion.button
+                        style={{ ...styles.actionBtn, position: 'relative', fontSize: '12px', color: '#999' }}
+                        onClick={() => openLikes(post.id)}
+                        whileTap={{ scale: 0.85 }}
+                      >
+                        {likes[post.id]?.count || 0}
+                        {showLikesPopover === post.id && likesUsers && (
+                          <div style={styles.likesPopover}>
+                            {likesUsers.length === 0 ? (
+                              <span style={{ color: '#888', fontSize: '12px' }}>No likes yet</span>
+                            ) : (
+                              likesUsers.map((u) => (
+                                <div key={u.id} style={styles.likesPopoverItem}>
+                                  {u.avatar_url ? (
+                                    <img src={u.avatar_url} alt="" style={styles.likesPopoverAvatar} />
+                                  ) : (
+                                    <div style={styles.likesPopoverInitial}>{u.name?.charAt(0).toUpperCase()}</div>
+                                  )}
+                                  <span style={{ color: '#ccc', fontSize: '13px' }}>{u.name}</span>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        )}
+                      </motion.button>
+                      <motion.button
+                        style={styles.actionBtn}
+                        onClick={() => setExpanded((prev) => ({ ...prev, [post.id]: !prev[post.id] }))}
+                        whileHover={{ background: 'rgba(255,255,255,0.06)' }}
+                        whileTap={{ scale: 0.8 }}
+                      >
+                        <CommentIcon />
+                        <span>{post._commentCount ?? post.comments_count ?? 0}</span>
+                      </motion.button>
+                    </div>
                   </div>
 
                     <AnimatePresence>
@@ -660,6 +698,21 @@ const styles = {
     display: 'flex', alignItems: 'center', gap: '7px',
     fontWeight: 500, borderRadius: '8px',
     transition: 'background 0.15s',
+  },
+  actionBarLeft: { display: 'flex', alignItems: 'center' },
+  likesPopover: {
+    position: 'absolute', top: '100%', left: 0, background: '#1a1a1a',
+    border: '1px solid #333', borderRadius: '8px', padding: '8px',
+    minWidth: '160px', maxHeight: '200px', overflowY: 'auto',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.6)', zIndex: 100,
+  },
+  likesPopoverItem: { display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0' },
+  likesPopoverAvatar: { width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover' },
+  likesPopoverInitial: {
+    width: '24px', height: '24px', borderRadius: '50%', background: '#111',
+    border: '1px solid #a37a39', display: 'flex', alignItems: 'center',
+    justifyContent: 'center', color: '#a37a39', fontSize: '11px',
+    fontWeight: 700, flexShrink: 0,
   },
   userBar: {
     display: 'flex', alignItems: 'center', gap: '10px',
