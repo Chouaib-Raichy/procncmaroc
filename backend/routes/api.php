@@ -30,6 +30,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::post('/profile/update', [ProfileController::class, 'update']);
+    Route::post('/profile/send-code', [ProfileController::class, 'sendVerificationCode']);
+    Route::post('/profile/update-verified', [ProfileController::class, 'updateWithVerification']);
     Route::post('/register/complete', [ProfileController::class, 'completeRegistration']);
     Route::get('/gallery/my', [GalleryPostController::class, 'myPosts']);
     Route::post('/gallery', [GalleryPostController::class, 'store']);

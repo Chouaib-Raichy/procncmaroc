@@ -2,7 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import api from '../api/axios';
 import PhoneInput from '../components/PhoneInput';
+import VerificationCodeModal from '../components/VerificationCodeModal';
 import machineBg from '../assets/machineBG.jpeg';
 
 const CalendarIcon = () => (
@@ -32,6 +34,8 @@ export default function Profile() {
   const [savingBg, setSavingBg] = useState(false);
   const [msgInfo, setMsgInfo] = useState(null);
   const [msgPass, setMsgPass] = useState(null);
+  const [verifyModal, setVerifyModal] = useState(null);
+  const [pendingChanges, setPendingChanges] = useState(null);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [modal, setModal] = useState(null);
   const [countryList, setCountryList] = useState([]);
@@ -115,41 +119,38 @@ export default function Profile() {
 
   const handleInfoSubmit = async (e) => {
     e.preventDefault();
-    setSavingInfo(true);
-    setMsgInfo(null);
-    try {
-      const fd = new FormData();
-      if (form.name !== user.name) fd.append('name', form.name);
-      if (form.email !== user.email) fd.append('email', form.email);
-      if (form.phone !== (user.phone || '')) fd.append('phone', form.phone);
-      if (form.business_location !== (user.business_location || '')) fd.append('business_location', form.business_location);
-      if (form.city !== (user.city || '')) fd.append('city', form.city);
-      if (form.country !== (user.country || '')) fd.append('country', form.country);
-      await updateProfile(fd);
-      setMsgInfo({ type: 'success', text: 'Profile information updated' });
-    } catch (err) {
-      const d = err.response?.data;
-      setMsgInfo({ type: 'error', text: d?.message || Object.values(d?.errors || {}).flat().join(', ') || 'Update failed' });
-    } finally { setSavingInfo(false); }
+    const changes = {};
+    if (form.name !== user.name) changes.name = form.name;
+    if (form.email !== user.email) changes.email = form.email;
+    if (form.phone !== (user.phone || '')) changes.phone = form.phone;
+    if (form.business_location !== (user.business_location || '')) changes.business_location = form.business_location;
+    if (form.city !== (user.city || '')) changes.city = form.city;
+    if (form.country !== (user.country || '')) changes.country = form.country;
+    if (Object.keys(changes).length === 0) { setMsgInfo({ type: 'info', text: 'No changes to save' }); return; }
+    setPendingChanges(changes);
+    setVerifyModal('info');
   };
 
   const handlePassSubmit = async (e) => {
     e.preventDefault();
     if (!form.password) { setMsgPass({ type: 'error', text: 'Enter a new password' }); return; }
     if (form.password !== form.password_confirmation) { setMsgPass({ type: 'error', text: 'Passwords do not match' }); return; }
-    setSavingPass(true);
-    setMsgPass(null);
-    try {
-      const fd = new FormData();
-      fd.append('password', form.password);
-      fd.append('password_confirmation', form.password_confirmation);
-      await updateProfile(fd);
-      setMsgPass({ type: 'success', text: 'Password updated successfully' });
+    setPendingChanges({ password: form.password, password_confirmation: form.password_confirmation });
+    setVerifyModal('security');
+  };
+
+  const handleVerified = async (code) => {
+    const body = { code, ...pendingChanges };
+    await api.post('/profile/update-verified', body);
+    refreshUser();
+    setVerifyModal(null);
+    setPendingChanges(null);
+    if (body.password) {
       setForm((p) => ({ ...p, password: '', password_confirmation: '' }));
-    } catch (err) {
-      const d = err.response?.data;
-      setMsgPass({ type: 'error', text: d?.message || Object.values(d?.errors || {}).flat().join(', ') || 'Update failed' });
-    } finally { setSavingPass(false); }
+      setMsgPass({ type: 'success', text: 'Password updated successfully' });
+    } else {
+      setMsgInfo({ type: 'success', text: 'Profile information updated' });
+    }
   };
 
   const currentAvatar = avatarPreview || user.avatar_url;
@@ -357,7 +358,7 @@ export default function Profile() {
                   </div>
                   <AnimatePresence>
                     {msgInfo && (
-                      <motion.div style={{ ...s.msg, background: msgInfo.type === 'success' ? '#0d2a0d' : '#2a0d0d', borderColor: msgInfo.type === 'success' ? '#2e7d32' : '#c62828', color: msgInfo.type === 'success' ? '#81c784' : '#ef9a9a' }}
+                      <motion.div style={{ ...s.msg, background: msgInfo.type === 'success' ? '#0d2a0d' : msgInfo.type === 'info' ? '#0a1a2a' : '#2a0d0d', borderColor: msgInfo.type === 'success' ? '#2e7d32' : msgInfo.type === 'info' ? '#1565c0' : '#c62828', color: msgInfo.type === 'success' ? '#81c784' : msgInfo.type === 'info' ? '#90caf9' : '#ef9a9a' }}
                         initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
                       >{msgInfo.text}</motion.div>
                     )}
@@ -438,6 +439,17 @@ export default function Profile() {
               </button>
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Verification Code Modal */}
+      <AnimatePresence>
+        {verifyModal && (
+          <VerificationCodeModal
+            email={user.email}
+            onVerified={handleVerified}
+            onClose={() => { setVerifyModal(null); setPendingChanges(null); }}
+          />
         )}
       </AnimatePresence>
 
