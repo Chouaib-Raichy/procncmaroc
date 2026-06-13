@@ -69,7 +69,20 @@ export default function MachineDetail() {
 
   return (
     <div style={styles.page}>
-      <SEO title={machine.title + ' | PRO CNC MAROC'} description={machine.description} canonicalUrl={'/machines/' + id} />
+      <SEO title={machine.title + ' | PRO CNC MAROC'} description={machine.description} canonicalUrl={'/machines/' + id} ogImage={machine.image_url || undefined} ogType="product" jsonLd={{
+        '@type': 'Product',
+        name: machine.title,
+        description: machine.description,
+        image: machine.image_url || undefined,
+        offers: machine.price ? {
+          '@type': 'Offer',
+          price: parseFloat(machine.price),
+          priceCurrency: 'MAD',
+          availability: 'https://schema.org/InStock',
+          url: `https://procncmaroc.com/machines/${id}`,
+        } : undefined,
+        category: machine.category?.name || undefined,
+      }} />
       <div style={styles.overlay}>
         <div style={styles.inner}>
           <motion.div
