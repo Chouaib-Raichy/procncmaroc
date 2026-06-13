@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getPartners } from '../api/partners';
+import api from '../api/axios';
 import machineBg from '../assets/machineBG.jpeg';
 import showcaseBg from '../assets/showcase_bg.png';
 import L from 'leaflet';
@@ -83,15 +84,32 @@ export default function PartnerMap() {
   useEffect(() => { loadPartners(); }, []);
 
   const extractCoords = (p) => {
-    if (p.latitude && p.longitude) return [p.latitude, p.longitude];
+    if (p.latitude && p.longitude) return [parseFloat(p.latitude), parseFloat(p.longitude)];
 
     const url = p.business_location || '';
-    if (url.includes('google')) {
-      const m = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) || url.match(/[?&](?:q|ll)=(-?\d+\.\d+),(-?\d+\.\d+)/);
-      if (m) return [parseFloat(m[1]), parseFloat(m[2])];
-    }
+    const m = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) || url.match(/[?&](?:q|ll)=(-?\d+\.\d+),(-?\d+\.\d+)/);
+    if (m) return [parseFloat(m[1]), parseFloat(m[2])];
     return null;
   };
+
+  const [resolvedCoords, setResolvedCoords] = useState({});
+
+  useEffect(() => {
+    const todo = partners.filter((p) => {
+      if (p.latitude && p.longitude) return false;
+      const url = p.business_location || '';
+      return url.includes('goo.gl') || url.includes('google');
+    });
+    if (todo.length === 0) return;
+    todo.forEach(async (p) => {
+      try {
+        const res = await api.get('/resolve-url', { params: { url: p.business_location } });
+        if (res.data.lat && res.data.lng) {
+          setResolvedCoords((prev) => ({ ...prev, [p.id]: [parseFloat(res.data.lat), parseFloat(res.data.lng)] }));
+        }
+      } catch {}
+    });
+  }, [partners]);
 
   useEffect(() => {
     if (loading || partners.length === 0) return;
@@ -125,7 +143,7 @@ export default function PartnerMap() {
     markersRef.current = [];
 
     partners.forEach((p) => {
-      const coords = extractCoords(p);
+      const coords = extractCoords(p) || resolvedCoords[p.id];
       if (!coords) return;
 
       const [lat, lng] = coords;
@@ -159,7 +177,7 @@ export default function PartnerMap() {
       markersRef.current.push(marker);
     });
 
-  }, [loading, partners, navigate]);
+  }, [loading, partners, navigate, resolvedCoords]);
 
   return (
     <div style={styles.page}>

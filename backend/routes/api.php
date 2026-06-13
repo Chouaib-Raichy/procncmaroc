@@ -25,6 +25,7 @@ Route::get('/gallery', [GalleryPostController::class, 'index']);
 Route::get('/partners', [App\Http\Controllers\Api\PartnerController::class, 'index']);
 Route::get('/partners/{id}', [App\Http\Controllers\Api\PartnerController::class, 'show']);
 Route::post('/track-visit', [StatsController::class, 'trackVisit']);
+Route::get('/resolve-url', [AuthController::class, 'resolveLocation']);
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);

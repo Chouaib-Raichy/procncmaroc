@@ -137,6 +137,32 @@ class AuthController extends Controller
         return response()->json(['message' => __($status)], 400);
     }
 
+    public function resolveLocation(Request $request)
+    {
+        $request->validate(['url' => 'required|string']);
+        $coords = self::geocode($request->url);
+        if ($coords['lat'] !== null && $coords['lng'] !== null) {
+            return response()->json($coords);
+        }
+        try {
+            $ch = curl_init($request->url);
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_TIMEOUT => 5,
+                CURLOPT_SSL_VERIFYPEER => false,
+            ]);
+            curl_exec($ch);
+            $finalUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+            curl_close($ch);
+            if ($finalUrl && $finalUrl !== $request->url) {
+                $coords = self::parseGoogleMapsUrl($finalUrl);
+                if ($coords) return response()->json($coords);
+            }
+        } catch (\Exception) {}
+        return response()->json(['lat' => null, 'lng' => null]);
+    }
+
     public static function geocode(string $location, ?string $city = null, ?string $country = null): array
     {
         $coords = self::parseGoogleMapsUrl($location);
@@ -160,10 +186,9 @@ class AuthController extends Controller
                 $ch = curl_init($url);
                 curl_setopt_array($ch, [
                     CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_HEADER => true,
-                    CURLOPT_NOBODY => true,
                     CURLOPT_FOLLOWLOCATION => true,
                     CURLOPT_TIMEOUT => 5,
+                    CURLOPT_SSL_VERIFYPEER => false,
                 ]);
                 curl_exec($ch);
                 $redirectUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
