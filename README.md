@@ -84,12 +84,19 @@ The platform features a **multi-step registration flow** requiring admin approva
 - **Settings modals** — Edit Profile and Password & Security open in centered modals with scale/fade animation
 - **Image preview modals** — Click avatar or cover to preview, upload, or view full size
 
+### My Gallery (User)
+- **Two-column layout** — Add New Post form on left, posts feed on right
+- **Professional post cards** — User bar with avatar, premium carousel with gradient overlays/image counter, description clamping with "View more"/"Show less", SVG heart/comment/thumbs-up/delete icons
+- **Comments** — Threaded with commenter avatars, animated reply form, Enter-to-submit
+- **Likes popover** — Click thumbs-up to see who liked, with avatar/initial avatars
+- **Delete with confirmation** — ConfirmModal for safe deletion
+- **Loading skeleton** — Shimmer animation while fetching posts
+- **Empty state** — SVG illustration with helpful prompt
+- **Lightbox** — Full-screen image viewer with close button
+
 ### Gallery System
-- Users create posts with 1–5 images, title, description, business location
-- Threaded comments (replies with `parent_id`)
-- Like/unlike on both posts and comments
-- Paginated public gallery (9 posts/page)
-- Professional card design with SVG icons, loading skeleton grid, staggered card entrance, premium carousel with gradient overlays and image counter badge, lightbox with close button
+- **Public Customer Gallery** — Paginated (9 posts/page), professional cards with SVG icons, skeleton grid, staggered entrance, premium carousel with gradient overlays and image counter, action bar (heart/comment/thumbs-up), threaded comments, lightbox
+- **My Gallery** — User-managed posts at `/my-gallery`, two-column layout (form + posts), professional cards matching public gallery style, likes popover, delete with confirm modal, loading skeleton, empty state
 
 ### Visitor Tracking
 - `POST /api/track-visit` — Records page URL, IP address, user agent, referrer
