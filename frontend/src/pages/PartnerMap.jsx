@@ -104,8 +104,12 @@ export default function PartnerMap() {
     todo.forEach(async (p) => {
       try {
         const res = await api.get('/resolve-url', { params: { url: p.business_location } });
-        if (res.data.lat && res.data.lng) {
-          setResolvedCoords((prev) => ({ ...prev, [p.id]: [parseFloat(res.data.lat), parseFloat(res.data.lng)] }));
+        if (res.data && res.data.lat != null && res.data.lng != null) {
+          const lat = parseFloat(res.data.lat);
+          const lng = parseFloat(res.data.lng);
+          if (!isNaN(lat) && !isNaN(lng)) {
+            setResolvedCoords((prev) => ({ ...prev, [p.id]: [lat, lng] }));
+          }
         }
       } catch {}
     });

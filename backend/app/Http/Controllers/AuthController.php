@@ -142,12 +142,12 @@ class AuthController extends Controller
         $request->validate(['url' => 'required|string']);
 
         $resolvedUrl = self::followRedirects($request->url);
-        if ($resolvedUrl) {
-            $coords = self::extractCoordsFromUrl($resolvedUrl);
-            if ($coords) return response()->json($coords);
-        }
+        $targetUrl = $resolvedUrl ?: $request->url;
 
-        $coords = self::geocode($request->url);
+        $coords = self::extractCoordsFromUrl($targetUrl);
+        if ($coords) return response()->json($coords);
+
+        $coords = self::geocode($targetUrl);
         if ($coords['lat'] !== null && $coords['lng'] !== null) {
             return response()->json($coords);
         }
@@ -177,12 +177,14 @@ class AuthController extends Controller
             $client = new \GuzzleHttp\Client([
                 'allow_redirects' => ['track_redirects' => true],
                 'verify' => false,
-                'timeout' => 5,
+                'timeout' => 10,
+                'headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'],
             ]);
-            $response = $client->get($url);
+            $response = $client->get($url, ['http_errors' => false]);
             $history = $response->getHeader('X-Guzzle-Redirect-History');
             if (!empty($history)) {
-                return end($history);
+                $final = end($history);
+                if ($final && $final !== $url) return $final;
             }
         } catch (\Exception) {}
         return null;
@@ -209,6 +211,14 @@ class AuthController extends Controller
         }
 
         if (preg_match('/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/', $url, $m)) {
+            return ['lat' => (float) $m[1], 'lng' => (float) $m[2]];
+        }
+
+        if (preg_match('/[?&]center=(-?\d+\.\d+),(-?\d+\.\d+)/', $url, $m)) {
+            return ['lat' => (float) $m[1], 'lng' => (float) $m[2]];
+        }
+
+        if (preg_match('/[?&]destination=(-?\d+\.\d+),(-?\d+\.\d+)/', $url, $m)) {
             return ['lat' => (float) $m[1], 'lng' => (float) $m[2]];
         }
 
