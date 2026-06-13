@@ -3,13 +3,19 @@ import { Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import PhoneInput from '../components/PhoneInput';
-import Loading from '../components/Loading';
 import machineBg from '../assets/machineBG.jpeg';
 
-const tabs = [
-  { key: 'info', label: 'Edit Profile', icon: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8' },
-  { key: 'security', label: 'Password & Security', icon: 'M3 11h18v11H3z M7 11V7a5 5 0 0 1 10 0v4' },
-];
+const CalendarIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+);
+const LocationIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+);
+const BuildingIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/><line x1="9" y1="18" x2="9" y2="18.01"/><line x1="15" y1="18" x2="15" y2="18.01"/></svg>
+);
+
+const fadeUp = (delay = 0) => ({ initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.4, delay } });
 
 export default function Profile() {
   const { user, loading, updateProfile, refreshUser } = useAuth();
@@ -60,7 +66,28 @@ export default function Profile() {
     if (user) setForm((f) => ({ ...f, name: user.name || '', email: user.email || '', phone: user.phone || '', business_location: user.business_location || '', city: user.city || '', country: user.country || '' }));
   }, [user]);
 
-  if (loading) return <Loading text="Loading profile..." />;
+  if (loading) return (
+    <div style={s.page}>
+      <div style={s.overlay} />
+      <div style={s.card}>
+        <div style={{ ...s.cover, background: '#111' }} />
+        <div style={{ padding: '0 clamp(20px, 5vw, 60px)' }}>
+          <div style={{ width: '110px', height: '110px', borderRadius: '50%', marginTop: '-55px', marginBottom: '16px', background: '#1a1a1a', border: '3px solid #222' }} />
+          <div style={{ width: 'clamp(140px, 20vw, 220px)', height: '22px', borderRadius: '6px', background: '#1a1a1a', marginBottom: '8px' }} />
+          <div style={{ width: 'clamp(100px, 15vw, 160px)', height: '14px', borderRadius: '6px', background: '#1a1a1a', marginBottom: '24px' }} />
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '28px' }}>
+            {[1, 2, 3].map((n) => (
+              <div key={n} style={{ flex: '1 1 160px', height: '70px', borderRadius: '12px', background: '#1a1a1a' }} />
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: 'clamp(20px, 3vw, 40px)', paddingBottom: '40px' }}>
+            <div style={{ flex: '1 1 50%' }}><div style={{ width: '100%', height: 'clamp(100px, 14vw, 160px)', borderRadius: '12px', background: '#1a1a1a' }} /></div>
+            <div style={{ flex: '1 1 40%' }}><div style={{ width: '100%', height: 'clamp(220px, 30vw, 420px)', borderRadius: '12px', background: '#1a1a1a' }} /></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
   if (!user) return <Navigate to="/login" replace />;
 
   const handleAvatarPick = (e) => { const f = e.target.files[0]; if (f) { setAvatar(f); setAvatarPreview(URL.createObjectURL(f)); uploadImage(f, 'avatar'); } };
@@ -74,10 +101,7 @@ export default function Profile() {
       fd.append(field, file);
       await updateProfile(fd);
       refreshUser();
-    } catch (err) {
-      const d = err.response?.data;
-      console.error('Upload failed', d);
-    } finally { setSaving(false); }
+    } catch {} finally { setSaving(false); }
   };
 
   const handleInfoSubmit = async (e) => {
@@ -122,6 +146,8 @@ export default function Profile() {
   const currentAvatar = avatarPreview || user.avatar_url;
   const currentBg = profileBgPreview || user.profile_bg_url;
   const images = user.business_images_url || [];
+  const memberSince = user.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : '';
+  const roleLabel = user.role === 'admin' ? 'Administrator' : 'Member';
 
   const fields = [
     { key: 'name', label: 'Full Name', placeholder: 'John Doe', autoComplete: 'name' },
@@ -130,37 +156,15 @@ export default function Profile() {
     { key: 'business_location', label: 'Business Location', placeholder: 'Paste from Google Maps', autoComplete: 'country-name' },
   ];
 
-  const memberSince = user.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : '';
-
   return (
     <div style={s.page}>
       <div style={s.overlay} />
 
-      <motion.div style={s.sidebar} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}>
-        <div style={s.sidebarLogo}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-          </svg>
-          Settings
-        </div>
-        <div style={s.sidebarLabel}>Menu</div>
-        {tabs.map((t) => (
-          <div key={t.key} style={s.sidebarItem(false)} onClick={() => setSettingsModal(t.key)}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d={t.icon} />
-            </svg>
-            {t.label}
-          </div>
-        ))}
-      </motion.div>
-
-      <div style={s.container}>
-
-        <motion.div style={s.cover} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-          <div style={{ ...s.coverBg, backgroundImage: `url(${currentBg || 'https://placehold.co/1200x350/1a1a1a/333?text=+ '})` }} onClick={() => { modalRef.current = 'cover'; setModal('cover'); }}>
+      <div style={s.card}>
+        {/* Cover */}
+        <motion.div style={s.cover} {...fadeUp()}>
+          <div style={{ ...s.coverBg, backgroundImage: `url(${currentBg || machineBg})` }}>
             <div style={s.coverGradient} />
-            <input ref={bgRef} type="file" accept="image/*" onChange={handleBgPick} style={{ display: 'none' }} />
-
             <div style={s.coverContent}>
               <div style={s.avatarWrap}>
                 <div style={s.avatarInner} onClick={(e) => { e.stopPropagation(); modalRef.current = 'avatar'; setModal('avatar'); }}>
@@ -174,9 +178,12 @@ export default function Profile() {
                 </div>
                 <input ref={avatarRef} type="file" accept="image/*" onChange={handleAvatarPick} style={{ display: 'none' }} />
               </div>
-              <div style={s.coverInfo}>
+              <div style={s.identityInfo}>
                 <h1 style={s.name}>{user.name}</h1>
-                <p style={s.roleBadge}>{user.role === 'admin' ? 'Administrator' : 'Member'}</p>
+                <div style={s.roleRow}>
+                  {user.entreprise_name && <span style={s.entreprise}>{user.entreprise_name}</span>}
+                  <span style={s.roleBadge}>{roleLabel}</span>
+                </div>
                 <div style={s.coverMeta}>
                   {user.email && (
                     <span style={s.coverMetaItem}>
@@ -197,112 +204,138 @@ export default function Profile() {
                 </div>
               </div>
             </div>
+            <input ref={bgRef} type="file" accept="image/*" onChange={handleBgPick} style={{ display: 'none' }} />
+            {/* Settings button */}
+            <button style={s.settingsBtn} onClick={() => setSettingsModal('info')}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+              </svg>
+              Settings
+            </button>
           </div>
         </motion.div>
 
-        <motion.div style={s.statsBar} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.15 }}>
+        {/* Stats Bar */}
+        <motion.div style={s.statsBar} {...fadeUp(0.15)}>
           {user.city && user.country && (
-            <div style={s.statItem}>
-              <div style={s.statIcon}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
-                </svg>
-              </div>
+            <div style={s.statCard}>
+              <div style={s.statIcon}><LocationIcon /></div>
               <div>
-                <div style={s.statLabel}>Location</div>
                 <div style={s.statValue}>{user.city}, {user.country}</div>
+                <div style={s.statLabel}>Location</div>
               </div>
             </div>
           )}
           {memberSince && (
-            <div style={s.statItem}>
-              <div style={s.statIcon}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
-              </div>
+            <div style={s.statCard}>
+              <div style={s.statIcon}><CalendarIcon /></div>
               <div>
-                <div style={s.statLabel}>Member Since</div>
                 <div style={s.statValue}>{memberSince}</div>
+                <div style={s.statLabel}>Member Since</div>
               </div>
             </div>
           )}
           {user.business_location && (
-            <div style={s.statItem}>
-              <div style={s.statIcon}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                </svg>
-              </div>
+            <div style={s.statCard}>
+              <div style={s.statIcon}><BuildingIcon /></div>
               <div>
-                <div style={s.statLabel}>Business</div>
                 <div style={s.statValue}>{user.business_location}</div>
+                <div style={s.statLabel}>Business</div>
               </div>
             </div>
           )}
         </motion.div>
 
-        <div style={s.contentGrid}>
-          <div style={s.contentMain}>
+        <div style={s.divider} />
+
+        {/* Content: About + Gallery */}
+        <div style={s.contentArea}>
+          <motion.div style={s.leftCol} {...fadeUp(0.2)}>
             {user.business_bio && (
-              <motion.div style={s.card} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
-                <div style={s.cardHeader}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" />
-                  </svg>
-                  About
-                </div>
-                <p style={s.cardText}>{user.business_bio}</p>
-              </motion.div>
+              <div style={s.bioBox}>
+                <div style={s.bioLabel}>About</div>
+                <p style={s.bioText}>{user.business_bio}</p>
+              </div>
             )}
-
-            {images.length > 0 && (
-              <motion.div style={s.card} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.25 }}>
-                <div style={s.cardHeader}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
+            <div style={s.settingsSection}>
+              <div style={s.settingsLabel}>Account Settings</div>
+              <div style={s.settingsButtons}>
+                <motion.button style={s.settingsCard} onClick={() => setSettingsModal('info')} whileHover={{ background: 'rgba(163,122,57,0.08)' }} whileTap={{ scale: 0.98 }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
                   </svg>
-                  Business Gallery ({images.length})
-                </div>
-                <div style={s.carousel}>
-                  <AnimatePresence mode="wait">
-                    <motion.img key={carouselIndex} src={images[carouselIndex]} alt="" style={s.carouselImg}
-                      initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -60 }} transition={{ duration: 0.25 }}
-                      onClick={() => window.open(images[carouselIndex], '_blank')}
-                    />
-                  </AnimatePresence>
-                  {images.length > 1 && (
-                    <>
-                      <button style={{ ...s.carouselBtn, left: '10px' }} onClick={() => setCarouselIndex((p) => (p - 1 + images.length) % images.length)}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
-                      </button>
-                      <button style={{ ...s.carouselBtn, right: '10px' }} onClick={() => setCarouselIndex((p) => (p + 1) % images.length)}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
-                      </button>
-                    </>
-                  )}
-                </div>
-                {images.length > 1 && (
-                  <div style={s.dots}>
-                    {images.map((_, i) => (<button key={i} style={s.dot(i === carouselIndex)} onClick={() => setCarouselIndex(i)} />))}
+                  <div>
+                    <div style={s.settingsCardTitle}>Edit Profile</div>
+                    <div style={s.settingsCardSub}>Name, email, phone, location</div>
                   </div>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 'auto', flexShrink: 0 }}><polyline points="9 18 15 12 9 6" /></svg>
+                </motion.button>
+                <motion.button style={s.settingsCard} onClick={() => setSettingsModal('security')} whileHover={{ background: 'rgba(163,122,57,0.08)' }} whileTap={{ scale: 0.98 }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                  <div>
+                    <div style={s.settingsCardTitle}>Password & Security</div>
+                    <div style={s.settingsCardSub}>Change your password</div>
+                  </div>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 'auto', flexShrink: 0 }}><polyline points="9 18 15 12 9 6" /></svg>
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div style={s.rightCol} {...fadeUp(0.25)}>
+            <div style={s.galleryHeader}>
+              <div style={s.galleryLine} />
+              <span style={s.galleryTitle}>Business Gallery {images.length > 0 ? `(${images.length})` : ''}</span>
+              <div style={s.galleryLine} />
+            </div>
+            {images.length > 0 ? (
+              <div style={s.carousel}>
+                <AnimatePresence mode="wait">
+                  <motion.img key={carouselIndex} src={images[carouselIndex]} alt="" style={s.carouselImg}
+                    initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.25 }}
+                    onClick={() => window.open(images[carouselIndex], '_blank')}
+                  />
+                </AnimatePresence>
+                <div style={s.carouselGradientLeft} />
+                <div style={s.carouselGradientRight} />
+                <span style={s.carouselCounter}>{carouselIndex + 1} / {images.length}</span>
+                {images.length > 1 && (
+                  <>
+                    <button style={{ ...s.carouselBtn, left: '8px' }} onClick={() => setCarouselIndex((p) => (p - 1 + images.length) % images.length)} aria-label="Previous">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
+                    </button>
+                    <button style={{ ...s.carouselBtn, right: '8px' }} onClick={() => setCarouselIndex((p) => (p + 1) % images.length)} aria-label="Next">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
+                    </button>
+                    <div style={s.dots}>
+                      {images.map((_, i) => (<button key={i} style={s.dot(i === carouselIndex)} onClick={() => setCarouselIndex(i)} />))}
+                    </div>
+                  </>
                 )}
-              </motion.div>
+              </div>
+            ) : (
+              <div style={s.noImages}>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
+                </svg>
+                <p style={{ color: '#666', marginTop: '12px', fontSize: '14px' }}>No gallery images yet</p>
+              </div>
             )}
-
-          </div>
+          </motion.div>
         </div>
-
       </div>
 
+      {/* Settings Modals */}
       <AnimatePresence>
         {settingsModal && (
           <motion.div style={s.modalOverlay} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSettingsModal(null)}>
-            <motion.div style={{ ...s.modal, maxWidth: '560px' }} initial={{ opacity: 0, scale: 0.85, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.85, y: 20 }} onClick={(e) => e.stopPropagation()}>
+            <motion.div style={s.modal} initial={{ opacity: 0, scale: 0.85, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.85, y: 20 }} onClick={(e) => e.stopPropagation()}>
               {settingsModal === 'info' && (
                 <>
-                  <div style={s.cardHeader}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <div style={s.modalTitleBar}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
                     </svg>
                     Edit Profile
@@ -331,13 +364,9 @@ export default function Profile() {
                         <div style={s.selectWrap}>
                           <select style={s.select} value={form.country} onChange={(e) => setForm((p) => ({ ...p, country: e.target.value, city: '' }))}>
                             <option value="">{countryList.length ? 'Select your country' : 'Loading...'}</option>
-                            {countryList.map((c) => (
-                              <option key={c} value={c}>{c}</option>
-                            ))}
+                            {countryList.map((c) => <option key={c} value={c}>{c}</option>)}
                           </select>
-                          <svg style={s.selectArrow} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="6 9 12 15 18 9" />
-                          </svg>
+                          <svg style={s.selectArrow} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2.5"><polyline points="6 9 12 15 18 9" /></svg>
                         </div>
                       </div>
                       <div style={s.field}>
@@ -345,13 +374,9 @@ export default function Profile() {
                         <div style={s.selectWrap}>
                           <select style={{ ...s.select, opacity: !form.country || loadingCities ? 0.5 : 1, cursor: !form.country || loadingCities ? 'not-allowed' : 'pointer' }} value={form.city} onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))} disabled={!form.country || loadingCities}>
                             <option value="">{loadingCities ? 'Loading cities...' : form.country ? `Select city (${cityList.length})` : 'Select a country first'}</option>
-                            {cityList.map((city) => (
-                              <option key={city} value={city}>{city}</option>
-                            ))}
+                            {cityList.map((city) => <option key={city} value={city}>{city}</option>)}
                           </select>
-                          <svg style={{ ...s.selectArrow, opacity: !form.country || loadingCities ? 0.3 : 1 }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="6 9 12 15 18 9" />
-                          </svg>
+                          <svg style={{ ...s.selectArrow, opacity: !form.country || loadingCities ? 0.3 : 1 }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2.5"><polyline points="6 9 12 15 18 9" /></svg>
                         </div>
                       </div>
                     </div>
@@ -363,8 +388,8 @@ export default function Profile() {
               )}
               {settingsModal === 'security' && (
                 <>
-                  <div style={s.cardHeader}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <div style={s.modalTitleBar}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
                     </svg>
                     Password & Security
@@ -401,10 +426,11 @@ export default function Profile() {
         )}
       </AnimatePresence>
 
+      {/* Image Preview Modals */}
       <AnimatePresence>
         {modal && (
           <motion.div style={s.modalOverlay} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setModal(null)}>
-            <motion.div style={s.modal} initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.85 }} onClick={(e) => e.stopPropagation()}>
+            <motion.div style={{ ...s.modal, maxWidth: '420px' }} initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.85 }} onClick={(e) => e.stopPropagation()}>
               <div style={s.modalTitle}>{modal === 'avatar' ? 'Profile Picture' : 'Cover Photo'}</div>
               <div style={s.modalPreviewWrap}>
                 <img src={modal === 'avatar' ? currentAvatar : currentBg} alt="" style={s.modalPreview} />
@@ -428,58 +454,113 @@ export default function Profile() {
           </motion.div>
         )}
       </AnimatePresence>
-
     </div>
   );
 }
 
 const s = {
-  page: { minHeight: '100vh', background: `url(${machineBg}) center/cover fixed no-repeat`, paddingTop: 'clamp(16px, 2vw, 30px)', position: 'relative' },
+  page: { minHeight: '100vh', background: `url(${machineBg}) center/cover fixed no-repeat`, position: 'relative' },
   overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 0 },
-  container: { width: '100%', maxWidth: '100%', margin: '0 auto', padding: '0 clamp(16px, 3vw, 40px) 0 clamp(200px, 20vw, 260px)', position: 'relative', zIndex: 1, boxSizing: 'border-box' },
 
-  sidebar: { position: 'fixed', top: 0, left: 0, width: 'clamp(170px, 18vw, 220px)', height: '100vh', background: '#0a0a0a', borderRight: '1px solid #1e1e1e', padding: 'clamp(24px, 3vw, 36px) 12px', zIndex: 10, display: 'flex', flexDirection: 'column', gap: '2px', boxSizing: 'border-box' },
-  sidebarLogo: { display: 'flex', alignItems: 'center', gap: '10px', color: '#d4af37', fontSize: '18px', fontWeight: '700', padding: '0 16px 24px', marginBottom: '12px', borderBottom: '1px solid #1e1e1e' },
-  sidebarLabel: { color: '#555', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1.5px', padding: '8px 16px 6px' },
-  sidebarItem: (active) => ({
-    display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 16px', borderRadius: '10px', cursor: 'pointer', fontSize: '13px', fontWeight: active ? '700' : '500', color: active ? '#000' : '#888', background: active ? 'linear-gradient(135deg, #a37a39, #c8952e)' : 'transparent', transition: 'all 0.2s ease',
-  }),
+  card: {
+    position: 'relative', zIndex: 1,
+    background: 'rgba(10,10,10,0.95)',
+    minHeight: '100vh',
+  },
 
-  cover: { borderRadius: '16px', overflow: 'hidden', height: 'clamp(240px, 30vw, 320px)', boxShadow: '0 4px 30px rgba(0,0,0,0.4)', width: '100%' },
-  coverBg: { width: '100%', height: '100%', backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative', transition: 'background-image 0.5s ease', cursor: 'pointer' },
-  coverGradient: { position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.1) 100%)' },
-  coverContent: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 'clamp(20px, 3vw, 36px)', display: 'flex', alignItems: 'flex-end', gap: 'clamp(20px, 3vw, 32px)' },
+  cover: { height: 'clamp(200px, 30vw, 340px)', position: 'relative' },
+  coverBg: { width: '100%', height: '100%', backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative', cursor: 'pointer' },
+  coverGradient: { position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.15) 30%, rgba(0,0,0,0.85) 100%)' },
+  coverContent: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: '0 clamp(20px, 5vw, 60px) clamp(20px, 3vw, 36px)', display: 'flex', alignItems: 'flex-end', gap: 'clamp(16px, 2.5vw, 28px)' },
   avatarWrap: { flexShrink: 0 },
-  avatarInner: { width: 'clamp(88px, 10vw, 110px)', height: 'clamp(88px, 10vw, 110px)', borderRadius: '50%', border: '3px solid #d4af37', overflow: 'hidden', cursor: 'pointer', background: '#111', boxShadow: '0 0 0 3px rgba(0,0,0,0.5), 0 8px 32px rgba(0,0,0,0.6)', position: 'relative' },
+  avatarInner: {
+    width: 'clamp(88px, 10vw, 112px)', height: 'clamp(88px, 10vw, 112px)',
+    borderRadius: '50%', border: '3px solid #d4af37', overflow: 'hidden', cursor: 'pointer',
+    background: '#111', boxShadow: '0 0 0 3px rgba(0,0,0,0.5), 0 8px 32px rgba(0,0,0,0.6)', position: 'relative',
+  },
   avatarImg: { width: '100%', height: '100%', objectFit: 'cover' },
   avatarPlaceholder: { width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #a37a39, #c8952e)', color: '#000', fontSize: 'clamp(34px, 5vw, 44px)', fontWeight: 'bold' },
   avatarBadge: { position: 'absolute', bottom: '3px', right: '3px', background: '#d4af37', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.5)' },
   avatarSpinner: { position: 'absolute', inset: 0, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 3 },
   thumbSpinner: { width: '20px', height: '20px', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#d4af37', borderRadius: '50%', animation: 'spin 0.6s linear infinite', display: 'inline-block' },
-  coverInfo: { paddingBottom: '4px' },
-  name: { color: '#fff', fontSize: 'clamp(22px, 2.8vw, 28px)', fontWeight: '700', margin: '0 0 6px', letterSpacing: '-0.3px', textShadow: '0 2px 8px rgba(0,0,0,0.5)' },
-  roleBadge: { display: 'inline-block', color: '#d4af37', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 10px', padding: '3px 10px', borderRadius: '4px', background: 'rgba(212,175,55,0.12)', border: '1px solid rgba(212,175,55,0.2)' },
+  identityInfo: { paddingBottom: '4px', flex: 1 },
+  name: { color: '#fff', fontSize: 'clamp(22px, 2.8vw, 28px)', fontWeight: '700', margin: '0 0 4px', letterSpacing: '-0.3px', textShadow: '0 2px 8px rgba(0,0,0,0.5)' },
+  roleRow: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', flexWrap: 'wrap' },
+  entreprise: { color: '#ccc', fontSize: '14px', fontWeight: 500 },
+  roleBadge: { display: 'inline-block', color: '#d4af37', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', padding: '3px 10px', borderRadius: '4px', background: 'rgba(212,175,55,0.12)', border: '1px solid rgba(212,175,55,0.2)' },
   coverMeta: { display: 'flex', flexWrap: 'wrap', gap: 'clamp(10px, 1.5vw, 18px)' },
   coverMetaItem: { display: 'flex', alignItems: 'center', gap: '6px', color: 'rgba(255,255,255,0.8)', fontSize: '13px', textShadow: '0 1px 4px rgba(0,0,0,0.5)' },
 
-  statsBar: { display: 'flex', flexWrap: 'wrap', gap: 'clamp(16px, 2vw, 28px)', padding: 'clamp(16px, 2vw, 24px) clamp(20px, 3vw, 36px)', marginTop: '6px', background: 'rgba(0,0,0,0.3)', borderBottom: '1px solid #1e1e1e', backdropFilter: 'blur(8px)' },
-  statItem: { display: 'flex', alignItems: 'center', gap: '10px' },
-  statIcon: { width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  statLabel: { color: '#666', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' },
-  statValue: { color: '#ddd', fontSize: '14px', fontWeight: '500' },
+  settingsBtn: {
+    position: 'absolute', top: '16px', right: 'clamp(16px, 3vw, 28px)',
+    display: 'flex', alignItems: 'center', gap: '6px',
+    background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)',
+    color: '#d4af37', padding: '8px 16px', borderRadius: '8px',
+    cursor: 'pointer', fontSize: '13px', fontWeight: 600, zIndex: 5,
+    backdropFilter: 'blur(8px)', transition: 'background 0.2s',
+  },
 
-  contentGrid: { padding: 'clamp(14px, 2vw, 24px) 0' },
-  contentMain: { display: 'flex', flexDirection: 'column', gap: 'clamp(14px, 2vw, 20px)' },
+  statsBar: {
+    display: 'flex', gap: 'clamp(8px, 1.5vw, 14px)', flexWrap: 'wrap',
+    padding: '20px clamp(20px, 5vw, 60px) 0',
+  },
+  statCard: {
+    flex: '1 1 160px', display: 'flex', alignItems: 'center', gap: '12px',
+    padding: '14px 18px', background: 'rgba(255,255,255,0.03)',
+    border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px',
+    backdropFilter: 'blur(8px)',
+  },
+  statIcon: { width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(163,122,57,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  statValue: { color: '#eee', fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  statLabel: { color: '#888', fontSize: '11px', fontWeight: 500, marginTop: '1px' },
 
-  card: { padding: 'clamp(20px, 2.5vw, 28px)', background: '#0a0a0a', border: '1px solid #1e1e1e', borderRadius: '14px' },
-  cardHeader: { display: 'flex', alignItems: 'center', gap: '8px', color: '#d4af37', fontSize: '14px', fontWeight: '700', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.5px' },
-  cardText: { color: '#aaa', fontSize: '14px', lineHeight: 1.8, margin: 0 },
+  divider: { height: '1px', margin: '20px clamp(20px, 5vw, 60px)', background: 'linear-gradient(90deg, transparent, rgba(163,122,57,0.3), transparent)' },
 
-  carousel: { position: 'relative', borderRadius: '10px', overflow: 'hidden', background: '#111' },
-  carouselImg: { width: '100%', height: 'clamp(240px, 38vw, 400px)', objectFit: 'cover', display: 'block', cursor: 'pointer' },
-  carouselBtn: { position: 'absolute', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 2, backdropFilter: 'blur(4px)' },
-  dots: { display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '12px', flexWrap: 'wrap' },
-  dot: (active) => ({ width: '8px', height: '8px', borderRadius: '50%', border: 'none', cursor: 'pointer', background: active ? '#d4af37' : '#333', transition: 'background 0.2s', padding: 0 }),
+  contentArea: {
+    display: 'flex', flexWrap: 'wrap', gap: 'clamp(20px, 3vw, 40px)',
+    padding: '0 clamp(20px, 5vw, 60px) clamp(28px, 4vw, 60px)',
+  },
+  leftCol: { flex: '1 1 50%', minWidth: '280px', display: 'flex', flexDirection: 'column', gap: '20px' },
+  rightCol: { flex: '1 1 40%', minWidth: '280px', display: 'flex', flexDirection: 'column' },
+
+  bioBox: { borderLeft: '3px solid #a37a39', padding: '16px 20px', background: 'rgba(0,0,0,0.3)', borderRadius: '0 12px 12px 0' },
+  bioLabel: { color: '#d4af37', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' },
+  bioText: { color: '#bbb', fontSize: '14px', lineHeight: 1.8, margin: 0 },
+
+  settingsSection: {},
+  settingsLabel: { color: '#d4af37', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' },
+  settingsButtons: { display: 'flex', flexDirection: 'column', gap: '8px' },
+  settingsCard: {
+    display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none',
+    padding: '14px 16px', borderRadius: '10px', border: '1px solid #1e1e1e',
+    background: 'rgba(0,0,0,0.3)', cursor: 'pointer', width: '100%', textAlign: 'left',
+    transition: 'background 0.2s',
+  },
+  settingsCardTitle: { color: '#ddd', fontSize: '14px', fontWeight: 600 },
+  settingsCardSub: { color: '#666', fontSize: '12px', marginTop: '2px' },
+
+  galleryHeader: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' },
+  galleryLine: { flex: 1, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(163,122,57,0.4) 50%, transparent)' },
+  galleryTitle: { color: '#d4af37', fontSize: '13px', fontWeight: 700, letterSpacing: '2px', flexShrink: 0 },
+
+  carousel: {
+    position: 'relative', borderRadius: '12px', overflow: 'hidden', background: '#0d0d0d',
+    flex: 1, minHeight: '220px',
+  },
+  carouselGradientLeft: { position: 'absolute', top: 0, left: 0, width: '30px', height: '100%', background: 'linear-gradient(90deg, rgba(0,0,0,0.25), transparent)', pointerEvents: 'none', zIndex: 1 },
+  carouselGradientRight: { position: 'absolute', top: 0, right: 0, width: '30px', height: '100%', background: 'linear-gradient(270deg, rgba(0,0,0,0.25), transparent)', pointerEvents: 'none', zIndex: 1 },
+  carouselCounter: { position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.6)', color: '#d4af37', fontSize: '11px', fontWeight: 700, padding: '2px 10px', borderRadius: '12px', zIndex: 2, letterSpacing: '0.3px' },
+  carouselImg: { width: '100%', height: 'clamp(220px, 30vw, 420px)', objectFit: 'cover', display: 'block', cursor: 'pointer' },
+  carouselBtn: {
+    position: 'absolute', top: '50%', transform: 'translateY(-50%)',
+    background: 'rgba(0,0,0,0.55)', border: 'none',
+    color: '#fff', borderRadius: '50%', width: '32px', height: '32px',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    cursor: 'pointer', zIndex: 2, transition: 'background 0.2s',
+  },
+  dots: { display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '10px' },
+  dot: (active) => ({ width: '8px', height: '8px', borderRadius: '50%', border: 'none', cursor: 'pointer', background: active ? '#a37a39' : '#333', transition: 'background 0.2s', padding: 0 }),
+  noImages: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#555', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', minHeight: '220px' },
 
   msg: { padding: '12px 16px', borderRadius: '10px', marginBottom: '18px', border: '1px solid', fontSize: '14px' },
   formGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 'clamp(14px, 2vw, 20px)' },
@@ -492,8 +573,9 @@ const s = {
   btn: (saving) => ({ width: '100%', padding: '13px', marginTop: 'clamp(18px, 2.5vw, 24px)', background: 'linear-gradient(135deg, #a37a39, #d4af37)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '700', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, transition: 'opacity 0.2s' }),
   spinner: { width: '18px', height: '18px', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.6s linear infinite', display: 'inline-block' },
 
+  modalTitleBar: { display: 'flex', alignItems: 'center', gap: '8px', color: '#d4af37', fontSize: '16px', fontWeight: '700', marginBottom: '20px' },
   modalOverlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, backdropFilter: 'blur(4px)' },
-  modal: { background: '#111', border: '1px solid #2a2a2a', borderRadius: '16px', padding: 'clamp(20px, 3vw, 28px)', maxWidth: '420px', width: '90vw', position: 'relative', boxShadow: '0 20px 60px rgba(0,0,0,0.6)' },
+  modal: { background: '#111', border: '1px solid #2a2a2a', borderRadius: '16px', padding: 'clamp(20px, 3vw, 28px)', maxWidth: '560px', width: '90vw', position: 'relative', boxShadow: '0 20px 60px rgba(0,0,0,0.6)' },
   modalTitle: { color: '#d4af37', fontSize: '16px', fontWeight: '700', marginBottom: '14px', textAlign: 'center' },
   modalPreviewWrap: { borderRadius: '10px', overflow: 'hidden', background: '#000', display: 'flex', justifyContent: 'center', maxHeight: '260px' },
   modalPreview: { maxWidth: '100%', maxHeight: '260px', objectFit: 'contain' },
