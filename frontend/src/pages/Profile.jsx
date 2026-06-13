@@ -235,13 +235,13 @@ export default function Profile() {
                     exit={{ opacity: 0, y: -8, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
                   >
-                    <motion.button style={s.dropdownItem} onClick={() => { setSettingsModal('info'); setSettingsDropdown(false); }} whileHover={{ background: 'rgba(163,122,57,0.1)' }} whileTap={{ scale: 0.98 }}>
+                    <motion.button style={s.dropdownItem} onClick={(e) => { e.stopPropagation(); setSettingsModal('info'); setSettingsDropdown(false); }} whileHover={{ background: 'rgba(163,122,57,0.1)' }} whileTap={{ scale: 0.98 }}>
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
                       </svg>
                       Edit Profile
                     </motion.button>
-                    <motion.button style={s.dropdownItem} onClick={() => { setSettingsModal('security'); setSettingsDropdown(false); }} whileHover={{ background: 'rgba(163,122,57,0.1)' }} whileTap={{ scale: 0.98 }}>
+                    <motion.button style={s.dropdownItem} onClick={(e) => { e.stopPropagation(); setSettingsModal('security'); setSettingsDropdown(false); }} whileHover={{ background: 'rgba(163,122,57,0.1)' }} whileTap={{ scale: 0.98 }}>
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
                       </svg>
@@ -296,31 +296,7 @@ export default function Profile() {
                 <p style={s.bioText}>{user.business_bio}</p>
               </div>
             )}
-            <div style={s.settingsSection}>
-              <div style={s.settingsLabel}>Account Settings</div>
-              <div style={s.settingsButtons}>
-                <motion.button style={s.settingsCard} onClick={() => setSettingsModal('info')} whileHover={{ background: 'rgba(163,122,57,0.08)' }} whileTap={{ scale: 0.98 }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
-                  </svg>
-                  <div>
-                    <div style={s.settingsCardTitle}>Edit Profile</div>
-                    <div style={s.settingsCardSub}>Name, email, phone, location</div>
-                  </div>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 'auto', flexShrink: 0 }}><polyline points="9 18 15 12 9 6" /></svg>
-                </motion.button>
-                <motion.button style={s.settingsCard} onClick={() => setSettingsModal('security')} whileHover={{ background: 'rgba(163,122,57,0.08)' }} whileTap={{ scale: 0.98 }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                  </svg>
-                  <div>
-                    <div style={s.settingsCardTitle}>Password & Security</div>
-                    <div style={s.settingsCardSub}>Change your password</div>
-                  </div>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 'auto', flexShrink: 0 }}><polyline points="9 18 15 12 9 6" /></svg>
-                </motion.button>
-              </div>
-            </div>
+
           </motion.div>
 
           <motion.div style={s.rightCol} {...fadeUp(0.25)}>
@@ -577,17 +553,6 @@ const s = {
   bioLabel: { color: '#d4af37', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' },
   bioText: { color: '#bbb', fontSize: '14px', lineHeight: 1.8, margin: 0 },
 
-  settingsSection: {},
-  settingsLabel: { color: '#d4af37', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' },
-  settingsButtons: { display: 'flex', flexDirection: 'column', gap: '8px' },
-  settingsCard: {
-    display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none',
-    padding: '14px 16px', borderRadius: '10px', border: '1px solid #1e1e1e',
-    background: 'rgba(0,0,0,0.3)', cursor: 'pointer', width: '100%', textAlign: 'left',
-    transition: 'background 0.2s',
-  },
-  settingsCardTitle: { color: '#ddd', fontSize: '14px', fontWeight: 600 },
-  settingsCardSub: { color: '#666', fontSize: '12px', marginTop: '2px' },
 
   galleryHeader: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' },
   galleryLine: { flex: 1, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(163,122,57,0.4) 50%, transparent)' },
