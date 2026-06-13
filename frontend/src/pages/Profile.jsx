@@ -328,21 +328,31 @@ export default function Profile() {
                       ))}
                       <div style={s.field}>
                         <label style={s.fieldLabel}>Country</label>
-                        <select style={s.select} value={form.country} onChange={(e) => setForm((p) => ({ ...p, country: e.target.value, city: '' }))}>
-                          <option value="">{countryList.length ? 'Select your country' : 'Loading...'}</option>
-                          {countryList.map((c) => (
-                            <option key={c} value={c}>{c}</option>
-                          ))}
-                        </select>
+                        <div style={s.selectWrap}>
+                          <select style={s.select} value={form.country} onChange={(e) => setForm((p) => ({ ...p, country: e.target.value, city: '' }))}>
+                            <option value="">{countryList.length ? 'Select your country' : 'Loading...'}</option>
+                            {countryList.map((c) => (
+                              <option key={c} value={c}>{c}</option>
+                            ))}
+                          </select>
+                          <svg style={s.selectArrow} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="6 9 12 15 18 9" />
+                          </svg>
+                        </div>
                       </div>
                       <div style={s.field}>
                         <label style={s.fieldLabel}>City</label>
-                        <select style={s.select} value={form.city} onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))} disabled={!form.country || loadingCities}>
-                          <option value="">{loadingCities ? 'Loading cities...' : form.country ? `Select city (${cityList.length})` : 'Select a country first'}</option>
-                          {cityList.map((city) => (
-                            <option key={city} value={city}>{city}</option>
-                          ))}
-                        </select>
+                        <div style={s.selectWrap}>
+                          <select style={{ ...s.select, opacity: !form.country || loadingCities ? 0.5 : 1, cursor: !form.country || loadingCities ? 'not-allowed' : 'pointer' }} value={form.city} onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))} disabled={!form.country || loadingCities}>
+                            <option value="">{loadingCities ? 'Loading cities...' : form.country ? `Select city (${cityList.length})` : 'Select a country first'}</option>
+                            {cityList.map((city) => (
+                              <option key={city} value={city}>{city}</option>
+                            ))}
+                          </select>
+                          <svg style={{ ...s.selectArrow, opacity: !form.country || loadingCities ? 0.3 : 1 }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="6 9 12 15 18 9" />
+                          </svg>
+                        </div>
                       </div>
                     </div>
                     <motion.button type="submit" disabled={savingInfo} style={s.btn(savingInfo)} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
@@ -476,7 +486,9 @@ const s = {
   field: { marginBottom: '2px' },
   fieldLabel: { color: '#d4af37', fontSize: '13px', fontWeight: '600', display: 'block', marginBottom: '6px' },
   input: { width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid #2a2a2a', background: '#111', color: '#fff', fontSize: '14px', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' },
-  select: { width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid #2a2a2a', background: '#111', color: '#fff', fontSize: '14px', outline: 'none', boxSizing: 'border-box', cursor: 'pointer', appearance: 'none' },
+  selectWrap: { position: 'relative', display: 'flex', alignItems: 'center' },
+  select: { width: '100%', padding: '12px 36px 12px 14px', borderRadius: '10px', border: '1px solid #2a2a2a', background: '#111', color: '#fff', fontSize: '14px', outline: 'none', boxSizing: 'border-box', cursor: 'pointer', appearance: 'none', transition: 'border-color 0.2s' },
+  selectArrow: { position: 'absolute', right: '12px', pointerEvents: 'none' },
   btn: (saving) => ({ width: '100%', padding: '13px', marginTop: 'clamp(18px, 2.5vw, 24px)', background: 'linear-gradient(135deg, #a37a39, #d4af37)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '700', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, transition: 'opacity 0.2s' }),
   spinner: { width: '18px', height: '18px', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.6s linear infinite', display: 'inline-block' },
 
