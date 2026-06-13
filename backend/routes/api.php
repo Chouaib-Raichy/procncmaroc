@@ -75,6 +75,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/admin/users/{id}/restore', [AdminUserController::class, 'restore']);
         Route::get('/admin/users/pending/list', [AdminUserController::class, 'pending']);
         Route::post('/admin/users/{id}/approve', [AdminUserController::class, 'approve']);
+        Route::post('/admin/users/{id}/toggle-contact', [AdminUserController::class, 'toggleContactVisibility']);
         Route::delete('/admin/users/{id}/reject', [AdminUserController::class, 'reject']);
     });
 });

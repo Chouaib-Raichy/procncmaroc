@@ -151,10 +151,7 @@ export default function PublicProfile() {
               {u.entreprise_name && <span style={styles.entreprise}>{u.entreprise_name}</span>}
               <span style={styles.roleBadge}>{roleLabel}</span>
             </motion.div>
-            <motion.div style={styles.contactMini} {...fadeUp(0.3)}>
-              {u.email && <span style={styles.miniItem}><MailIcon />{u.email}</span>}
-              {u.phone && <span style={styles.miniItem}><WhatsAppIcon />{u.phone}</span>}
-            </motion.div>
+
           </div>
         </div>
 
@@ -210,26 +207,28 @@ export default function PublicProfile() {
               </div>
             )}
 
-            <div style={styles.contactSection}>
-              <div style={styles.contactLabel}>Contact</div>
-              <div style={styles.contactButtons}>
-                {u.phone && (
-                  <a href={`https://wa.me/${u.phone.replace(/[^\d+]/g, '')}`} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#25D366', color: '#25D366' }}>
-                    <WhatsAppIcon /> WhatsApp
-                  </a>
-                )}
-                {u.business_location && (
-                  <a href={mapsLink(u.business_location)} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#4285F4', color: '#4285F4' }}>
-                    <MapsIcon /> Google Maps
-                  </a>
-                )}
-                {u.email && (
-                  <a href={`mailto:${u.email}`} style={{ ...styles.contactBtn, borderColor: '#d4af37', color: '#d4af37' }}>
-                    <MailIcon /> Email
-                  </a>
-                )}
+            {u.show_contact !== false && (
+              <div style={styles.contactSection}>
+                <div style={styles.contactLabel}>Contact</div>
+                <div style={styles.contactButtons}>
+                  {u.phone && (
+                    <a href={`https://wa.me/${u.phone.replace(/[^\d+]/g, '')}`} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#25D366', color: '#25D366' }}>
+                      <WhatsAppIcon /> WhatsApp
+                    </a>
+                  )}
+                  {u.business_location && (
+                    <a href={mapsLink(u.business_location)} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#4285F4', color: '#4285F4' }}>
+                      <MapsIcon /> Google Maps
+                    </a>
+                  )}
+                  {u.email && (
+                    <a href={`mailto:${u.email}`} style={{ ...styles.contactBtn, borderColor: '#d4af37', color: '#d4af37' }}>
+                      <MailIcon /> Email
+                    </a>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </motion.div>
 
           <motion.div style={styles.rightCol} {...fadeUp(0.45)}>
@@ -336,12 +335,6 @@ const styles = {
     fontWeight: 700, padding: '3px 12px', borderRadius: '20px',
     border: '1px solid rgba(163,122,57,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px',
   },
-  contactMini: { display: 'flex', gap: '16px', flexWrap: 'wrap', marginTop: '2px' },
-  miniItem: {
-    display: 'flex', alignItems: 'center', gap: '5px', color: '#888',
-    fontSize: '12px', fontWeight: 500,
-  },
-
   statsBar: {
     display: 'flex', gap: 'clamp(8px, 1.5vw, 14px)', flexWrap: 'wrap',
     padding: '20px clamp(20px, 5vw, 60px) 0',
