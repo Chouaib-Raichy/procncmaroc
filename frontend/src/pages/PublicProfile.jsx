@@ -111,6 +111,15 @@ export default function PublicProfile() {
   const images = u.business_images_url || [];
   const roleLabel = formatRole(u.role);
   const memberSince = formatDate(u.created_at);
+  const mapsLink = (loc) => {
+    if (!loc) return '#';
+    if (loc.startsWith('http')) {
+      const m = loc.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+      if (m) return `https://www.google.com/maps/search/?api=1&query=${m[1]},${m[2]}`;
+      return loc;
+    }
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc)}`;
+  };
 
   return (
     <div style={styles.wrapper}>
@@ -210,7 +219,7 @@ export default function PublicProfile() {
                   </a>
                 )}
                 {u.business_location && (
-                  <a href={u.business_location.startsWith('http') ? u.business_location : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(u.business_location)}`} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#4285F4', color: '#4285F4' }}>
+                  <a href={mapsLink(u.business_location)} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#4285F4', color: '#4285F4' }}>
                     <MapsIcon /> Google Maps
                   </a>
                 )}

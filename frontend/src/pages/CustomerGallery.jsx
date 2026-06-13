@@ -414,9 +414,13 @@ export default function CustomerGallery() {
                   <div style={styles.cardBody}>
                     <div style={styles.cardHeader}>
                       <h3 style={styles.cardTitle}>{post.title}</h3>
-                      {post.business_location && (
+                      {post.business_location && (() => {
+                        const loc = post.business_location;
+                        const m = loc.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+                        const mapsHref = m ? `https://www.google.com/maps/search/?api=1&query=${m[1]},${m[2]}` : (loc.startsWith('http') ? loc : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc)}`);
+                        return (
                         <motion.a
-                          href={post.business_location.startsWith('http') ? post.business_location : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(post.business_location)}`}
+                          href={mapsHref}
                           target="_blank" rel="noopener noreferrer"
                           style={styles.gmapsBtn} title="View on Google Maps"
                           whileHover={{ background: 'rgba(79,195,247,0.18)', borderColor: 'rgba(79,195,247,0.5)' }}
@@ -424,7 +428,8 @@ export default function CustomerGallery() {
                         >
                           <MapPinIcon />
                         </motion.a>
-                      )}
+                      );
+                    })()}
                     </div>
                     <div style={styles.descWrap}>
                       <p style={{
