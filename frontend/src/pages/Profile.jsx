@@ -20,6 +20,7 @@ const fadeUp = (delay = 0) => ({ initial: { opacity: 0, y: 20 }, animate: { opac
 export default function Profile() {
   const { user, loading, updateProfile, refreshUser } = useAuth();
   const [settingsModal, setSettingsModal] = useState(null);
+  const [settingsDropdown, setSettingsDropdown] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', phone: '', business_location: '', city: '', country: '', password: '', password_confirmation: '' });
   const [avatar, setAvatar] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
@@ -40,6 +41,7 @@ export default function Profile() {
   const modalRef = useRef(null);
   const avatarRef = useRef(null);
   const bgRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     fetch('/data/cities/_index.json')
@@ -61,6 +63,13 @@ export default function Profile() {
       .then((cities) => { setCityList(cities); setLoadingCities(false); })
       .catch(() => { setCityList([]); setLoadingCities(false); });
   }, [form.country, countryIndex]);
+
+  useEffect(() => {
+    if (!settingsDropdown) return;
+    const handler = (e) => { if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setSettingsDropdown(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [settingsDropdown]);
 
   useEffect(() => {
     if (user) setForm((f) => ({ ...f, name: user.name || '', email: user.email || '', phone: user.phone || '', business_location: user.business_location || '', city: user.city || '', country: user.country || '' }));
@@ -163,7 +172,7 @@ export default function Profile() {
       <div style={s.card}>
         {/* Cover */}
         <motion.div style={s.cover} {...fadeUp()}>
-          <div style={{ ...s.coverBg, backgroundImage: `url(${currentBg || machineBg})` }}>
+          <div style={{ ...s.coverBg, backgroundImage: `url(${currentBg || machineBg})` }} onClick={() => { modalRef.current = 'cover'; setModal('cover'); }}>
             <div style={s.coverGradient} />
             <div style={s.coverContent}>
               <div style={s.avatarWrap}>
@@ -205,13 +214,43 @@ export default function Profile() {
               </div>
             </div>
             <input ref={bgRef} type="file" accept="image/*" onChange={handleBgPick} style={{ display: 'none' }} />
-            {/* Settings button */}
-            <button style={s.settingsBtn} onClick={() => setSettingsModal('info')}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-              </svg>
-              Settings
-            </button>
+            {/* Settings dropdown */}
+            <div ref={dropdownRef} style={{ position: 'absolute', top: '16px', right: 'clamp(16px, 3vw, 28px)', zIndex: 5 }}>
+              <motion.button
+                style={s.settingsBtn}
+                onClick={() => setSettingsDropdown(!settingsDropdown)}
+                whileTap={{ scale: 0.95 }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
+                Settings
+              </motion.button>
+              <AnimatePresence>
+                {settingsDropdown && (
+                  <motion.div
+                    style={s.dropdown}
+                    initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    <motion.button style={s.dropdownItem} onClick={() => { setSettingsModal('info'); setSettingsDropdown(false); }} whileHover={{ background: 'rgba(163,122,57,0.1)' }} whileTap={{ scale: 0.98 }}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+                      </svg>
+                      Edit Profile
+                    </motion.button>
+                    <motion.button style={s.dropdownItem} onClick={() => { setSettingsModal('security'); setSettingsDropdown(false); }} whileHover={{ background: 'rgba(163,122,57,0.1)' }} whileTap={{ scale: 0.98 }}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </svg>
+                      Password & Security
+                    </motion.button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </motion.div>
 
@@ -492,12 +531,23 @@ const s = {
   coverMetaItem: { display: 'flex', alignItems: 'center', gap: '6px', color: 'rgba(255,255,255,0.8)', fontSize: '13px', textShadow: '0 1px 4px rgba(0,0,0,0.5)' },
 
   settingsBtn: {
-    position: 'absolute', top: '16px', right: 'clamp(16px, 3vw, 28px)',
     display: 'flex', alignItems: 'center', gap: '6px',
     background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)',
     color: '#d4af37', padding: '8px 16px', borderRadius: '8px',
-    cursor: 'pointer', fontSize: '13px', fontWeight: 600, zIndex: 5,
+    cursor: 'pointer', fontSize: '13px', fontWeight: 600,
     backdropFilter: 'blur(8px)', transition: 'background 0.2s',
+  },
+  dropdown: {
+    position: 'absolute', top: '100%', right: 0, marginTop: '6px',
+    background: '#111', border: '1px solid #2a2a2a', borderRadius: '10px',
+    padding: '6px', minWidth: '200px', boxShadow: '0 12px 40px rgba(0,0,0,0.6)',
+    zIndex: 10, overflow: 'hidden',
+  },
+  dropdownItem: {
+    display: 'flex', alignItems: 'center', gap: '10px', width: '100%',
+    padding: '10px 14px', border: 'none', borderRadius: '8px',
+    background: 'transparent', color: '#ccc', fontSize: '13px', fontWeight: 500,
+    cursor: 'pointer', transition: 'background 0.15s', textAlign: 'left',
   },
 
   statsBar: {
