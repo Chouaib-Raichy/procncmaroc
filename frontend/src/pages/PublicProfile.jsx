@@ -210,7 +210,7 @@ export default function PublicProfile() {
                   </a>
                 )}
                 {u.business_location && (
-                  <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(u.business_location)}`} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#4285F4', color: '#4285F4' }}>
+                  <a href={u.business_location.startsWith('http') ? u.business_location : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(u.business_location)}`} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#4285F4', color: '#4285F4' }}>
                     <MapsIcon /> Google Maps
                   </a>
                 )}

@@ -416,7 +416,7 @@ export default function CustomerGallery() {
                       <h3 style={styles.cardTitle}>{post.title}</h3>
                       {post.business_location && (
                         <motion.a
-                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(post.business_location)}`}
+                          href={post.business_location.startsWith('http') ? post.business_location : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(post.business_location)}`}
                           target="_blank" rel="noopener noreferrer"
                           style={styles.gmapsBtn} title="View on Google Maps"
                           whileHover={{ background: 'rgba(79,195,247,0.18)', borderColor: 'rgba(79,195,247,0.5)' }}
