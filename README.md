@@ -31,6 +31,7 @@ The platform features a **multi-step registration flow** requiring admin approva
 | **Database** | MySQL 8 (XAMPP) |
 | **Authentication** | JWT (`php-open-source-saver/jwt-auth`) |
 | **API Style** | RESTful with DTO layer |
+| **SEO** | react-helmet-async, JSON-LD structured data, Open Graph, Twitter Cards |
 | **Maps** | Leaflet + ESRI World Imagery (satellite) |
 | **Geocoding** | Nominatim (OpenStreetMap) |
 | **IP Geolocation** | ip-api.com |
@@ -49,11 +50,12 @@ The platform features a **multi-step registration flow** requiring admin approva
 - **Products** — Product listing page
 - **About Us** — Dynamic random stats (visitors, orders, completed), premium SVG icons, framer-motion animations
 - **Contact Us** — Contact form, Google Map embed, phone/email/location info
-- **Customer Gallery** — User-submitted gallery posts (1-5 images), threaded comments, likes (requires login)
+- **Customer Gallery** — User-submitted gallery posts (1-5 images), threaded comments, likes (requires login), professional card design with SVG icons, loading skeleton, staggered card entrance, premium carousel with gradient overlays, lightbox
 - **Partner Map** — Satellite map with red teardrop pins showing registered business partners (requires login)
 - **Machine Detail** — Full specifications, features list, WhatsApp direct inquiry link
 - **Public Profile** — Two-column layout with cover photo, avatar, info icons (WhatsApp, Google Maps), gallery carousel, full-screen lightbox
 - **Terms of Use** — Professionally designed legal page with staggered fade-in sections, gold accents
+- **SEO everywhere** — Every page has unique `<title>`, `<meta description>`, Open Graph, Twitter Cards, and JSON-LD structured data via `react-helmet-async`
 
 ### Authentication & User Management
 - **JWT-based auth** (login, register, logout)
@@ -75,11 +77,19 @@ The platform features a **multi-step registration flow** requiring admin approva
 - **Visitors** — Real visitor tracking with IP, location (city/country), page visited, timestamp, SVG device icons (desktop/mobile/tablet/bot), paginated
 - **Sidebar** — Collapsible navigation with active tab highlighting
 
+### User Profile
+- **Cover hero** — Avatar, name, role badge, email/phone overlaid on cover image with gradient overlay (LinkedIn-style)
+- **Stats bar** — Glassmorphism row with icon-cards for location, member since, business location
+- **About + Business Gallery** — Card-based sections with SVG icon headers
+- **Settings modals** — Edit Profile and Password & Security open in centered modals with scale/fade animation
+- **Image preview modals** — Click avatar or cover to preview, upload, or view full size
+
 ### Gallery System
-- Users create posts with 1–5 images, title, description, business location, phone
+- Users create posts with 1–5 images, title, description, business location
 - Threaded comments (replies with `parent_id`)
 - Like/unlike on both posts and comments
 - Paginated public gallery (9 posts/page)
+- Professional card design with SVG icons, loading skeleton grid, staggered card entrance, premium carousel with gradient overlays and image counter badge, lightbox with close button
 
 ### Visitor Tracking
 - `POST /api/track-visit` — Records page URL, IP address, user agent, referrer
@@ -92,6 +102,14 @@ Consistent API responses via Data Transfer Objects:
 - `MachineDTO`, `CategoryDTO`, `UserDTO`, `GalleryPostDTO`, `GalleryCommentDTO`, `ContactDTO`
 - Base `DTO` class with `fromModel()`, `collection()`, `paginated()` helpers
 - All API endpoints return typed, URL-resolved data (`image_url`, `pdf_url`)
+
+### SEO
+- **Per-page metadata** — Each public route sets unique `<title>`, `<meta description>`, Open Graph, and Twitter Cards via `react-helmet-async`
+- **JSON-LD structured data** — Organization schema (logo, contact, address, sameAs social profiles) + WebSite schema with SearchAction for Google Sitelinks
+- **Hreflang tags** — `en` and `x-default` on every page for global targeting
+- **Sitemap** — `sitemap.xml` with 8 URLs, hreflang alternates, priority/frequency
+- **Robots.txt** — Allows all crawlers, points to sitemap
+- **Dynamic pages** — Machine detail and public profile set title/description from API data
 
 ### Additional Features
 - **Soft deletes** on all major entities (machines, categories, gallery, users) with admin restore
@@ -269,7 +287,8 @@ procncmaroc/
 │   │   │   ├── ConfirmModal.jsx
 │   │   │   ├── PhoneInput.jsx
 │   │   │   ├── ErrorBoundary.jsx
-│   │   │   └── ErrorState.jsx
+│   │   │   ├── ErrorState.jsx
+│   │   │   └── SEO.jsx                       # Per-page meta/OG/JSON-LD via react-helmet-async
 │   │   ├── context/
 │   │   │   ├── AuthContext.jsx                # Auth state + JWT management
 │   │   │   └── ToastContext.jsx               # Global toast notifications
@@ -299,6 +318,11 @@ procncmaroc/
 │   │   │   └── google_maps_icon.svg            # Google Maps contact icon
 │   │   ├── App.jsx                            # Root with routing + auth guards
 │   │   └── App.css                            # Global styles
+│   ├── public/
+│   │   ├── favicon.png
+│   │   ├── robots.txt                        # Crawl directives + sitemap link
+│   │   ├── sitemap.xml                       # 8 URLs with hreflang
+│   │   └── data/                             # Auto-generated city JSON files
 │   └── index.html
 └── README.md
 ```
@@ -413,6 +437,9 @@ procncmaroc/
 - **Gmail SMTP with App Password** — Secure email sending without third-party mail services
 - **Loadable skeletons** — Content-shaped placeholders during data fetch instead of generic spinners
 - **SVG icons over emoji** — Consistent rendering across all platforms and browsers
+- **Settings in modals** — Edit profile and password forms open in centered popups to keep the profile view clean
+- **Cover hero layout** — User identity (avatar, name, role, contact) overlaid on cover photo for a premium social-media-style profile
+- **react-helmet-async** — Lightweight per-page SEO without server-side rendering; JSON-LD structured data enables rich search results
 
 ---
 
