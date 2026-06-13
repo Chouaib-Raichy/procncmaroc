@@ -214,17 +214,17 @@ export default function PublicProfile() {
             <div style={styles.contactSection}>
               <div style={styles.contactLabel}>Contact</div>
               <div style={styles.contactButtons}>
-                {u.phone && siteSettings.show_whatsapp && (
+                {u.phone && siteSettings.show_whatsapp === '1' && (
                   <a href={`https://wa.me/${u.phone.replace(/[^\d+]/g, '')}`} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#25D366', color: '#25D366' }}>
                     <WhatsAppIcon /> WhatsApp
                   </a>
                 )}
-                {u.business_location && siteSettings.show_maps && (
+                {u.business_location && siteSettings.show_maps === '1' && (
                   <a href={mapsLink(u.business_location)} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#4285F4', color: '#4285F4' }}>
                     <MapsIcon /> Google Maps
                   </a>
                 )}
-                {u.email && siteSettings.show_email && (
+                {u.email && siteSettings.show_email === '1' && (
                   <a href={`mailto:${u.email}`} style={{ ...styles.contactBtn, borderColor: '#d4af37', color: '#d4af37' }}>
                     <MailIcon /> Email
                   </a>
