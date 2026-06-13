@@ -447,6 +447,10 @@ procncmaroc/
 - **Settings in modals** — Edit profile and password forms open in centered popups to keep the profile view clean
 - **Cover hero layout** — User identity (avatar, name, role, contact) overlaid on cover photo for a premium social-media-style profile
 - **react-helmet-async** — Lightweight per-page SEO without server-side rendering; JSON-LD structured data enables rich search results
+- **Two-column My Gallery layout** — Form panel on left, posts feed on right; keeps the creation interface always accessible without scrolling
+- **My Gallery cards match Customer Gallery** — Consistent user bar, carousel, action bar, and description clamp for visual coherence across the app
+- **Description clamp at 3 lines / 100+ chars** — Prevents card height explosion while letting users expand long descriptions
+- **og-image.png as default OG image** — Dedicated 1200×630 social preview image instead of recycling favicon
 
 ---
 
