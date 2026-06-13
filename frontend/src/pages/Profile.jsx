@@ -27,9 +27,34 @@ export default function Profile() {
   const [msgPass, setMsgPass] = useState(null);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [modal, setModal] = useState(null);
+  const [countryList, setCountryList] = useState([]);
+  const [countryIndex, setCountryIndex] = useState(null);
+  const [cityList, setCityList] = useState([]);
+  const [loadingCities, setLoadingCities] = useState(false);
   const modalRef = useRef(null);
   const avatarRef = useRef(null);
   const bgRef = useRef(null);
+
+  useEffect(() => {
+    fetch('/data/cities/_index.json')
+      .then((r) => r.json())
+      .then((idx) => {
+        setCountryIndex(idx);
+        setCountryList(Object.keys(idx).sort((a, b) => a.localeCompare(b)));
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!form.country || !countryIndex) { setCityList([]); return; }
+    setLoadingCities(true);
+    const iso = countryIndex[form.country];
+    if (!iso) { setLoadingCities(false); setCityList([]); return; }
+    fetch(`/data/cities/${iso}.json`)
+      .then((r) => r.json())
+      .then((cities) => { setCityList(cities); setLoadingCities(false); })
+      .catch(() => { setCityList([]); setLoadingCities(false); });
+  }, [form.country, countryIndex]);
 
   useEffect(() => {
     if (user) setForm((f) => ({ ...f, name: user.name || '', email: user.email || '', phone: user.phone || '', business_location: user.business_location || '', city: user.city || '', country: user.country || '' }));
@@ -103,8 +128,6 @@ export default function Profile() {
     { key: 'email', label: 'Email', type: 'email', placeholder: 'you@example.com', autoComplete: 'email' },
     { key: 'phone', label: 'Phone', component: 'phone' },
     { key: 'business_location', label: 'Business Location', placeholder: 'Paste from Google Maps', autoComplete: 'country-name' },
-    { key: 'city', label: 'City', placeholder: 'Casablanca', autoComplete: 'address-level2' },
-    { key: 'country', label: 'Country', placeholder: 'Morocco', autoComplete: 'country-name' },
   ];
 
   const memberSince = user.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : '';
@@ -303,6 +326,24 @@ export default function Profile() {
                           )}
                         </div>
                       ))}
+                      <div style={s.field}>
+                        <label style={s.fieldLabel}>Country</label>
+                        <select style={s.select} value={form.country} onChange={(e) => setForm((p) => ({ ...p, country: e.target.value, city: '' }))}>
+                          <option value="">{countryList.length ? 'Select your country' : 'Loading...'}</option>
+                          {countryList.map((c) => (
+                            <option key={c} value={c}>{c}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div style={s.field}>
+                        <label style={s.fieldLabel}>City</label>
+                        <select style={s.select} value={form.city} onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))} disabled={!form.country || loadingCities}>
+                          <option value="">{loadingCities ? 'Loading cities...' : form.country ? `Select city (${cityList.length})` : 'Select a country first'}</option>
+                          {cityList.map((city) => (
+                            <option key={city} value={city}>{city}</option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
                     <motion.button type="submit" disabled={savingInfo} style={s.btn(savingInfo)} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
                       {savingInfo ? <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}><span style={s.spinner} /> Saving...</span> : 'Save Changes'}
@@ -435,6 +476,7 @@ const s = {
   field: { marginBottom: '2px' },
   fieldLabel: { color: '#d4af37', fontSize: '13px', fontWeight: '600', display: 'block', marginBottom: '6px' },
   input: { width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid #2a2a2a', background: '#111', color: '#fff', fontSize: '14px', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' },
+  select: { width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid #2a2a2a', background: '#111', color: '#fff', fontSize: '14px', outline: 'none', boxSizing: 'border-box', cursor: 'pointer', appearance: 'none' },
   btn: (saving) => ({ width: '100%', padding: '13px', marginTop: 'clamp(18px, 2.5vw, 24px)', background: 'linear-gradient(135deg, #a37a39, #d4af37)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '700', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, transition: 'opacity 0.2s' }),
   spinner: { width: '18px', height: '18px', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.6s linear infinite', display: 'inline-block' },
 
