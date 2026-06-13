@@ -49,14 +49,14 @@ export default function MachineDetail() {
     window.open(`https://wa.me/${PHONE}?text=${text}`, '_blank');
   };
 
-  if (loading) return <><SEO title="Machine CNC | PRO CNC MAROC" /><Loading text="Loading machine..." /></>;
+  if (loading) return <><SEO title="Machine | PRO CNC MAROC" /><Loading text="Loading machine..." /></>;
 
-  if (error) return <><SEO title="Machine CNC | PRO CNC MAROC" /><ErrorState message={error} onRetry={fetch} /></>;
+  if (error) return <><SEO title="Machine | PRO CNC MAROC" /><ErrorState message={error} onRetry={fetch} /></>;
 
   if (!machine) {
     return (
       <div style={styles.page}>
-        <SEO title="Machine CNC | PRO CNC MAROC" />
+        <SEO title="Machine | PRO CNC MAROC" />
         <div style={styles.overlay}>
           <div style={styles.center}>
             <h2 style={{ color: '#fff' }}>Machine not found</h2>

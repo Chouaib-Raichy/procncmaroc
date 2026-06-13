@@ -15,7 +15,7 @@ export default function AboutUs() {
   const [completed] = useState(() => rand(2, 5));
   return (
     <div style={styles.page}>
-      <SEO title="À Propos" description="Découvrez PRO CNC MAROC, votre expert en machines CNC et usinage de précision au Maroc. Notre équipe vous accompagne dans vos projets d'industrie et d'artisanat." canonicalUrl="/about-us" />
+      <SEO title="About Us" description="Discover PRO CNC MAROC, your expert in CNC machines and precision machining in Morocco. Our team supports you in your industrial and craft projects." canonicalUrl="/about-us" />
       <div style={styles.overlay}>
         <section style={styles.container}>
           <motion.div

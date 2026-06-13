@@ -317,7 +317,7 @@ export default function CustomerGallery() {
 
   return (
     <div style={styles.page}>
-      <SEO title="Galerie Clients" description="Découvrez les réalisations de nos clients : projets d'usinage CNC, découpe laser, gravure et impression 3D au Maroc." canonicalUrl="/customer-gallery" />
+      <SEO title="Customer Gallery" description="Discover our customers' achievements: CNC machining, laser cutting, engraving, and 3D printing projects in Morocco." canonicalUrl="/customer-gallery" />
       <div style={styles.overlay}>
         <section style={styles.container}>
           <motion.div

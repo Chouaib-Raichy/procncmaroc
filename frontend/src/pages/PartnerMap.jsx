@@ -163,7 +163,7 @@ export default function PartnerMap() {
 
   return (
     <div style={styles.page}>
-      <SEO title="Carte des Partenaires" description="Trouvez un partenaire PRO CNC MAROC près de chez vous au Maroc. Réseau de professionnels en machines CNC et usinage." canonicalUrl="/partner-map" />
+      <SEO title="Partner Map" description="Find a PRO CNC MAROC partner near you in Morocco. Network of professionals in CNC machines and machining." canonicalUrl="/partner-map" />
       <div style={styles.overlay}>
         <motion.h1 style={styles.title} initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>Partner Map</motion.h1>
         <motion.p style={styles.sub} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>Our trusted partners around the world</motion.p>

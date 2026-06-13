@@ -63,7 +63,7 @@ export default function OurMachines() {
 
   return (
     <div style={styles.pageWrapper}>
-      <SEO title="Nos Machines" description="Découvrez notre gamme complète de machines CNC professionnelles au Maroc : fraiseuses, découpeuses laser, graveuses et imprimantes 3D." canonicalUrl="/our-machines" />
+      <SEO title="Our Machines" description="Discover our complete range of professional CNC machines in Morocco: milling machines, laser cutters, engravers, and 3D printers." canonicalUrl="/our-machines" />
       <div style={styles.overlay}>
         <div style={styles.titleWrap}>
           <h1 style={styles.title}>Our Machines</h1>

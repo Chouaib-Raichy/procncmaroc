@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 export default function NotFound() {
   return (
     <div style={styles.page}>
-      <SEO title="Page Non Trouvée" description="La page que vous cherchez n'existe pas ou a été déplacée." />
+      <SEO title="Page Not Found" description="The page you are looking for does not exist or has been moved." />
       <div style={styles.overlay}>
         <div style={styles.card}>
           <h1 style={styles.code}>404</h1>

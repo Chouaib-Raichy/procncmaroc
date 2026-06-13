@@ -48,7 +48,7 @@ export default function ForgotPassword() {
   if (sent) {
     return (
       <div style={styles.page}>
-        <SEO title="Mot de Passe Oublié" description="Si un compte existe avec cet email, un lien de réinitialisation a été envoyé." />
+        <SEO title="Forgot Password" description="If an account exists with that email, a reset link has been sent." />
         <div style={styles.overlay}>
           <div style={styles.form}>
             <h1 style={styles.title}>Check Your Email</h1>
@@ -66,7 +66,7 @@ export default function ForgotPassword() {
 
   return (
     <div style={styles.page}>
-      <SEO title="Mot de Passe Oublié" description="Entrez votre adresse email pour recevoir un lien de réinitialisation de mot de passe." canonicalUrl="/forgot-password" />
+      <SEO title="Forgot Password" description="Enter your email address to receive a password reset link." canonicalUrl="/forgot-password" />
       <div style={styles.overlay}>
         <form style={styles.form} onSubmit={handleSubmit}>
           <h1 style={styles.title}>Forgot Password</h1>

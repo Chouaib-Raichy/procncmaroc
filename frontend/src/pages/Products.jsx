@@ -22,7 +22,7 @@ export default function Products() {
 
   return (
     <div className="page-section">
-      <SEO title="Produits" description="Explorez tous nos produits et services CNC au Maroc : usinage de précision, découpe laser, gravure et impression 3D." canonicalUrl="/products" />
+      <SEO title="Products" description="Explore all our CNC products and services in Morocco: precision machining, laser cutting, engraving, and 3D printing." canonicalUrl="/products" />
       <h1 className="section-title">Products</h1>
       <p className="section-subtitle">Everything you need for your CNC and laser operations</p>
       <div className="card-grid">

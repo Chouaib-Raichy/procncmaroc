@@ -127,7 +127,7 @@ export default function Signup() {
 
   return (
     <div style={styles.page}>
-      <SEO title="Inscription" description="Créez votre compte PRO CNC MAROC et rejoignez notre réseau de professionnels de l'usinage CNC au Maroc." canonicalUrl="/signup" />
+      <SEO title="Sign Up" description="Create your PRO CNC MAROC account and join our network of CNC machining professionals in Morocco." canonicalUrl="/signup" />
       <div style={styles.overlay}>
         <motion.form
           style={styles.form}

@@ -99,7 +99,7 @@ export default function Login() {
 
   return (
     <div style={styles.page}>
-      <SEO title="Connexion" description="Connectez-vous à votre compte PRO CNC MAROC pour accéder à vos commandes et services." canonicalUrl="/login" />
+      <SEO title="Login" description="Log in to your PRO CNC MAROC account to access your orders and services." canonicalUrl="/login" />
       <div style={styles.overlay}>
         <motion.form
           style={styles.form}

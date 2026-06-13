@@ -41,7 +41,7 @@ export default function ContactUs() {
 
   return (
     <div style={styles.page}>
-      <SEO title="Contact" description="Contactez PRO CNC MAROC pour toute question sur nos machines CNC, services d'usinage, découpe laser et gravure au Maroc." canonicalUrl="/contact-us" />
+      <SEO title="Contact" description="Contact PRO CNC MAROC for any questions about our CNC machines, machining services, laser cutting, and engraving in Morocco." canonicalUrl="/contact-us" />
       {/* Hero Banner */}
       <motion.div
         style={styles.hero}

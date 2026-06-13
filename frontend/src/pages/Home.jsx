@@ -51,7 +51,7 @@ export default function Home() {
 
   return (
     <div>
-      <SEO title="Accueil" description="PRO CNC MAROC — Votre partenaire en machines CNC, usinage de précision, découpe laser et gravure au Maroc. Solutions professionnelles pour l'industrie et l'artisanat." canonicalUrl="/" />
+      <SEO title="Home" description="PRO CNC MAROC — Your partner in CNC machines, precision machining, laser cutting, and engraving in Morocco. Professional solutions for industry and crafts." canonicalUrl="/" />
       <motion.div style={styles.hero}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

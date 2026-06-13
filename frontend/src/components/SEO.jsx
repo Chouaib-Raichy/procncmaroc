@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 const SITE_NAME = 'PRO CNC MAROC';
 const BASE_URL = 'https://procncmaroc.com';
 const DEFAULT_OG_IMAGE = '/favicon.png';
-const DEFAULT_DESC = 'PRO CNC MAROC — Votre partenaire en machines CNC, usinage de précision, découpe laser et gravure au Maroc. Solutions professionnelles pour l\'industrie et l\'artisanat.';
+const DEFAULT_DESC = 'PRO CNC MAROC — Your partner in CNC machines, precision machining, laser cutting, and engraving in Morocco. Professional solutions for industry and crafts.';
 
 const orgJsonLd = {
   '@context': 'https://schema.org',
@@ -50,7 +50,7 @@ export default function SEO({
       <meta property="og:image" content={`${BASE_URL}${ogImage}`} />
       <meta property="og:type" content={ogType} />
       <meta property="og:site_name" content={SITE_NAME} />
-      <meta property="og:locale" content="fr_FR" />
+      <meta property="og:locale" content="en_US" />
 
       <meta name="twitter:card" content={twitterCard} />
       <meta name="twitter:title" content={fullTitle} />

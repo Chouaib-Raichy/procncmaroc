@@ -82,7 +82,7 @@ export default function ResetPassword() {
 
   return (
     <div style={styles.page}>
-      <SEO title="Réinitialisation du Mot de Passe" description="Réinitialisez votre mot de passe PRO CNC MAROC." canonicalUrl="/reset-password" />
+      <SEO title="Reset Password" description="Reset your PRO CNC MAROC password." canonicalUrl="/reset-password" />
       <div style={styles.overlay}>
         <form style={styles.form} onSubmit={handleSubmit}>
           <h1 style={styles.title}>Reset Password</h1>
