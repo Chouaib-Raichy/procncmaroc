@@ -140,32 +140,24 @@ class AuthController extends Controller
     public function resolveLocation(Request $request)
     {
         $request->validate(['url' => 'required|string']);
+
+        $resolvedUrl = self::followRedirects($request->url);
+        if ($resolvedUrl) {
+            $coords = self::extractCoordsFromUrl($resolvedUrl);
+            if ($coords) return response()->json($coords);
+        }
+
         $coords = self::geocode($request->url);
         if ($coords['lat'] !== null && $coords['lng'] !== null) {
             return response()->json($coords);
         }
-        try {
-            $ch = curl_init($request->url);
-            curl_setopt_array($ch, [
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_TIMEOUT => 5,
-                CURLOPT_SSL_VERIFYPEER => false,
-            ]);
-            curl_exec($ch);
-            $finalUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
-            curl_close($ch);
-            if ($finalUrl && $finalUrl !== $request->url) {
-                $coords = self::parseGoogleMapsUrl($finalUrl);
-                if ($coords) return response()->json($coords);
-            }
-        } catch (\Exception) {}
+
         return response()->json(['lat' => null, 'lng' => null]);
     }
 
     public static function geocode(string $location, ?string $city = null, ?string $country = null): array
     {
-        $coords = self::parseGoogleMapsUrl($location);
+        $coords = self::extractCoordsFromUrl($location);
         if ($coords !== null) return $coords;
 
         $queries = array_filter([$location, trim("$city $country"), $country]);
@@ -177,25 +169,28 @@ class AuthController extends Controller
         return ['lat' => null, 'lng' => null];
     }
 
-    private static function parseGoogleMapsUrl(string $url): ?array
+    private static function followRedirects(string $url): ?string
     {
-        if (!str_contains($url, 'google') && !str_contains($url, 'goo.gl')) return null;
+        if (!str_contains($url, 'goo.gl')) return null;
 
-        if (str_contains($url, 'goo.gl')) {
-            try {
-                $ch = curl_init($url);
-                curl_setopt_array($ch, [
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_TIMEOUT => 5,
-                    CURLOPT_SSL_VERIFYPEER => false,
-                ]);
-                curl_exec($ch);
-                $redirectUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
-                curl_close($ch);
-                if ($redirectUrl && $redirectUrl !== $url) $url = $redirectUrl;
-            } catch (\Exception) {}
-        }
+        try {
+            $client = new \GuzzleHttp\Client([
+                'allow_redirects' => ['track_redirects' => true],
+                'verify' => false,
+                'timeout' => 5,
+            ]);
+            $response = $client->get($url);
+            $history = $response->getHeader('X-Guzzle-Redirect-History');
+            if (!empty($history)) {
+                return end($history);
+            }
+        } catch (\Exception) {}
+        return null;
+    }
+
+    private static function extractCoordsFromUrl(string $url): ?array
+    {
+        if (!str_contains($url, 'google')) return null;
 
         if (preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', $url, $m)) {
             return ['lat' => (float) $m[1], 'lng' => (float) $m[2]];
@@ -210,6 +205,10 @@ class AuthController extends Controller
         }
 
         if (preg_match('#/place/[^@]+@(-?\d+\.\d+),(-?\d+\.\d+)#', $url, $m)) {
+            return ['lat' => (float) $m[1], 'lng' => (float) $m[2]];
+        }
+
+        if (preg_match('/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/', $url, $m)) {
             return ['lat' => (float) $m[1], 'lng' => (float) $m[2]];
         }
 
