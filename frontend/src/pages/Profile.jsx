@@ -140,7 +140,7 @@ export default function Profile() {
 
             <div style={s.coverContent}>
               <div style={s.avatarWrap}>
-                <div style={s.avatarInner} onClick={() => { modalRef.current = 'avatar'; setModal('avatar'); }}>
+                <div style={s.avatarInner} onClick={(e) => { e.stopPropagation(); modalRef.current = 'avatar'; setModal('avatar'); }}>
                   {currentAvatar ? <img src={currentAvatar} alt="" style={s.avatarImg} /> : <div style={s.avatarPlaceholder}>{user.name?.charAt(0).toUpperCase()}</div>}
                   <div style={s.avatarBadge}>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
