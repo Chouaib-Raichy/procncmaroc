@@ -76,21 +76,21 @@ export default function PublicProfile() {
       <SEO title="Profile | PRO CNC MAROC" />
       <div style={styles.card}>
         <div style={{ ...styles.cover, background: '#111' }} />
-        <div style={{ padding: '0 28px' }}>
+        <div style={{ padding: '0 clamp(20px, 5vw, 60px)' }}>
           <div style={{ width: '110px', height: '110px', borderRadius: '50%', marginTop: '-55px', marginBottom: '16px', background: '#1a1a1a', border: '3px solid #222' }} />
-          <div style={{ width: '180px', height: '22px', borderRadius: '6px', background: '#1a1a1a', marginBottom: '8px' }} />
-          <div style={{ width: '120px', height: '14px', borderRadius: '6px', background: '#1a1a1a', marginBottom: '24px' }} />
+          <div style={{ width: 'clamp(140px, 20vw, 220px)', height: '22px', borderRadius: '6px', background: '#1a1a1a', marginBottom: '8px' }} />
+          <div style={{ width: 'clamp(100px, 15vw, 160px)', height: '14px', borderRadius: '6px', background: '#1a1a1a', marginBottom: '24px' }} />
           <div style={{ display: 'flex', gap: '12px', marginBottom: '28px' }}>
             {[1, 2, 3, 4].map((n) => (
-              <div key={n} style={{ flex: 1, height: '70px', borderRadius: '12px', background: '#1a1a1a' }} />
+              <div key={n} style={{ flex: '1 1 160px', height: '70px', borderRadius: '12px', background: '#1a1a1a' }} />
             ))}
           </div>
-          <div style={{ display: 'flex', gap: '24px' }}>
-            <div style={{ flex: '1 1 55%' }}>
-              <div style={{ width: '100%', height: '120px', borderRadius: '12px', background: '#1a1a1a' }} />
+          <div style={{ display: 'flex', gap: 'clamp(20px, 3vw, 40px)', paddingBottom: '40px' }}>
+            <div style={{ flex: '1 1 50%' }}>
+              <div style={{ width: '100%', height: 'clamp(100px, 14vw, 160px)', borderRadius: '12px', background: '#1a1a1a' }} />
             </div>
-            <div style={{ flex: '1 1 45%' }}>
-              <div style={{ width: '100%', height: '260px', borderRadius: '12px', background: '#1a1a1a' }} />
+            <div style={{ flex: '1 1 40%' }}>
+              <div style={{ width: '100%', height: 'clamp(220px, 30vw, 420px)', borderRadius: '12px', background: '#1a1a1a' }} />
             </div>
           </div>
         </div>
@@ -287,20 +287,15 @@ export default function PublicProfile() {
 const styles = {
   wrapper: {
     minHeight: '100vh', background: `url(${machineBg}) center/cover fixed no-repeat`,
-    display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
-    padding: 'clamp(20px, 4vw, 60px)',
   },
   card: {
-    maxWidth: '1000px', width: '100%',
+    width: '100%',
     background: 'rgba(10,10,10,0.95)',
-    border: '1px solid #1e1e1e',
-    borderRadius: '20px',
-    overflow: 'hidden',
-    boxShadow: '0 0 80px rgba(163,122,57,0.06), 0 20px 60px rgba(0,0,0,0.5)',
+    minHeight: '100vh',
   },
 
   cover: {
-    height: 'clamp(180px, 26vw, 280px)',
+    height: 'clamp(200px, 30vw, 340px)',
     backgroundSize: 'cover', backgroundPosition: 'center',
     position: 'relative',
   },
@@ -310,8 +305,8 @@ const styles = {
   },
 
   identityWrap: {
-    display: 'flex', alignItems: 'flex-end', gap: '20px',
-    padding: '0 28px', marginTop: '-56px', position: 'relative', zIndex: 2,
+    display: 'flex', alignItems: 'flex-end', gap: 'clamp(16px, 2.5vw, 28px)',
+    padding: '0 clamp(20px, 5vw, 60px)', marginTop: '-56px', position: 'relative', zIndex: 2,
   },
   avatarWrap: {
     width: '112px', height: '112px', borderRadius: '50%', flexShrink: 0,
@@ -340,11 +335,11 @@ const styles = {
 
   statsBar: {
     display: 'flex', gap: 'clamp(8px, 1.5vw, 14px)', flexWrap: 'wrap',
-    padding: '20px 28px 0',
+    padding: '20px clamp(20px, 5vw, 60px) 0',
   },
   statCard: {
-    flex: '1 1 140px', display: 'flex', alignItems: 'center', gap: '10px',
-    padding: '12px 14px', background: 'rgba(255,255,255,0.03)',
+    flex: '1 1 160px', display: 'flex', alignItems: 'center', gap: '12px',
+    padding: '14px 18px', background: 'rgba(255,255,255,0.03)',
     border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px',
     backdropFilter: 'blur(8px)',
   },
@@ -357,13 +352,13 @@ const styles = {
   statLabel: { color: '#888', fontSize: '11px', fontWeight: 500, marginTop: '1px' },
 
   divider: {
-    height: '1px', margin: '20px 28px',
+    height: '1px', margin: '20px clamp(20px, 5vw, 60px)',
     background: 'linear-gradient(90deg, transparent, rgba(163,122,57,0.3), transparent)',
   },
 
   contentArea: {
-    display: 'flex', flexWrap: 'wrap', gap: '28px',
-    padding: '0 28px 28px',
+    display: 'flex', flexWrap: 'wrap', gap: 'clamp(20px, 3vw, 40px)',
+    padding: '0 clamp(20px, 5vw, 60px) clamp(28px, 4vw, 60px)',
   },
   leftCol: { flex: '1 1 50%', minWidth: '280px', display: 'flex', flexDirection: 'column', gap: '20px' },
   rightCol: { flex: '1 1 40%', minWidth: '280px', display: 'flex', flexDirection: 'column' },
@@ -413,7 +408,7 @@ const styles = {
   carouselGradientRight: { position: 'absolute', top: 0, right: 0, width: '30px', height: '100%', background: 'linear-gradient(270deg, rgba(0,0,0,0.25), transparent)', pointerEvents: 'none', zIndex: 1 },
   carouselCounter: { position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.6)', color: '#d4af37', fontSize: '11px', fontWeight: 700, padding: '2px 10px', borderRadius: '12px', zIndex: 2, letterSpacing: '0.3px' },
   carouselImg: {
-    width: '100%', height: 'clamp(200px, 28vw, 360px)',
+    width: '100%', height: 'clamp(220px, 30vw, 420px)',
     objectFit: 'cover', display: 'block', cursor: 'pointer',
   },
   carouselBtn: {
