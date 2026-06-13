@@ -13,7 +13,7 @@ const tabs = [
 
 export default function Profile() {
   const { user, loading, updateProfile, refreshUser } = useAuth();
-  const [tab, setTab] = useState('info');
+  const [settingsModal, setSettingsModal] = useState(null);
   const [form, setForm] = useState({ name: '', email: '', phone: '', business_location: '', city: '', country: '', password: '', password_confirmation: '' });
   const [avatar, setAvatar] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
@@ -122,7 +122,7 @@ export default function Profile() {
         </div>
         <div style={s.sidebarLabel}>Menu</div>
         {tabs.map((t) => (
-          <div key={t.key} style={s.sidebarItem(tab === t.key)} onClick={() => setTab(t.key)}>
+          <div key={t.key} style={s.sidebarItem(false)} onClick={() => setSettingsModal(t.key)}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d={t.icon} />
             </svg>
@@ -267,11 +267,17 @@ export default function Profile() {
               </motion.div>
             )}
 
-            <AnimatePresence mode="wait">
-              {tab === 'info' && (
-                <motion.div key="info" style={s.card}
-                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}
-                >
+          </div>
+        </div>
+
+      </div>
+
+      <AnimatePresence>
+        {settingsModal && (
+          <motion.div style={s.modalOverlay} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSettingsModal(null)}>
+            <motion.div style={{ ...s.modal, maxWidth: '560px' }} initial={{ opacity: 0, scale: 0.85, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.85, y: 20 }} onClick={(e) => e.stopPropagation()}>
+              {settingsModal === 'info' && (
+                <>
                   <div style={s.cardHeader}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
@@ -302,12 +308,10 @@ export default function Profile() {
                       {savingInfo ? <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}><span style={s.spinner} /> Saving...</span> : 'Save Changes'}
                     </motion.button>
                   </form>
-                </motion.div>
+                </>
               )}
-              {tab === 'security' && (
-                <motion.div key="security" style={s.card}
-                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}
-                >
+              {settingsModal === 'security' && (
+                <>
                   <div style={s.cardHeader}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -336,13 +340,15 @@ export default function Profile() {
                       {savingPass ? <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}><span style={s.spinner} /> Saving...</span> : 'Update Password'}
                     </motion.button>
                   </form>
-                </motion.div>
+                </>
               )}
-            </AnimatePresence>
-          </div>
-        </div>
-
-      </div>
+              <button style={s.modalClose} onClick={() => setSettingsModal(null)}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {modal && (
