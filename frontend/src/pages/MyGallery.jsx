@@ -460,14 +460,20 @@ export default function MyGallery() {
                                   <span style={{ color: '#888', fontSize: '12px' }}>No likes yet</span>
                                 ) : (
                                   likesUsers.map((u) => (
-                                    <div key={u.id} style={styles.likesPopoverItem}>
+                                    <motion.div
+                                      key={u.id}
+                                      style={styles.likesPopoverItem}
+                                      onClick={() => { setShowLikesPopover(null); setLikesUsers(null); navigate(`/profile/${u.id}`); }}
+                                      whileHover={{ background: 'rgba(255,255,255,0.05)' }}
+                                      whileTap={{ scale: 0.97 }}
+                                    >
                                       {u.avatar_url ? (
                                         <img src={u.avatar_url} alt="" style={styles.likesPopoverAvatar} />
                                       ) : (
                                         <div style={styles.likesPopoverInitial}>{u.name?.charAt(0).toUpperCase()}</div>
                                       )}
                                       <span style={{ color: '#ccc', fontSize: '13px' }}>{u.name}</span>
-                                    </div>
+                                    </motion.div>
                                   ))
                                 )}
                               </div>

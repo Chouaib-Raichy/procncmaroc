@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getComments, addComment, replyToComment, togglePostLike, toggleCommentLike, getPostLikes } from '../api/gallery';
 import api from '../api/axios';
@@ -277,6 +278,7 @@ function CommentSection({ postId, user, onCommentCountChange }) {
 
 export default function CustomerGallery() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -391,7 +393,11 @@ export default function CustomerGallery() {
                   style={styles.card}
                   layout
                 >
-                  <div style={styles.userBar}>
+                  <motion.div
+                    onClick={() => post.user?.id && navigate(`/profile/${post.user.id}`)}
+                    whileTap={{ scale: 0.98 }}
+                    style={{ ...styles.userBar, cursor: post.user?.id ? 'pointer' : 'default' }}
+                  >
                     {post.user?.avatar_url ? (
                       <img src={post.user.avatar_url} alt="" style={styles.userBarAvatar} />
                     ) : (
@@ -401,7 +407,7 @@ export default function CustomerGallery() {
                       <div style={styles.userBarName}>{post.user?.name}</div>
                       <div style={styles.userBarTime}>{formatTime(post.created_at)}</div>
                     </div>
-                  </div>
+                  </motion.div>
 
                   <ImageCarousel images={post.images_url} title={post.title} onImageClick={(url) => setFullImg(url)} />
 
@@ -462,14 +468,20 @@ export default function CustomerGallery() {
                               <span style={{ color: '#888', fontSize: '12px' }}>No likes yet</span>
                             ) : (
                               likesUsers.map((u) => (
-                                <div key={u.id} style={styles.likesPopoverItem}>
+                                <motion.div
+                                  key={u.id}
+                                  style={styles.likesPopoverItem}
+                                  onClick={() => { setShowLikesPopover(null); setLikesUsers(null); navigate(`/profile/${u.id}`); }}
+                                  whileHover={{ background: 'rgba(255,255,255,0.05)' }}
+                                  whileTap={{ scale: 0.97 }}
+                                >
                                   {u.avatar_url ? (
                                     <img src={u.avatar_url} alt="" style={styles.likesPopoverAvatar} />
                                   ) : (
                                     <div style={styles.likesPopoverInitial}>{u.name?.charAt(0).toUpperCase()}</div>
                                   )}
                                   <span style={{ color: '#ccc', fontSize: '13px' }}>{u.name}</span>
-                                </div>
+                                </motion.div>
                               ))
                             )}
                           </div>
