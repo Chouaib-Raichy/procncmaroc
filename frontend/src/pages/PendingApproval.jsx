@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import machineBg from '../assets/machineBG.jpeg';
+import SEO from '../components/SEO';
 
 export default function PendingApproval() {
   const { user, loading, logout } = useAuth();
@@ -11,24 +12,27 @@ export default function PendingApproval() {
   if (!user.business_bio) return <Navigate to="/complete-registration" replace />;
 
   return (
-    <div style={styles.page}>
-      <div style={styles.overlay}>
-        <div style={styles.card}>
-          <div style={styles.icon}>⏳</div>
-          <h1 style={styles.title}>Registration Under Review</h1>
-          <p style={styles.text}>
-            Thank you for submitting your business information! Your account is currently
-            being reviewed by our team. This usually takes 1-2 business days.
-          </p>
-          <p style={styles.text}>
-            You will be notified once your account is approved. If you have any questions,
-            please contact us at <a href="mailto:contact@procncmaroc.com" style={styles.link}>contact@procncmaroc.com</a>.
-          </p>
-          <div style={styles.divider} />
-          <button onClick={logout} style={styles.btn}>Logout</button>
+    <>
+      <SEO title="Pending Approval" description="Your PRO CNC MAROC account is under review. You will be notified once approved." canonicalUrl="/pending-approval" />
+      <div style={styles.page}>
+        <div style={styles.overlay}>
+          <div style={styles.card}>
+            <div style={styles.icon}>⏳</div>
+            <h1 style={styles.title}>Registration Under Review</h1>
+            <p style={styles.text}>
+              Thank you for submitting your business information! Your account is currently
+              being reviewed by our team. This usually takes 1-2 business days.
+            </p>
+            <p style={styles.text}>
+              You will be notified once your account is approved. If you have any questions,
+              please contact us at <a href="mailto:contact@procncmaroc.com" style={styles.link}>contact@procncmaroc.com</a>.
+            </p>
+            <div style={styles.divider} />
+            <button onClick={logout} style={styles.btn}>Logout</button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

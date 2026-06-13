@@ -20,6 +20,7 @@ import { getSettings, toggleSetting } from '../api/settings';
 import { getVisitors, getStatsSummary } from '../api/visitors';
 import { motion, AnimatePresence } from 'framer-motion';
 import ConfirmModal from '../components/ConfirmModal';
+import SEO from '../components/SEO';
 
 const sidebarItems = [
   { key: 'overview', label: 'Overview', icon: '📊' },
@@ -40,7 +41,9 @@ export default function Dashboard() {
   if (!user || user.role !== 'admin') return <Navigate to="/" replace />;
 
   return (
-    <div className="dashboard-page" style={{ display: 'flex', height: '100vh', padding: 0, maxWidth: '100%', overflow: 'hidden' }}>
+    <>
+      <SEO title="Admin Dashboard" description="PRO CNC MAROC admin dashboard — manage users, machines, categories, gallery, and site settings." canonicalUrl="/dashboard" />
+      <div className="dashboard-page" style={{ display: 'flex', height: '100vh', padding: 0, maxWidth: '100%', overflow: 'hidden' }}>
       {/* Sidebar */}
       <aside style={{
         width: sidebarOpen ? '220px' : '60px',
@@ -110,6 +113,7 @@ export default function Dashboard() {
           activeTab === 'messages' ? <MessagesManager /> : null}
       </div>
     </div>
+    </>
   );
 }
 

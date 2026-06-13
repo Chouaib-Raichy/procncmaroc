@@ -7,6 +7,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import { getComments, addComment, replyToComment, togglePostLike, toggleCommentLike, getPostLikes } from '../api/gallery';
 import api from '../api/axios';
 import machineBg from '../assets/machineBG.jpeg';
+import SEO from '../components/SEO';
 
 const HeartIcon = ({ filled }) => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill={filled ? '#e74c3c' : 'none'} stroke={filled ? '#e74c3c' : '#999'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -302,7 +303,9 @@ export default function MyGallery() {
   };
 
   return (
-    <div style={styles.page}>
+    <>
+      <SEO title="My Gallery" description="Manage your photo gallery on PRO CNC MAROC — upload, organize, and share your CNC projects." canonicalUrl="/my-gallery" />
+      <div style={styles.page}>
       <div style={styles.overlay}>
         <div style={styles.container}>
           <motion.div
@@ -535,6 +538,7 @@ export default function MyGallery() {
         message="This action cannot be undone. The post and all its comments will be permanently removed."
       />
     </div>
+    </>
   );
 }
 

@@ -6,6 +6,7 @@ import api from '../api/axios';
 import PhoneInput from '../components/PhoneInput';
 import VerificationCodeModal from '../components/VerificationCodeModal';
 import machineBg from '../assets/machineBG.jpeg';
+import SEO from '../components/SEO';
 
 const CalendarIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -167,7 +168,9 @@ export default function Profile() {
   ];
 
   return (
-    <div style={s.page}>
+    <>
+      <SEO title="My Profile" description="Edit your PRO CNC MAROC profile, manage your business information, and update your gallery." canonicalUrl="/profile" />
+      <div style={s.page}>
       <div style={s.overlay} />
 
       <div style={s.card}>
@@ -482,6 +485,7 @@ export default function Profile() {
         )}
       </AnimatePresence>
     </div>
+    </>
   );
 }
 

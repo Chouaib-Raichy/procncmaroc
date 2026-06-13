@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import machineBg from '../assets/machineBG.jpeg';
+import SEO from '../components/SEO';
 
 const MAX_IMAGES = 6;
 
@@ -62,7 +63,9 @@ export default function CompleteRegistration() {
   };
 
   return (
-    <div style={styles.page}>
+    <>
+      <SEO title="Complete Registration" description="Complete your PRO CNC MAROC business registration to get your account approved." canonicalUrl="/complete-registration" />
+      <div style={styles.page}>
       <div style={styles.overlay}>
         <form style={styles.form} onSubmit={handleSubmit}>
           <h1 style={styles.title}>Complete Your Registration</h1>
@@ -109,6 +112,7 @@ export default function CompleteRegistration() {
         </form>
       </div>
     </div>
+    </>
   );
 }
 
