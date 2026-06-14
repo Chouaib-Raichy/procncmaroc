@@ -225,7 +225,7 @@ export default function PublicProfile() {
                   </a>
                 )}
                 {u.email && siteSettings.show_email === '1' && (
-                  <a href={`mailto:${u.email}`} style={{ ...styles.contactBtn, borderColor: '#d4af37', color: '#d4af37' }}>
+                  <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(u.email)}`} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#d4af37', color: '#d4af37' }}>
                     <MailIcon /> Email
                   </a>
                 )}
