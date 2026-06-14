@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SEO from '../components/SEO';
-import api from '../api/axios';
+import { getProducts } from '../api/products';
 
 const WHATSAPP_NUMBER = '+212625280991';
 
@@ -54,11 +54,12 @@ export default function Products() {
     setError(null);
     const params = { page, per_page: 9 };
     if (debouncedSearch.trim()) params.search = debouncedSearch.trim();
-    api.get('/machines', { params })
+    getProducts(params)
       .then((res) => {
-        setProducts(res.data.data);
-        setTotalPages(res.data.meta?.last_page || 1);
-        setTotal(res.data.meta?.total || 0);
+        const d = res.data;
+        setProducts(d.data ?? d);
+        setTotalPages(d.last_page ?? 1);
+        setTotal(d.total ?? 0);
       })
       .catch(() => setError('Failed to load products. Please try again.'))
       .finally(() => setLoading(false));
@@ -136,21 +137,17 @@ export default function Products() {
                     style={styles.card}
                   >
                     <div style={styles.cardImgWrap}>
-                      {p.image_url ? (
-                        <img src={p.image_url} alt={p.title} style={styles.cardImg} />
+                      {p.images_url?.length > 0 ? (
+                        <img src={p.images_url[0]} alt={p.title} style={styles.cardImg} />
                       ) : (
                         <div style={styles.cardImgPlaceholder}>
                           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
                         </div>
                       )}
-                      {p.category && <span style={styles.badge}>{p.category.name}</span>}
                     </div>
                     <div style={styles.cardBody}>
                       <h3 style={styles.cardTitle}>{p.title}</h3>
-                      <div style={styles.cardMeta}>
-                        {p.price != null && <span style={styles.price}>{formatPrice(p.price)}</span>}
-                        {p.features?.length > 0 && <span style={styles.featureCount}>{p.features.length} {p.features.length === 1 ? 'feature' : 'features'}</span>}
-                      </div>
+                      {p.price != null && <div style={styles.cardMeta}><span style={styles.price}>{formatPrice(p.price)}</span></div>}
                       <p style={styles.cardDesc}>{truncate(p.description, 100)}</p>
                       <motion.a
                         href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hi, I am interested in: ' + p.title)}`}

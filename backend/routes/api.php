@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\GalleryCommentController;
 use App\Http\Controllers\Api\GalleryPostController;
 use App\Http\Controllers\Api\MachineController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\SiteSettingController;
 use App\Http\Controllers\AuthController;
@@ -20,6 +21,8 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 Route::get('/machines', [MachineController::class, 'index']);
 Route::get('/machines/{machine}', [MachineController::class, 'showPublic']);
+Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/{product}', [ProductController::class, 'show']);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::post('/contact', [ContactController::class, 'store']);
 Route::get('/gallery', [GalleryPostController::class, 'index']);
@@ -80,5 +83,10 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('/admin/users/{id}/reject', [AdminUserController::class, 'reject']);
 
         Route::post('/admin/settings/{key}/toggle', [SiteSettingController::class, 'toggle']);
+
+        Route::get('/admin/products', [ProductController::class, 'all']);
+        Route::post('/admin/products', [ProductController::class, 'store']);
+        Route::post('/admin/products/update/{product}', [ProductController::class, 'update']);
+        Route::delete('/admin/products/{product}', [ProductController::class, 'destroy']);
     });
 });
