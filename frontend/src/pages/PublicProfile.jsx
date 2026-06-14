@@ -377,7 +377,7 @@ const styles = {
     color: '#d4af37', fontSize: '11px', fontWeight: 700,
     textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px',
   },
-  bioText: { color: '#bbb', fontSize: '14px', lineHeight: 1.8, margin: 0 },
+  bioText: { color: '#bbb', fontSize: '14px', lineHeight: 1.8, margin: 0, whiteSpace: 'pre-wrap', overflowWrap: 'break-word', wordBreak: 'break-word' },
 
   contactSection: {},
   contactLabel: {

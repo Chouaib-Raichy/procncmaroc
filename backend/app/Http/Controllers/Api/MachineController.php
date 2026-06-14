@@ -16,6 +16,13 @@ class MachineController extends Controller
             ->with('category')
             ->orderBy('created_at', 'desc');
 
+        if ($search = request('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
         if (request('all')) {
             return MachineDTO::collection($query->get());
         }

@@ -567,7 +567,7 @@ const s = {
 
   bioBox: { borderLeft: '3px solid #a37a39', padding: '16px 20px', background: 'rgba(0,0,0,0.3)', borderRadius: '0 12px 12px 0' },
   bioLabel: { color: '#d4af37', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' },
-  bioText: { color: '#bbb', fontSize: '14px', lineHeight: 1.8, margin: 0 },
+  bioText: { color: '#bbb', fontSize: '14px', lineHeight: 1.8, margin: 0, whiteSpace: 'pre-wrap', overflowWrap: 'break-word', wordBreak: 'break-word' },
 
 
   galleryHeader: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' },
