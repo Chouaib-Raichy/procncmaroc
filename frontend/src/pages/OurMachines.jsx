@@ -5,6 +5,7 @@ import Loading from '../components/Loading';
 import ErrorState from '../components/ErrorState';
 import { getCategories } from '../api/categories';
 import machineBg from '../assets/machineBG.jpeg';
+import placeholderImg from '../assets/placeholder.svg';
 import SEO from '../components/SEO';
 
 export default function OurMachines() {
@@ -67,7 +68,6 @@ export default function OurMachines() {
       <div style={styles.overlay}>
         <div style={styles.titleWrap}>
           <h1 style={styles.title}>Our Machines</h1>
-          <p style={styles.subtitle}>RAYSET , CNC ROUTER . LASER CO2 . FIBER MARKING MACHINES </p>
         </div>
 
         <div style={styles.filters}>
@@ -101,7 +101,7 @@ export default function OurMachines() {
                 <div key={m.id} style={styles.card} className="machine-card">
                   <div style={styles.imgWrap}>
                     <img
-                      src={m.image_url || 'https://placehold.co/400x250/ccc/333?text=Machine'}
+                      src={m.image_url || placeholderImg}
                       alt={m.title}
                       style={styles.img}
                     />

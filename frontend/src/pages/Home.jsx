@@ -3,20 +3,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import heroBg from '../assets/dq-1.jpg';
 import showroom from '../assets/showroom.png';
-import ownerImg from '../assets/owner.png';
-import cncRouterImg from '../assets/cnc-router.png';
+import placeholderImg from '../assets/placeholder.svg';
 import bgWhyChooseUs from '../assets/bg_whychooseus.png';
 import showcase1 from '../assets/showcase1.mp4';
 import showcase2 from '../assets/showcase2.mp4';
 import showcase3 from '../assets/showcase3.mp4';
 import showcaseBg from '../assets/showcase_bg.png';
 import {
-  FaAward,
-  FaDollarSign,
-  FaShieldAlt,
-  FaHeadset,
-} from "react-icons/fa";
+  LuAward,
+  LuDollarSign,
+  LuShield,
+  LuHeadphones,
+} from "react-icons/lu";
 import { getAllMachines } from '../api/machines';
+import { getPartners } from '../api/partners';
 import SEO from '../components/SEO';
 
 export default function Home() {
@@ -24,6 +24,7 @@ export default function Home() {
   const [featured, setFeatured] = useState([]);
   const [current, setCurrent] = useState(0);
   const [lightboxVideo, setLightboxVideo] = useState(null);
+  const [partner, setPartner] = useState(null);
 
   useEffect(() => {
     getAllMachines()
@@ -39,6 +40,17 @@ export default function Home() {
         setFeatured(picks);
       })
       .catch(() => setMachines([]));
+  }, []);
+
+  useEffect(() => {
+    getPartners()
+      .then((res) => {
+        const users = res.data || res;
+        if (users.length > 0) {
+          setPartner(users[Math.floor(Math.random() * users.length)]);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -79,24 +91,37 @@ export default function Home() {
 
       <div style={styles.showroomSection}>
         <div style={styles.overlayCards}>
-          {/* LEFT CARD */}
+          {/* LEFT CARD - PARTNER */}
           <motion.div style={styles.card} className="home-card"
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
           >
-            <img src={ownerImg} alt="Mr Azeddine" style={styles.cardImg} />
-            <div style={styles.cardBody}>
-              <h3 style={styles.cardTitle}>Mr AZEDDINE Mouhcine</h3>
-              <p style={styles.cardText}>
-                CNC & laser cutting workshop, manufacturer of facade panels,
-                carpentry and interior design.
-              </p>
-              <hr style={styles.cardHr} />
-              <div style={styles.location}>📍 EL JADIDA - MOROCCO</div>
-              <a href="/about" style={styles.moreLink} className="home-more-link">More infos</a>
-            </div>
+            {partner ? (
+              <>
+                <img
+                  src={partner.avatar_url || placeholderImg}
+                  alt={partner.name}
+                  style={styles.cardImg}
+                />
+                <div style={styles.cardBody}>
+                  <h3 style={styles.cardTitle}>{partner.name}</h3>
+                  <p style={styles.cardText}>
+                    {partner.business_bio || partner.business_location || 'No information provided.'}
+                  </p>
+                  <hr style={styles.cardHr} />
+                  <div style={styles.location}>
+                    📍 {partner.city}{partner.city && partner.country ? ', ' : ''}{partner.country || ''}
+                  </div>
+                  <Link to={`/profile/${partner.id}`} style={styles.moreLink} className="home-more-link">More infos</Link>
+                </div>
+              </>
+            ) : (
+              <div style={{ ...styles.cardImg, background: '#222', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666', fontSize: '14px' }}>
+                Loading partner...
+              </div>
+            )}
           </motion.div>
 
           {/* RIGHT CARD - MACHINE CAROUSEL */}
@@ -109,7 +134,7 @@ export default function Home() {
             <div style={styles.carouselImgWrap}>
               {active ? (
                 <img
-                  src={active.image_url || 'https://placehold.co/400x250/333/fff?text=Machine'}
+                  src={active.image_url || placeholderImg}
                   alt={active.title}
                   style={styles.carouselImg}
                 />
@@ -231,22 +256,22 @@ export default function Home() {
         <div style={styles.whyChooseGrid}>
           {[
             {
-              icon: <FaAward />,
+              icon: <LuAward />,
               title: "Best Quality",
               text: "We have completed and achieved the Certificate of Quality Management System",
             },
             {
-              icon: <FaDollarSign />,
+              icon: <LuDollarSign />,
               title: "Best Prices",
               text: "We guarantee the most competitive prices on the market without compromising on quality.",
             },
             {
-              icon: <FaShieldAlt />,
+              icon: <LuShield />,
               title: "Buyer Protection",
               text: "Shop with confidence through secure transactions and a satisfaction guarantee.",
             },
             {
-              icon: <FaHeadset />,
+              icon: <LuHeadphones />,
               title: "24/7 Customer Support",
               text: "Our team is available anytime to answer your questions and assist you.",
             },
@@ -393,6 +418,10 @@ const styles = {
     lineHeight: 1.6,
     marginBottom: 'clamp(8px, 1vw, 12px)',
     flex: 1,
+    display: '-webkit-box',
+    WebkitLineClamp: 6,
+    WebkitBoxOrient: 'vertical',
+    overflow: 'hidden',
   },
   location: {
     fontSize: 'clamp(12px, 1.2vw, 14px)',

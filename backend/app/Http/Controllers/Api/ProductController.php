@@ -65,27 +65,35 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $data = $request->validate([
-            'title'       => 'sometimes|string|max:255',
-            'description' => 'nullable|string',
-            'price'       => 'nullable|numeric|min:0',
-            'images'      => 'nullable|array|max:3',
-            'images.*'    => 'image|max:10240',
-            'visible'     => 'boolean',
+            'title'          => 'sometimes|string|max:255',
+            'description'    => 'nullable|string',
+            'price'          => 'nullable|numeric|min:0',
+            'images'         => 'nullable|array|max:3',
+            'images.*'       => 'image|max:10240',
+            'deleted_images' => 'nullable|array',
+            'deleted_images.*' => 'string',
+            'visible'        => 'boolean',
         ]);
 
-        if ($request->hasFile('images')) {
-            if ($product->images) {
-                foreach ($product->images as $old) {
-                    Storage::disk('public')->delete($old);
-                }
+        $currentImages = $product->images ?? [];
+
+        if ($request->has('deleted_images')) {
+            $toDelete = $request->input('deleted_images');
+            foreach ($toDelete as $path) {
+                Storage::disk('public')->delete($path);
             }
-            $paths = [];
-            foreach ($request->file('images') as $img) {
-                $paths[] = $img->store('products', 'public');
-            }
-            $data['images'] = $paths;
+            $currentImages = array_values(array_diff($currentImages, $toDelete));
         }
 
+        if ($request->hasFile('images')) {
+            $newPaths = [];
+            foreach ($request->file('images') as $img) {
+                $newPaths[] = $img->store('products', 'public');
+            }
+            $currentImages = array_merge($currentImages, $newPaths);
+        }
+
+        $data['images'] = $currentImages;
         $product->update($data);
 
         return ProductDTO::fromModel($product)->toArray();
@@ -105,8 +113,13 @@ class ProductController extends Controller
 
     public function all()
     {
-        return ProductDTO::collection(
-            Product::withTrashed()->orderBy('created_at', 'desc')->get()
-        );
+        $query = Product::orderBy('created_at', 'desc');
+
+        if ($perPage = request('per_page')) {
+            $paginator = $query->paginate($perPage);
+            return ProductDTO::paginated($paginator);
+        }
+
+        return ProductDTO::collection($query->get());
     }
 }

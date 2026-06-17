@@ -5,6 +5,7 @@ import api from '../api/axios';
 import Loading from '../components/Loading';
 import ErrorState from '../components/ErrorState';
 import machineBg from '../assets/machineBG.jpeg';
+import placeholderImg from '../assets/placeholder.svg';
 import SEO from '../components/SEO';
 
 const PHONE = '212625280991';
@@ -116,7 +117,7 @@ export default function MachineDetail() {
               transition={{ duration: 0.6, ease: 'easeOut' }}
             >
               <img
-                src={machine.image_url || 'https://placehold.co/800x500/333/fff?text=No+Image'}
+                src={machine.image_url || placeholderImg}
                 alt={machine.title}
                 style={styles.image}
               />

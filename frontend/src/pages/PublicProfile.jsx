@@ -5,6 +5,7 @@ import { getPartner } from '../api/partners';
 import { getSettings } from '../api/settings';
 import ErrorState from '../components/ErrorState';
 import machineBg from '../assets/machineBG.jpeg';
+import placeholderImg from '../assets/placeholder.svg';
 import SEO from '../components/SEO';
 
 const WhatsAppIcon = () => (
@@ -131,7 +132,7 @@ export default function PublicProfile() {
       <motion.div style={styles.card} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
 
         {/* Cover */}
-        <motion.div {...fadeUp()} style={{ ...styles.cover, backgroundImage: `url(${u.profile_bg_url || machineBg})` }}>
+        <motion.div {...fadeUp()} style={{ ...styles.cover, backgroundImage: `url(${u.profile_bg_url || placeholderImg})` }}>
           <div style={styles.coverOverlay} />
         </motion.div>
 
@@ -143,11 +144,7 @@ export default function PublicProfile() {
             transition={{ type: 'spring', stiffness: 200, delay: 0.15 }}
             onClick={() => u.avatar_url && setLightboxImg(u.avatar_url)}
           >
-            {u.avatar_url ? (
-              <img src={u.avatar_url} alt={u.name} style={styles.avatarImg} />
-            ) : (
-              <div style={styles.avatarPlaceholder}>{u.name?.charAt(0).toUpperCase()}</div>
-            )}
+            <img src={u.avatar_url || placeholderImg} alt={u.name} style={styles.avatarImg} />
           </motion.div>
           <div style={styles.identityInfo}>
             <motion.h1 style={styles.name} {...fadeUp(0.2)}>{u.name}</motion.h1>

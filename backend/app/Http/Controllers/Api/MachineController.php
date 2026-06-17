@@ -33,9 +33,14 @@ class MachineController extends Controller
 
     public function all()
     {
-        return MachineDTO::collection(
-            Machine::with('category')->orderBy('created_at', 'desc')->get()
-        );
+        $query = Machine::with('category')->orderBy('created_at', 'desc');
+
+        if ($perPage = request('per_page')) {
+            $paginator = $query->paginate($perPage);
+            return MachineDTO::paginated($paginator);
+        }
+
+        return MachineDTO::collection($query->get());
     }
 
     public function trashed()

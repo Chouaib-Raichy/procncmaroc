@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
 import Loading from '../components/Loading';
+import placeholderImg from '../assets/placeholder.svg';
 import {
   getAdminMachines,
   createMachine,
@@ -9,23 +10,31 @@ import {
   deleteMachine,
 } from '../api/machines';
 import {
+  getAdminProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+} from '../api/products';
+import {
   getCategories,
   createCategory,
   updateCategory,
   deleteCategory,
 } from '../api/categories';
 import { getMessages } from '../api/contacts';
-import { getUsers, toggleBanUser, getPendingUsers, approveUser, rejectUser } from '../api/users';
+import { getUsers, updateUser, deleteUser, toggleBanUser, getPendingUsers, approveUser, rejectUser } from '../api/users';
 import { getSettings, toggleSetting } from '../api/settings';
 import { getVisitors, getStatsSummary } from '../api/visitors';
 import { motion, AnimatePresence } from 'framer-motion';
 import ConfirmModal from '../components/ConfirmModal';
+import AlertModal from '../components/AlertModal';
 import SEO from '../components/SEO';
 
 const sidebarItems = [
   { key: 'overview', label: 'Overview', icon: '📊' },
   { key: 'users', label: 'Users', icon: '👥' },
   { key: 'visitors', label: 'Visitors', icon: '🌐' },
+  { key: 'products', label: 'Products', icon: '🏷️' },
   { key: 'machines', label: 'Machines', icon: '⚙️' },
   { key: 'categories', label: 'Categories', icon: '📁' },
   { key: 'pending', label: 'Pending', icon: '⏳' },
@@ -107,6 +116,7 @@ export default function Dashboard() {
         {          activeTab === 'overview' ? <Overview /> :
           activeTab === 'users' ? <UsersManager /> :
          activeTab === 'visitors' ? <VisitorsManager /> :
+         activeTab === 'products' ? <ProductManager /> :
          activeTab === 'machines' ? <MachineManager /> :
          activeTab === 'categories' ? <CategoryManager /> :
           activeTab === 'pending' ? <PendingRegistrations /> :
@@ -117,8 +127,7 @@ export default function Dashboard() {
   );
 }
 
-const thStyle = { padding: '10px 12px', color: '#d4af37', fontWeight: 700, textAlign: 'left', background: '#111', whiteSpace: 'nowrap' };
-const tdStyle = { padding: '10px 12px', color: '#ccc' };
+/* th and td are shared below — do not redefine */
 
 /* ---------- Overview ---------- */
 function Overview() {
@@ -349,23 +358,72 @@ const userRowVariants = {
 
 function UsersManager() {
   const [users, setUsers] = useState([]);
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [viewingUser, setViewingUser] = useState(null);
+  const [editingUser, setEditingUser] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [banConfirm, setBanConfirm] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [siteSettings, setSiteSettings] = useState({ show_whatsapp: '1', show_maps: '1', show_email: '1' });
 
-  const load = () => { getUsers().then((res) => setUsers(res.data)).catch(() => {}).finally(() => setLoading(false)); };
-  useEffect(() => { load(); }, []);
+  const load = () => {
+    setLoading(true);
+    getUsers({ per_page: 10, page }).then((res) => {
+      const d = res.data;
+      setUsers(d.data || d);
+      setLastPage(d.last_page || 1);
+      setTotal(d.total || d.length || 0);
+    }).catch(() => {}).finally(() => setLoading(false));
+  };
+  useEffect(() => { load(); }, [page]);
   useEffect(() => { getSettings().then((r) => setSiteSettings(r.data)).catch(() => {}); }, []);
 
   const handleToggleSetting = async (key) => {
     try { const r = await toggleSetting(key); setSiteSettings((p) => ({ ...p, [key]: r.data.value })); } catch (e) { alert(e.response?.data?.message || 'Error'); }
   };
 
-  const handleToggleBan = async (id) => {
+  const handleToggleBan = (id) => setBanConfirm(id);
+
+  const confirmBan = async () => {
+    const id = banConfirm;
+    setBanConfirm(null);
     try { await toggleBanUser(id); load(); } catch (e) { alert(e.response?.data?.message || 'Error'); }
   };
 
-  const handleViewProfile = (u) => setViewingUser(u);
+  const handleEdit = (u) => {
+    setEditForm({
+      name: u.name || '',
+      email: u.email || '',
+      phone: u.phone || '',
+      business_location: u.business_location || '',
+      city: u.city || '',
+      country: u.country || '',
+      entreprise_name: u.entreprise_name || '',
+      business_bio: u.business_bio || '',
+      role: u.role || 'user',
+    });
+    setEditingUser(u);
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      await updateUser(editingUser.id, editForm);
+      setEditingUser(null);
+      load();
+    } catch (e) {
+      alert(e.response?.data?.message || 'Error updating user');
+    }
+  };
+
+  const handleDelete = (id) => setDeleteConfirm(id);
+
+  const confirmDelete = async () => {
+    const id = deleteConfirm;
+    setDeleteConfirm(null);
+    try { await deleteUser(id); load(); } catch (e) { alert(e.response?.data?.message || 'Error deleting user'); }
+  };
 
   if (loading) {
     return (
@@ -398,7 +456,7 @@ function UsersManager() {
       <div style={sectionHeader}>
         <div>
           <h2 style={sectionTitle}>Registered Users</h2>
-          <p style={{ color: '#777', fontSize: '13px', margin: '4px 0 0' }}>{users.length} total users</p>
+          <p style={{ color: '#777', fontSize: '13px', margin: '4px 0 0' }}>{total} total users</p>
         </div>
         <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
           <span style={{ color: '#888', fontSize: '12px', fontWeight: 600 }}>Contact:</span>
@@ -482,28 +540,39 @@ function UsersManager() {
                   <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                     <motion.button
                       style={{ ...smallBtn, background:'#3498db', display:'inline-flex', alignItems:'center', gap:'4px' }}
-                      onClick={() => handleViewProfile(u)}
+                      onClick={() => handleEdit(u)}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
-                      Profile
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                      Edit
                     </motion.button>
                     {u.role !== 'admin' && (
-                      <motion.button
-                        style={{ ...smallBtn, background: u.banned_at ? '#27ae60' : '#e74c3c', display:'inline-flex', alignItems:'center', gap:'4px' }}
-                        onClick={() => handleToggleBan(u.id)}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                          {u.banned_at
-                            ? <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><path d="M12 9v4" /><path d="M12 17h.01" /></>
-                            : <><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></>
-                          }
-                        </svg>
-                        {u.banned_at ? 'Unban' : 'Ban'}
-                      </motion.button>
+                      <>
+                        <motion.button
+                          style={{ ...smallBtn, background: u.banned_at ? '#27ae60' : '#e74c3c', display:'inline-flex', alignItems:'center', gap:'4px' }}
+                          onClick={() => handleToggleBan(u.id)}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            {u.banned_at
+                              ? <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><path d="M12 9v4" /><path d="M12 17h.01" /></>
+                              : <><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></>
+                            }
+                          </svg>
+                          {u.banned_at ? 'Unban' : 'Ban'}
+                        </motion.button>
+                        <motion.button
+                          style={{ ...smallBtn, background:'#e74c3c', display:'inline-flex', alignItems:'center', gap:'4px' }}
+                          onClick={() => handleDelete(u.id)}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                          Delete
+                        </motion.button>
+                      </>
                     )}
                   </div>
                 </td>
@@ -513,64 +582,143 @@ function UsersManager() {
         </table>
       </div>
 
-      {viewingUser && (
+      {editingUser && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           style={overlay}
-          onClick={() => setViewingUser(null)}
+          onClick={() => setEditingUser(null)}
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.25 }}
-            style={{ ...modal, maxWidth: '600px' }}
+            style={{ ...modal, maxWidth: '550px' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ display:'flex', alignItems:'center', gap:'16px', marginBottom:'clamp(16px, 2vw, 24px)' }}>
+            <div style={{ display:'flex', alignItems:'center', gap:'12px', marginBottom:'20px' }}>
               <div style={{
-                width:'52px', height:'52px', borderRadius:'50%',
+                width:'42px', height:'42px', borderRadius:'50%',
                 background:'linear-gradient(135deg, #a37a39, #c8952e)',
                 display:'flex', alignItems:'center', justifyContent:'center',
-                color:'#000', fontWeight:'bold', fontSize:'22px', flexShrink:0,
+                color:'#000', fontWeight:'bold', fontSize:'18px', flexShrink:0,
               }}>
-                {viewingUser.name?.charAt(0).toUpperCase()}
+                {editingUser.name?.charAt(0).toUpperCase()}
               </div>
-              <div>
-                <h2 style={{ ...modalTitle, margin:0 }}>{viewingUser.name}</h2>
-                <span style={{ color:'#999', fontSize:'13px' }}>{viewingUser.email}</span>
-              </div>
+              <h2 style={{ ...modalTitle, margin:0 }}>Edit User — {editingUser.name}</h2>
             </div>
-            <div style={{
-              display:'grid', gridTemplateColumns:'1fr 1fr', gap:'clamp(10px, 1.5vw, 16px)',
-              marginBottom:'20px', fontSize:'14px', color:'#ccc',
-            }}>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px', marginBottom:'20px' }}>
               {[
-                { label:'Role', value: viewingUser.role === 'admin' ? 'Administrator' : 'Standard User' },
-                { label:'Status', value: viewingUser.banned_at ? 'Banned' : 'Active' },
-                { label:'Registered', value: new Date(viewingUser.created_at).toLocaleDateString() },
-                { label:'Last Active', value: viewingUser.last_activity_at ? new Date(viewingUser.last_activity_at).toLocaleString() : 'Never' },
-                { label:'Email', value: viewingUser.email },
+                { key:'name', label:'Name', type:'text' },
+                { key:'email', label:'Email', type:'email' },
+                { key:'phone', label:'Phone', type:'text' },
+                { key:'business_location', label:'Business Location', type:'text' },
+                { key:'city', label:'City', type:'text' },
+                { key:'country', label:'Country', type:'text' },
+                { key:'entreprise_name', label:'Company Name', type:'text' },
               ].map((f) => (
-                <div key={f.label}>
-                  <div style={{ color:'#d4af37', fontSize:'12px', fontWeight:600, marginBottom:'2px' }}>{f.label}</div>
-                  <div>{f.value}</div>
+                <div key={f.key}>
+                  <div style={{ color:'#d4af37', fontSize:'12px', fontWeight:600, marginBottom:'4px' }}>{f.label}</div>
+                  <input
+                    type={f.type}
+                    value={editForm[f.key] || ''}
+                    onChange={(e) => setEditForm((p) => ({ ...p, [f.key]: e.target.value }))}
+                    style={inputStyle}
+                  />
                 </div>
               ))}
+              <div style={{ gridColumn:'1 / -1' }}>
+                <div style={{ color:'#d4af37', fontSize:'12px', fontWeight:600, marginBottom:'4px' }}>Business Bio</div>
+                <textarea
+                  value={editForm.business_bio || ''}
+                  onChange={(e) => setEditForm((p) => ({ ...p, business_bio: e.target.value }))}
+                  style={{ ...inputStyle, minHeight:'70px', resize:'vertical', fontFamily:'inherit' }}
+                />
+              </div>
+              <div>
+                <div style={{ color:'#d4af37', fontSize:'12px', fontWeight:600, marginBottom:'4px' }}>Role</div>
+                <select
+                  value={editForm.role || 'user'}
+                  onChange={(e) => setEditForm((p) => ({ ...p, role: e.target.value }))}
+                  style={inputStyle}
+                >
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
             </div>
-            <div style={{ display:'flex', justifyContent:'flex-end' }}>
+            <div style={{ display:'flex', justifyContent:'flex-end', gap:'8px' }}>
               <motion.button
-                style={saveBtn}
-                onClick={() => setViewingUser(null)}
+                style={{ ...smallBtn, background:'#555' }}
+                onClick={() => setEditingUser(null)}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
               >
-                Close
+                Cancel
+              </motion.button>
+              <motion.button
+                style={{ ...saveBtn, background:'#d4af37', color:'#000' }}
+                onClick={handleSaveEdit}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                Save Changes
               </motion.button>
             </div>
           </motion.div>
         </motion.div>
       )}
+
+      {lastPage > 1 && (
+        <div style={paginationRow}>
+          <div style={paginationInfo}>
+            Page {page} of {lastPage} — {total} users
+          </div>
+          <div style={paginationBtns}>
+            <motion.button
+              style={pageBtn(page <= 1)}
+              disabled={page <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              whileTap={{ scale: 0.95 }}
+            >
+              ← Prev
+            </motion.button>
+            {Array.from({ length: lastPage }, (_, i) => i + 1).map((n) => (
+              <motion.button
+                key={n}
+                style={pageNumBtn(n === page)}
+                onClick={() => setPage(n)}
+                whileTap={{ scale: 0.95 }}
+              >
+                {n}
+              </motion.button>
+            ))}
+            <motion.button
+              style={pageBtn(page >= lastPage)}
+              disabled={page >= lastPage}
+              onClick={() => setPage((p) => Math.min(lastPage, p + 1))}
+              whileTap={{ scale: 0.95 }}
+            >
+              Next →
+            </motion.button>
+          </div>
+        </div>
+      )}
+
+      <ConfirmModal
+        open={banConfirm !== null}
+        onConfirm={confirmBan}
+        onCancel={() => setBanConfirm(null)}
+        title="Confirm Ban"
+        message="Are you sure you want to ban this user? They will lose access to their account."
+      />
+      <ConfirmModal
+        open={deleteConfirm !== null}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteConfirm(null)}
+        title="Delete User"
+        message="Are you sure you want to permanently delete this user? This action cannot be undone."
+      />
     </div>
   );
 }
@@ -856,6 +1004,9 @@ function PendingRegistrations() {
 function MachineManager() {
   const [machines, setMachines] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [total, setTotal] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ title: '', description: '', visible: true, category_id: '', price: '', features: '' });
@@ -866,14 +1017,20 @@ function MachineManager() {
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [lightboxImg, setLightboxImg] = useState(null);
 
   const load = () => {
     setLoading(true);
-    getAdminMachines().then((res) => setMachines(res.data)).catch(() => {});
+    getAdminMachines({ per_page: 10, page }).then((res) => {
+      const d = res.data;
+      setMachines(d.data || d);
+      setLastPage(d.last_page || 1);
+      setTotal(d.total || d.length || 0);
+    }).catch(() => {});
     getCategories().then((res) => setCategories(res.data)).catch(() => {}).finally(() => setLoading(false));
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [page]);
 
   const openAdd = () => {
     setEditing(null);
@@ -971,7 +1128,7 @@ function MachineManager() {
       <div style={sectionHeader}>
         <div>
           <h2 style={sectionTitle}>Machines</h2>
-          <p style={{ color: '#777', fontSize: '13px', margin: '4px 0 0' }}>{machines.length} machines</p>
+          <p style={{ color: '#777', fontSize: '13px', margin: '4px 0 0' }}>{total} machines</p>
         </div>
         <motion.button
           style={addBtn}
@@ -1018,7 +1175,7 @@ function MachineManager() {
                   style={tr}
                 >
                   <td style={td}>
-                    <img src={m.image_url || 'https://placehold.co/60x40/ccc/333?text=N/A'} alt="" style={thumb} />
+                    <img src={m.image_url || placeholderImg} alt="" style={{ ...thumb, cursor: 'pointer' }} onClick={() => setLightboxImg(m.image_url || placeholderImg)} />
                   </td>
                   <td style={{ ...td, fontWeight: '600', color:'#fff' }}>{m.title}</td>
                   <td style={td}>{m.price ? `${parseFloat(m.price).toLocaleString()} MAD` : '-'}</td>
@@ -1096,7 +1253,351 @@ function MachineManager() {
             </label>
             <div style={modalActions}>
               <button style={cancelBtn} onClick={() => setShowModal(false)}>Cancel</button>
-              <button style={saveBtn} onClick={handleSave} disabled={saving || !form.title.trim() || !form.description.trim()}>
+              <button style={saveBtn} onClick={handleSave} disabled={saving || !form.title.trim() || !form.description.trim() || imageCount() < 1}>
+                {saving ? 'Saving...' : editing ? 'Update' : 'Create'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/* ---------- Product Manager ---------- */
+function ProductManager() {
+  const [products, setProducts] = useState([]);
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [showModal, setShowModal] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState({ title: '', description: '', price: '', visible: true });
+  const [images, setImages] = useState([]);
+  const [existingImages, setExistingImages] = useState([]);
+  const [existingPaths, setExistingPaths] = useState([]);
+  const [removedPaths, setRemovedPaths] = useState([]);
+  const [newPreviews, setNewPreviews] = useState([]);
+  const [saving, setSaving] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [lightboxImg, setLightboxImg] = useState(null);
+  const [alertMsg, setAlertMsg] = useState(null);
+
+  const load = () => {
+    setLoading(true);
+    getAdminProducts({ per_page: 10, page }).then((res) => {
+      const d = res.data;
+      setProducts(d.data || d);
+      setLastPage(d.last_page || 1);
+      setTotal(d.total || d.length || 0);
+    }).catch(() => {}).finally(() => setLoading(false));
+  };
+
+  useEffect(() => { load(); }, [page]);
+
+  useEffect(() => { setPage(1); }, []);
+
+  const openAdd = () => {
+    setEditing(null);
+    setForm({ title: '', description: '', price: '', visible: true });
+    setImages([]); setExistingImages([]); setExistingPaths([]); setRemovedPaths([]); setNewPreviews([]);
+    setShowModal(true);
+  };
+
+  const openEdit = (p) => {
+    setEditing(p);
+    setForm({
+      title: p.title, description: p.description || '',
+      price: p.price ?? '', visible: p.visible,
+    });
+    setImages([]); setNewPreviews([]);
+    setExistingImages(p.images_url || []);
+    setExistingPaths(p.images || []);
+    setRemovedPaths([]);
+    setShowModal(true);
+  };
+
+  const handleImagePick = (e) => {
+    const files = Array.from(e.target.files);
+    const remainingCount = existingImages.length - removedPaths.length;
+    if (remainingCount + files.length > 3) { setAlertMsg({ title: 'Image Limit', message: 'Maximum 3 images allowed.' }); return; }
+    setImages(files);
+    setNewPreviews(files.map(f => URL.createObjectURL(f)));
+  };
+
+  const handleRemoveExisting = (index) => {
+    const path = existingPaths[index];
+    if (path) setRemovedPaths((prev) => [...prev, path]);
+  };
+
+  const imageCount = () => {
+    const remaining = existingImages.length - removedPaths.length;
+    return remaining + images.length;
+  };
+
+  const handleSave = async () => {
+    if (!form.title.trim()) return;
+    if (imageCount() < 1) { setAlertMsg({ title: 'Missing Image', message: 'At least 1 image is required.' }); return; }
+    setSaving(true);
+    try {
+      const fd = new FormData();
+      fd.append('title', form.title);
+      fd.append('description', form.description);
+      fd.append('visible', form.visible ? '1' : '0');
+      if (form.price) fd.append('price', form.price);
+      images.forEach((img) => fd.append('images[]', img));
+      if (removedPaths.length) {
+        removedPaths.forEach((path) => fd.append('deleted_images[]', path));
+      }
+      if (editing) {
+        const res = await updateProduct(editing.id, fd);
+        setProducts((prev) => prev.map((p) => (p.id === editing.id ? res.data : p)));
+      } else {
+        const res = await createProduct(fd);
+        setProducts((prev) => [res.data, ...prev]);
+        setTotal((t) => t + 1);
+      }
+      setShowModal(false);
+    } catch (e) { setAlertMsg({ title: 'Error', message: e.response?.data?.message || 'Error saving product' }); }
+    finally { setSaving(false); }
+  };
+
+  const handleDelete = async (id) => {
+    setDeleteConfirm(id);
+  };
+
+  const confirmDeleteProduct = async () => {
+    const id = deleteConfirm;
+    setDeleteConfirm(null);
+    try {
+      await deleteProduct(id);
+      setProducts((prev) => prev.filter((p) => p.id !== id));
+      setTotal((t) => t - 1);
+    } catch (e) { setAlertMsg({ title: 'Error', message: e.response?.data?.message || 'Error deleting product' }); }
+  };
+
+  const toggleVisible = async (p) => {
+    try {
+      const fd = new FormData();
+      fd.append('visible', p.visible ? '0' : '1');
+      const res = await updateProduct(p.id, fd);
+      setProducts((prev) => prev.map((x) => (x.id === p.id ? res.data : x)));
+    } catch (e) { setAlertMsg({ title: 'Error', message: e.response?.data?.message || 'Error toggling visibility' }); }
+  };
+
+  if (loading) {
+    return (
+      <div>
+        <div style={sectionHeader}>
+          <h2 style={sectionTitle}>Products</h2>
+        </div>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={table}>
+            <thead>
+              <tr><th style={th}>Image</th><th style={th}>Title</th><th style={th}>Price</th><th style={th}>Status</th><th style={th}>Actions</th></tr>
+            </thead>
+            <tbody>
+              {[1,2,3].map((i) => (
+                <tr key={i} style={tr}>
+                  {[1,2,3,4,5].map((j) => (
+                    <td key={j} style={td}><div style={{ height:'14px', background:'#1a1a1a', borderRadius:'4px', width: j === 2 ? '140px' : j === 3 ? '80px' : '60px' }} /></td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div style={sectionHeader}>
+        <div>
+          <h2 style={sectionTitle}>Products</h2>
+          <p style={{ color: '#777', fontSize: '13px', margin: '4px 0 0' }}>{total} products</p>
+        </div>
+        <motion.button
+          style={addBtn}
+          onClick={openAdd}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight:'6px', verticalAlign:'middle' }}>
+            <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Add Product
+        </motion.button>
+      </div>
+      {products.length === 0 ? (
+        <div style={{ textAlign:'center', padding:'60px 20px' }}>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.5" style={{ marginBottom:'16px' }}>
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+          </svg>
+          <p style={{ color: '#888', fontSize:'15px' }}>No products yet.</p>
+          <p style={{ color: '#555', fontSize:'13px', marginTop:'4px' }}>Click "Add Product" to create one.</p>
+        </div>
+      ) : (
+        <div style={{ overflowX: 'auto' }}>
+          <table style={table}>
+            <thead>
+              <tr>
+                <th style={th}>Image</th>
+                <th style={th}>Title</th>
+                <th style={th}>Description</th>
+                <th style={th}>Price</th>
+                <th style={th}>Status</th>
+                <th style={th}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((p, i) => (
+                <motion.tr
+                  key={p.id}
+                  custom={i}
+                  variants={userRowVariants}
+                  initial="hidden"
+                  animate="visible"
+                  whileHover={{ backgroundColor: 'rgba(163,122,57,0.04)' }}
+                  style={tr}
+                >
+                  <td style={td}>
+                    <img
+                      src={p.images_url?.[0] || placeholderImg}
+                      alt=""
+                      style={{ ...thumb, cursor: 'pointer' }}
+                      onClick={() => setLightboxImg(p.images_url?.[0] || placeholderImg)}
+                    />
+                  </td>
+                  <td style={{ ...td, fontWeight: '600', color:'#fff' }}>{p.title}</td>
+                  <td style={td}>{p.description ? (p.description.length > 60 ? p.description.slice(0, 60).trimEnd() + '...' : p.description) : '-'}</td>
+                  <td style={td}>{p.price ? `${parseFloat(p.price).toLocaleString()} MAD` : '-'}</td>
+                  <td style={td}>
+                    <span style={{ ...badge, background: p.visible ? '#27ae60' : '#e74c3c', display:'inline-flex', alignItems:'center', gap:'4px' }}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                        {p.visible ? <polyline points="20 6 9 17 4 12" /> : <line x1="1" y1="1" x2="23" y2="23" />}
+                      </svg>
+                      {p.visible ? 'Visible' : 'Hidden'}
+                    </span>
+                  </td>
+                  <td style={td}>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                      <motion.button
+                        style={{ ...smallBtn, background:'#555' }}
+                        onClick={() => toggleVisible(p)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {p.visible ? 'Hide' : 'Show'}
+                      </motion.button>
+                      <motion.button
+                        style={{ ...smallBtn, background:'#3498db', display:'inline-flex', alignItems:'center', gap:'4px' }}
+                        onClick={() => openEdit(p)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                        Edit
+                      </motion.button>
+                      <motion.button
+                        style={{ ...smallBtn, background:'#e74c3c', display:'inline-flex', alignItems:'center', gap:'4px' }}
+                        onClick={() => handleDelete(p.id)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                        Del
+                      </motion.button>
+                    </div>
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      {lastPage > 1 && (
+        <div style={paginationRow}>
+          <div style={paginationInfo}>
+            Page {page} of {lastPage} — {total} products
+          </div>
+          <div style={paginationBtns}>
+            <motion.button
+              style={pageBtn(page <= 1)}
+              disabled={page <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              whileTap={{ scale: 0.95 }}
+            >
+              ← Prev
+            </motion.button>
+            {Array.from({ length: lastPage }, (_, i) => i + 1).map((n) => (
+              <motion.button
+                key={n}
+                style={pageNumBtn(n === page)}
+                onClick={() => setPage(n)}
+                whileTap={{ scale: 0.95 }}
+              >
+                {n}
+              </motion.button>
+            ))}
+            <motion.button
+              style={pageBtn(page >= lastPage)}
+              disabled={page >= lastPage}
+              onClick={() => setPage((p) => Math.min(lastPage, p + 1))}
+              whileTap={{ scale: 0.95 }}
+            >
+              Next →
+            </motion.button>
+          </div>
+        </div>
+      )}
+      {showModal && (
+        <div style={overlay} onClick={() => setShowModal(false)}>
+          <div style={modal} onClick={(e) => e.stopPropagation()}>
+            <h2 style={modalTitle}>{editing ? 'Edit Product' : 'Add Product'}</h2>
+            <label style={label}>Title</label>
+            <input style={input} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Product name" />
+            <label style={label}>Description</label>
+            <textarea style={textarea} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Product description" rows={3} />
+            <label style={label}>Price (MAD)</label>
+            <input style={input} type="number" step="0.01" min="0" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="0.00" />
+            <label style={label}>Images <span style={{ color:'#999', fontWeight:400 }}>({imageCount()}/3, min 1)</span></label>
+            <input type="file" accept="image/*" multiple onChange={handleImagePick} />
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '8px', marginBottom: '12px' }}>
+              {existingImages.map((url, i) => {
+                const isRemoved = removedPaths.includes(existingPaths[i]);
+                if (isRemoved) return null;
+                return (
+                  <div key={`e-${i}`} style={{ position:'relative', display:'inline-block' }}>
+                    <img src={url} alt="" style={{ width:'80px', height:'60px', objectFit:'cover', borderRadius:'4px', border:'1px solid #333' }} />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveExisting(i)}
+                      style={{
+                        position:'absolute', top:'-6px', right:'-6px', width:'20px', height:'20px',
+                        borderRadius:'50%', border:'none', background:'#e74c3c', color:'#fff',
+                        fontSize:'12px', lineHeight:'1', cursor:'pointer', display:'flex',
+                        alignItems:'center', justifyContent:'center', padding:0,
+                      }}
+                    >×</button>
+                  </div>
+                );
+              })}
+              {newPreviews.map((url, i) => (
+                <div key={`n-${i}`} style={{ position:'relative', display:'inline-block' }}>
+                  <img src={url} alt="" style={{ width:'80px', height:'60px', objectFit:'cover', borderRadius:'4px', border:'1px solid #333' }} />
+                </div>
+              ))}
+            </div>
+            <label style={{ ...label, marginTop: '10px' }}>
+              <input type="checkbox" checked={form.visible} onChange={(e) => setForm({ ...form, visible: e.target.checked })} />{' '}
+              Visible to users
+            </label>
+            <div style={modalActions}>
+              <button style={cancelBtn} onClick={() => setShowModal(false)}>Cancel</button>
+              <button style={saveBtn} onClick={handleSave} disabled={saving || !form.title.trim() || !form.description.trim() || imageCount() < 1}>
                 {saving ? 'Saving...' : editing ? 'Update' : 'Create'}
               </button>
             </div>
@@ -1104,12 +1605,11 @@ function MachineManager() {
         </div>
       )}
 
-      <ConfirmModal
-        open={deleteConfirm !== null}
-        onConfirm={confirmDeleteMachine}
-        onCancel={() => setDeleteConfirm(null)}
-        title="Delete this machine?"
-        message="This action cannot be undone. The machine and all related data will be permanently removed."
+      <AlertModal
+        open={alertMsg !== null}
+        title={alertMsg?.title || 'Notice'}
+        message={alertMsg?.message || ''}
+        onClose={() => setAlertMsg(null)}
       />
     </>
   );
@@ -1121,6 +1621,7 @@ function CategoryManager() {
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
   const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -1128,14 +1629,22 @@ function CategoryManager() {
   const load = () => { getCategories().then((res) => setCategories(res.data)).catch(() => {}).finally(() => setLoading(false)); };
   useEffect(() => { load(); }, []);
 
-  const openAdd = () => { setEditing(null); setName(''); setShowModal(true); };
-  const openEdit = (c) => { setEditing(c); setName(c.name); setShowModal(true); };
+  const openAdd = () => {
+    setEditing(null); setName(''); setDescription('');
+    setShowModal(true);
+  };
+  const openEdit = (c) => {
+    setEditing(c); setName(c.name); setDescription(c.description || '');
+    setShowModal(true);
+  };
 
   const handleSave = async () => {
     if (!name.trim()) return;
     setSaving(true);
     try {
-      const fd = new FormData(); fd.append('name', name);
+      const fd = new FormData();
+      fd.append('name', name);
+      if (description.trim()) fd.append('description', description);
       if (editing) await updateCategory(editing.id, fd); else await createCategory(fd);
       load(); setShowModal(false);
     } catch { alert('Error saving category'); }
@@ -1161,13 +1670,13 @@ function CategoryManager() {
         <div style={{ overflowX: 'auto' }}>
           <table style={table}>
             <thead>
-              <tr><th style={th}>Name</th><th style={th}>Machines</th><th style={th}>Actions</th></tr>
+              <tr><th style={th}>Name</th><th style={th}>Description</th><th style={th}>Machines</th><th style={th}>Actions</th></tr>
             </thead>
             <tbody>
               {[1,2,3].map((i) => (
                 <tr key={i} style={tr}>
-                  {[1,2,3].map((j) => (
-                    <td key={j} style={td}><div style={{ height:'14px', background:'#1a1a1a', borderRadius:'4px', width: j === 1 ? '140px' : '60px' }} /></td>
+                  {[1,2,3,4].map((j) => (
+                    <td key={j} style={td}><div style={{ height:'14px', background:'#1a1a1a', borderRadius:'4px', width: j === 1 ? '140px' : j === 2 ? '200px' : '60px' }} /></td>
                   ))}
                 </tr>
               ))}
@@ -1211,6 +1720,7 @@ function CategoryManager() {
             <thead>
               <tr>
                 <th style={th}>Name</th>
+                <th style={th}>Description</th>
                 <th style={th}>Machines</th>
                 <th style={th}>Actions</th>
               </tr>
@@ -1227,6 +1737,7 @@ function CategoryManager() {
                   style={tr}
                 >
                   <td style={{ ...td, fontWeight: '600', color:'#fff' }}>{c.name}</td>
+                  <td style={td}>{c.description ? (c.description.length > 60 ? c.description.slice(0, 60).trimEnd() + '...' : c.description) : '-'}</td>
                   <td style={td}>
                     <span style={{ color:'#a37a39', fontWeight:700 }}>{c.machines?.length || 0}</span>
                   </td>
@@ -1264,6 +1775,8 @@ function CategoryManager() {
             <h2 style={modalTitle}>{editing ? 'Edit Category' : 'Add Category'}</h2>
             <label style={label}>Name</label>
             <input style={input} value={name} onChange={(e) => setName(e.target.value)} placeholder="Category name" />
+            <label style={label}>Description</label>
+            <textarea style={textarea} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Category description" rows={3} />
             <div style={modalActions}>
               <button style={cancelBtn} onClick={() => setShowModal(false)}>Cancel</button>
               <button style={saveBtn} onClick={handleSave} disabled={saving || !name.trim()}>
@@ -1374,11 +1887,11 @@ function VisitorsManager() {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'clamp(12px, 1.2vw, 14px)', minWidth: '700px' }}>
             <thead>
               <tr style={{ background: '#111', color: '#d4af37', textAlign: 'left' }}>
-                <th style={thStyle}>Device</th>
-                <th style={thStyle}>IP Address</th>
-                <th style={thStyle}>Location</th>
-                <th style={thStyle}>Page</th>
-                <th style={thStyle}>Visited At</th>
+                <th style={th}>Device</th>
+                <th style={th}>IP Address</th>
+                <th style={th}>Location</th>
+                <th style={th}>Page</th>
+                <th style={th}>Visited At</th>
               </tr>
             </thead>
             <tbody>
@@ -1392,13 +1905,13 @@ function VisitorsManager() {
                   whileHover={{ backgroundColor: 'rgba(163,122,57,0.04)' }}
                   style={{ borderBottom: '1px solid #222' }}
                 >
-                  <td style={tdStyle} title={v.user_agent || ''}>
+                  <td style={td} title={v.user_agent || ''}>
                     {deviceSvgs[getDeviceIcon(v.user_agent)] || deviceSvgs.desktop}
                   </td>
-                  <td style={tdStyle}>{v.ip_address || '-'}</td>
-                  <td style={tdStyle}>{[v.city, v.country].filter(Boolean).join(', ') || '-'}</td>
-                  <td style={{ ...tdStyle, maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={v.page_url}>{v.page_url || '/'}</td>
-                  <td style={{ ...tdStyle, whiteSpace: 'nowrap' }}>{new Date(v.visited_at).toLocaleString()}</td>
+                  <td style={td}>{v.ip_address || '-'}</td>
+                  <td style={td}>{[v.city, v.country].filter(Boolean).join(', ') || '-'}</td>
+                  <td style={{ ...td, maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={v.page_url}>{v.page_url || '/'}</td>
+                  <td style={{ ...td, whiteSpace: 'nowrap' }}>{new Date(v.visited_at).toLocaleString()}</td>
                 </motion.tr>
               ))}
             </tbody>
@@ -1438,11 +1951,13 @@ function VisitorsManager() {
 function MessagesManager() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [viewMsg, setViewMsg] = useState(null);
 
   useEffect(() => {
     getMessages().then((res) => setMessages(res.data))
-      .catch(() => setMessages([])).finally(() => setLoading(false));
+      .catch((e) => setError(e?.response?.data?.message || 'Failed to load messages'))
+      .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
@@ -1501,10 +2016,10 @@ function MessagesManager() {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'clamp(13px, 1.2vw, 15px)', minWidth: '600px' }}>
           <thead>
             <tr style={{ background: '#111', color: '#d4af37', textAlign: 'left' }}>
-              <th style={thStyle}>Date</th>
-              <th style={thStyle}>Name</th>
-              <th style={thStyle}>Email</th>
-              <th style={thStyle}>Message</th>
+              <th style={th}>Date</th>
+              <th style={th}>Name</th>
+              <th style={th}>Email</th>
+              <th style={th}>Message</th>
             </tr>
           </thead>
           <tbody>
@@ -1518,19 +2033,19 @@ function MessagesManager() {
                 whileHover={{ backgroundColor: 'rgba(163,122,57,0.04)' }}
                 style={{ borderBottom: '1px solid #222' }}
               >
-                <td style={{ ...tdStyle, whiteSpace: 'nowrap' }}>{new Date(m.created_at).toLocaleString()}</td>
-                <td style={tdStyle}>{m.first_name} {m.last_name}</td>
-                <td style={tdStyle}>{m.email}</td>
-                <td style={tdStyle}>
+                <td style={{ ...td, whiteSpace: 'nowrap' }}>{new Date(m.created_at).toLocaleString()}</td>
+                <td style={td}>{m.first_name} {m.last_name}</td>
+                <td style={td}>{m.email}</td>
+                <td style={td}>
                   <span style={{ color:'#bbb' }}>{truncate(m.message)}</span>
                   {m.message.length > 60 && (
-                    <motion.span
+                    <motion.button
                       onClick={() => setViewMsg(m)}
-                      style={{ color: '#d4af37', cursor: 'pointer', fontWeight: '600', marginLeft: '6px', fontSize: '12px' }}
+                      style={{ background: 'none', border: 'none', color: '#d4af37', cursor: 'pointer', fontWeight: '600', marginLeft: '6px', fontSize: '12px', padding: 0 }}
                       whileHover={{ opacity: 0.7 }}
                     >
                       Read all
-                    </motion.span>
+                    </motion.button>
                   )}
                 </td>
               </motion.tr>

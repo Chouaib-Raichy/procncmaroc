@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
+import placeholderImg from '../assets/placeholder.svg';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);

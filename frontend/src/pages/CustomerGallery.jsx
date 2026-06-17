@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { getComments, addComment, replyToComment, togglePostLike, toggleCommentLike, getPostLikes } from '../api/gallery';
 import api from '../api/axios';
 import machineBg from '../assets/machineBG.jpeg';
+import placeholderImg from '../assets/placeholder.svg';
 import SEO from '../components/SEO';
 
 const HeartIcon = ({ filled }) => (
@@ -398,11 +399,7 @@ export default function CustomerGallery() {
                     whileTap={{ scale: 0.98 }}
                     style={{ ...styles.userBar, cursor: post.user?.id ? 'pointer' : 'default' }}
                   >
-                    {post.user?.avatar_url ? (
-                      <img src={post.user.avatar_url} alt="" style={styles.userBarAvatar} />
-                    ) : (
-                      <div style={styles.userBarInitial}>{post.user?.name?.charAt(0).toUpperCase()}</div>
-                    )}
+                    <img src={post.user?.avatar_url || placeholderImg} alt="" style={styles.userBarAvatar} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={styles.userBarName}>{post.user?.name}</div>
                       <div style={styles.userBarTime}>{formatTime(post.created_at)}</div>
@@ -480,11 +477,7 @@ export default function CustomerGallery() {
                                   whileHover={{ background: 'rgba(255,255,255,0.05)' }}
                                   whileTap={{ scale: 0.97 }}
                                 >
-                                  {u.avatar_url ? (
-                                    <img src={u.avatar_url} alt="" style={styles.likesPopoverAvatar} />
-                                  ) : (
-                                    <div style={styles.likesPopoverInitial}>{u.name?.charAt(0).toUpperCase()}</div>
-                                  )}
+                                  <img src={u.avatar_url || placeholderImg} alt="" style={styles.likesPopoverAvatar} />
                                   <span style={{ color: '#ccc', fontSize: '13px' }}>{u.name}</span>
                                 </motion.div>
                               ))

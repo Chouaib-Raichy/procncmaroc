@@ -76,8 +76,10 @@ Route::middleware('auth:api')->group(function () {
 
         Route::get('/admin/users', [AdminUserController::class, 'index']);
         Route::get('/admin/users/{id}', [AdminUserController::class, 'show']);
+        Route::post('/admin/users/{id}/update', [AdminUserController::class, 'update']);
         Route::post('/admin/users/{id}/toggle-ban', [AdminUserController::class, 'toggleBan']);
         Route::post('/admin/users/{id}/restore', [AdminUserController::class, 'restore']);
+        Route::delete('/admin/users/{id}', [AdminUserController::class, 'destroy']);
         Route::get('/admin/users/pending/list', [AdminUserController::class, 'pending']);
         Route::post('/admin/users/{id}/approve', [AdminUserController::class, 'approve']);
         Route::delete('/admin/users/{id}/reject', [AdminUserController::class, 'reject']);

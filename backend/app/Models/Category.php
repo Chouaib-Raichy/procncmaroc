@@ -9,7 +9,7 @@ class Category extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'description'];
 
     protected $casts = [
         'deleted_at' => 'datetime',
@@ -19,4 +19,6 @@ class Category extends Model
     {
         return $this->hasMany(Machine::class);
     }
+
+
 }

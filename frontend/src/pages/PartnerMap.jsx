@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { getPartners } from '../api/partners';
 import api from '../api/axios';
 import machineBg from '../assets/machineBG.jpeg';
+import placeholderImg from '../assets/placeholder.svg';
 import showcaseBg from '../assets/showcase_bg.png';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -12,11 +13,11 @@ import SEO from '../components/SEO';
 const GOLD = '#a37a39';
 
 function makeIcon(avatarUrl, name, active) {
-  const initial = name ? name.charAt(0).toUpperCase() : '?';
   const sz = active ? 46 : 40;
   const circR = active ? 17 : 14;
   const circCx = active ? 23 : 20;
   const circCy = active ? 20 : 17;
+  const imgUrl = avatarUrl || placeholderImg;
 
   const pinSvg = `<svg width="${sz}" height="${sz + 14}" viewBox="0 0 ${sz} ${sz + 14}" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="filter:drop-shadow(0 ${active ? 3 : 2}px ${active ? 8 : 5}px rgba(180,40,40,${active ? 0.7 : 0.5}))">
     <defs>
@@ -30,8 +31,8 @@ function makeIcon(avatarUrl, name, active) {
       </clipPath>
     </defs>
     <path d="M${circCx} ${sz + 13}C${circCx} ${sz + 13} ${3} ${circCy + 16} ${3} ${circCy}C${3} ${circCy - circR + 2} ${circCx - circR} ${2} ${circCx} ${2}C${circCx + circR} ${2} ${sz - 3} ${circCy - circR + 2} ${sz - 3} ${circCy}C${sz - 3} ${circCy + 16} ${circCx} ${sz + 13} ${circCx} ${sz + 13}Z" fill="url(#g${active ? 'a' : 'b'})" stroke="${active ? '#fff' : 'rgba(255,255,255,0.5)'}" stroke-width="${active ? 2 : 1.5}"/>
-    <circle cx="${circCx}" cy="${circCy}" r="${circR}" fill="${avatarUrl ? '#1a1a1a' : 'none'}" stroke="${active ? '#fff' : 'rgba(255,255,255,0.5)'}" stroke-width="${active ? 2 : 1.5}"/>
-    ${avatarUrl ? `<image href="${avatarUrl}" x="${circCx - circR + 1.5}" y="${circCy - circR + 1.5}" width="${(circR - 1.5) * 2}" height="${(circR - 1.5) * 2}" clip-path="url(#c${active ? 'a' : 'b'})" preserveAspectRatio="xMidYMid slice"/>` : `<text x="${circCx}" y="${circCy + 5}" text-anchor="middle" fill="#fff" font-size="${circR}" font-weight="700" font-family="Georgia,serif">${initial}</text>`}
+    <circle cx="${circCx}" cy="${circCy}" r="${circR}" fill="#1a1a1a" stroke="${active ? '#fff' : 'rgba(255,255,255,0.5)'}" stroke-width="${active ? 2 : 1.5}"/>
+    <image href="${imgUrl}" x="${circCx - circR + 1.5}" y="${circCy - circR + 1.5}" width="${(circR - 1.5) * 2}" height="${(circR - 1.5) * 2}" clip-path="url(#c${active ? 'a' : 'b'})" preserveAspectRatio="xMidYMid slice"/>
   </svg>`;
 
   return L.divIcon({

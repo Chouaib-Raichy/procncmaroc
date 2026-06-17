@@ -10,6 +10,7 @@ class CategoryDTO extends DTO
     public function __construct(
         public readonly int $id,
         public readonly string $name,
+        public readonly ?string $description,
         public readonly ?array $machines,
         public readonly string $created_at,
     ) {}
@@ -31,6 +32,7 @@ class CategoryDTO extends DTO
         return new self(
             id: $category->id,
             name: $category->name,
+            description: $category->description,
             machines: $machines,
             created_at: $category->created_at->toISOString(),
         );
@@ -41,6 +43,7 @@ class CategoryDTO extends DTO
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'description' => $this->description,
             'machines' => $this->machines,
             'created_at' => $this->created_at,
         ];

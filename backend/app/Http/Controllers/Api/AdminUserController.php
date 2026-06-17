@@ -11,9 +11,14 @@ class AdminUserController extends Controller
 {
     public function index()
     {
-        return UserDTO::collection(
-            User::withTrashed()->orderBy('created_at', 'desc')->get()
-        );
+        $query = User::withTrashed()->orderBy('created_at', 'desc');
+
+        if ($perPage = request('per_page')) {
+            $paginator = $query->paginate($perPage);
+            return UserDTO::paginated($paginator);
+        }
+
+        return UserDTO::collection($query->get());
     }
 
     public function show($id)
@@ -90,5 +95,51 @@ class AdminUserController extends Controller
         $user->forceDelete();
 
         return response()->json(['message' => 'User rejected and account deleted']);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user = User::withTrashed()->findOrFail($id);
+
+        $data = $request->validate([
+            'name'             => 'sometimes|string|max:255',
+            'email'            => 'sometimes|string|email|max:255|unique:users,email,' . $id,
+            'phone'            => 'sometimes|string|max:20|unique:users,phone,' . $id,
+            'business_location' => 'sometimes|string|max:255',
+            'city'             => 'sometimes|string|max:100',
+            'country'          => 'sometimes|string|max:100',
+            'entreprise_name'  => 'nullable|string|max:255',
+            'business_bio'     => 'nullable|string',
+            'role'             => 'sometimes|string|in:user,admin',
+        ]);
+
+        $user->update($data);
+
+        return response()->json([
+            'message' => 'User updated successfully',
+            'user'    => UserDTO::fromModel($user)->toArray(),
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        $user = User::withTrashed()->findOrFail($id);
+
+        if ($user->business_images) {
+            $paths = json_decode($user->business_images, true);
+            if (is_array($paths)) {
+                foreach ($paths as $path) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+                }
+            }
+        }
+
+        if ($user->trashed()) {
+            $user->forceDelete();
+        } else {
+            $user->delete();
+        }
+
+        return response()->json(['message' => 'User deleted successfully']);
     }
 }
