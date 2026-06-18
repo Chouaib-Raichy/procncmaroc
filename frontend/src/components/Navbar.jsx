@@ -56,7 +56,6 @@ export default function Navbar() {
     setActiveCat(null);
     setMobileMachinesOpen(false);
     setMobileCatOpen(null);
-    setMobileUserMenuOpen(false);
   };
 
   const isMobile = () => window.innerWidth <= 900;
@@ -82,7 +81,7 @@ export default function Navbar() {
   const renderMobileMenu = () => (
     <>
       {user && (
-        <div className="nav-user-card" style={{ '--i': 0 }} onClick={() => setMobileUserMenuOpen(!mobileUserMenuOpen)}>
+        <div className="nav-user-card" style={{ '--i': 0 }}>
           {user.avatar_url && !imgError ? (
             <img src={user.avatar_url} alt="avatar"
               onError={() => setImgError(true)}
@@ -97,7 +96,6 @@ export default function Navbar() {
             <div className="nav-user-name">{user.name}</div>
             <div className="nav-user-role">{user.role === 'admin' ? 'Administrator' : 'Member'}</div>
           </div>
-          <span className={`nav-user-chevron${mobileUserMenuOpen ? ' open' : ''}`}>&#9660;</span>
         </div>
       )}
 
@@ -143,28 +141,26 @@ export default function Navbar() {
       <NavLink to="/contact-us" icon="✉" style={{ '--i': 7 }}>Contact Us</NavLink>
 
       {user ? (
-        <div className={`nav-user-menu-wrap${mobileUserMenuOpen ? ' open' : ''}`} style={{ '--i': 8 }}>
-          <div className="nav-user-menu-section">
-            <div className="nav-menu-section-label">Account</div>
-            {user.role === 'admin' && (
-              <Link to="/dashboard" onClick={closeAll} className="nav-link-row" style={{ color: '#a37a39' }}>
-                <span className="nav-link-icon" style={{ color: '#a37a39' }}>◈</span>
-                <span className="nav-link-label">Dashboard</span>
-              </Link>
-            )}
-            <Link to="/my-gallery" onClick={closeAll} className="nav-link-row">
-              <span className="nav-link-icon">▣</span>
-              <span className="nav-link-label">My Gallery</span>
+        <div className="nav-user-menu-section" style={{ '--i': 8 }}>
+          <div className="nav-menu-section-label">Account</div>
+          {user.role === 'admin' && (
+            <Link to="/dashboard" onClick={closeAll} className="nav-link-row" style={{ color: '#a37a39' }}>
+              <span className="nav-link-icon" style={{ color: '#a37a39' }}>◈</span>
+              <span className="nav-link-label">Dashboard</span>
             </Link>
-            <Link to="/profile" onClick={closeAll} className="nav-link-row">
-              <span className="nav-link-icon">●</span>
-              <span className="nav-link-label">My Profile</span>
-            </Link>
-            <button className="nav-link-row danger" onClick={() => { handleLogout(); closeAll(); }}>
-              <span className="nav-link-icon">⏻</span>
-              <span className="nav-link-label">Logout</span>
-            </button>
-          </div>
+          )}
+          <Link to="/my-gallery" onClick={closeAll} className="nav-link-row">
+            <span className="nav-link-icon">▣</span>
+            <span className="nav-link-label">My Gallery</span>
+          </Link>
+          <Link to="/profile" onClick={closeAll} className="nav-link-row">
+            <span className="nav-link-icon">●</span>
+            <span className="nav-link-label">My Profile</span>
+          </Link>
+          <button className="nav-link-row danger" onClick={() => { handleLogout(); closeAll(); }}>
+            <span className="nav-link-icon">⏻</span>
+            <span className="nav-link-label">Logout</span>
+          </button>
         </div>
       ) : (
         <div className="nav-auth-group" style={{ '--i': 8 }}>
