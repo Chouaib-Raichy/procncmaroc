@@ -320,7 +320,7 @@ export default function MyGallery() {
             <div style={styles.titleDivider} />
           </motion.div>
 
-          <div style={styles.layout}>
+          <div className="my-gallery-layout" style={styles.layout}>
             <motion.div style={styles.formCard}
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
