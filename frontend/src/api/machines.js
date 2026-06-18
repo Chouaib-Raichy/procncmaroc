@@ -1,11 +1,11 @@
 import api from './axios';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const BASE_URL = import.meta.env.VITE_API_URL || `${window.location.origin}/api`;
 
 export const getMachines = (page = 1) => api.get(`/machines?page=${page}&per_page=9`);
 export const getAllMachines = () => api.get('/machines?all=1');
 
-export const getAdminMachines = () => api.get('/admin/machines');
+export const getAdminMachines = (params = {}) => api.get('/admin/machines', { params });
 
 export const getMachine = (id) => api.get(`/admin/machines/${id}`);
 

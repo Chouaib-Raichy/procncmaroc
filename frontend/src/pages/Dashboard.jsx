@@ -22,7 +22,7 @@ import {
   deleteCategory,
 } from '../api/categories';
 import { getMessages } from '../api/contacts';
-import { getUsers, updateUser, deleteUser, toggleBanUser, getPendingUsers, approveUser, rejectUser } from '../api/users';
+import { getUsers, updateUser, toggleBanUser, getPendingUsers, approveUser, rejectUser } from '../api/users';
 import { getSettings, toggleSetting } from '../api/settings';
 import { getVisitors, getStatsSummary } from '../api/visitors';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -365,7 +365,6 @@ function UsersManager() {
   const [editingUser, setEditingUser] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [banConfirm, setBanConfirm] = useState(null);
-  const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [siteSettings, setSiteSettings] = useState({ show_whatsapp: '1', show_maps: '1', show_email: '1' });
 
   const load = () => {
@@ -415,14 +414,6 @@ function UsersManager() {
     } catch (e) {
       alert(e.response?.data?.message || 'Error updating user');
     }
-  };
-
-  const handleDelete = (id) => setDeleteConfirm(id);
-
-  const confirmDelete = async () => {
-    const id = deleteConfirm;
-    setDeleteConfirm(null);
-    try { await deleteUser(id); load(); } catch (e) { alert(e.response?.data?.message || 'Error deleting user'); }
   };
 
   if (loading) {
@@ -563,15 +554,6 @@ function UsersManager() {
                           </svg>
                           {u.banned_at ? 'Unban' : 'Ban'}
                         </motion.button>
-                        <motion.button
-                          style={{ ...smallBtn, background:'#e74c3c', display:'inline-flex', alignItems:'center', gap:'4px' }}
-                          onClick={() => handleDelete(u.id)}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
-                          Delete
-                        </motion.button>
                       </>
                     )}
                   </div>
@@ -709,15 +691,8 @@ function UsersManager() {
         open={banConfirm !== null}
         onConfirm={confirmBan}
         onCancel={() => setBanConfirm(null)}
-        title="Confirm Ban"
-        message="Are you sure you want to ban this user? They will lose access to their account."
-      />
-      <ConfirmModal
-        open={deleteConfirm !== null}
-        onConfirm={confirmDelete}
-        onCancel={() => setDeleteConfirm(null)}
-        title="Delete User"
-        message="Are you sure you want to permanently delete this user? This action cannot be undone."
+        title="Confirm Ban / Unban"
+        message="Are you sure you want to change this user's ban status?"
       />
     </div>
   );
@@ -1253,7 +1228,7 @@ function MachineManager() {
             </label>
             <div style={modalActions}>
               <button style={cancelBtn} onClick={() => setShowModal(false)}>Cancel</button>
-              <button style={saveBtn} onClick={handleSave} disabled={saving || !form.title.trim() || !form.description.trim() || imageCount() < 1}>
+              <button style={saveBtn} onClick={handleSave} disabled={saving || !form.title.trim() || !form.description.trim()}>
                 {saving ? 'Saving...' : editing ? 'Update' : 'Create'}
               </button>
             </div>

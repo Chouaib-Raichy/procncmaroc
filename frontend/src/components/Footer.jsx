@@ -66,7 +66,7 @@ export default function Footer() {
           <h4 style={styles.heading}>Contact Info</h4>
           <div style={styles.contactItem}>
             <span style={styles.contactIcon}>&#9906;</span>
-            <span>Casablanca, MOROCCO</span>
+            <span>PRO CNC MAROC, Casablanca, MOROCCO</span>
           </div>
           <div style={styles.contactItem}>
             <span style={styles.contactIcon}>&#9993;</span>

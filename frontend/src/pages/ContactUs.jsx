@@ -89,7 +89,7 @@ export default function ContactUs() {
             {[
               { icon: '☎', label: 'Phone', text: ['+212 625 280 991', '+212 667 198 564'] },
               { icon: '✉', label: 'Email', text: ['contact@procncmaroc.com'] },
-              { icon: '📍', label: 'Address', text: ['CASABLANCA, Morocco'] },
+              { icon: '📍', label: 'Address', text: ['PRO CNC MAROC, Casablanca, Morocco'] },
             ].map((card, i) => (
               <motion.div
                 key={i}
@@ -178,7 +178,7 @@ export default function ContactUs() {
             <div style={styles.mapWrap}>
               <iframe
                 title="Google Map"
-                src="https://maps.google.com/maps?q=33.5651338,-7.470498&hl=en&z=15&output=embed"
+                src="https://maps.google.com/maps?q=33.573235,-7.4780627&hl=en&z=18&output=embed"
                 width="100%"
                 height="100%"
                 style={styles.map}
