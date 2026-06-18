@@ -106,12 +106,12 @@ export default function Navbar() {
 
       <div style={{ '--i': 3 }}>
         <div className="nav-machines-wrap">
-          <div className={`nav-link-row ${isOurMachinesActive ? 'active' : ''}`}
-            onClick={() => setMobileMachinesOpen(!mobileMachinesOpen)}
-          >
-            <span className="nav-link-icon">⚙</span>
-            <span className="nav-link-label">Our Machines</span>
-            <span className={`nav-link-arrow${mobileMachinesOpen ? ' open' : ''}`}>&#9656;</span>
+          <div className={`nav-link-row ${isOurMachinesActive ? 'active' : ''}`}>
+            <Link to="/our-machines" onClick={closeAll} className="nav-machines-label">
+              <span className="nav-link-icon">⚙</span>
+              <span className="nav-link-label">Our Machines</span>
+            </Link>
+            <span className={`nav-link-arrow${mobileMachinesOpen ? ' open' : ''}`} onClick={() => setMobileMachinesOpen(!mobileMachinesOpen)}>&#9656;</span>
           </div>
           {mobileMachinesOpen && categories.length > 0 && (
             <div className="nav-cat-section">
@@ -145,8 +145,9 @@ export default function Navbar() {
       {user ? (
         <div className={`nav-user-menu-wrap${mobileUserMenuOpen ? ' open' : ''}`} style={{ '--i': 8 }}>
           <div className="nav-user-menu-section">
+            <div className="nav-menu-section-label">Account</div>
             {user.role === 'admin' && (
-              <Link to="/dashboard" onClick={closeAll} className="nav-link-row active" style={{ color: '#a37a39' }}>
+              <Link to="/dashboard" onClick={closeAll} className="nav-link-row" style={{ color: '#a37a39' }}>
                 <span className="nav-link-icon" style={{ color: '#a37a39' }}>◈</span>
                 <span className="nav-link-label">Dashboard</span>
               </Link>

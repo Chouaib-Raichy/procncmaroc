@@ -625,11 +625,43 @@ footer a:hover {
   .nav-user-menu-section .nav-link-row.danger .nav-link-icon {
     color: #e57373;
   }
+  .nav-menu-section-label {
+    padding: 8px 16px 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #555;
+  }
 
   /* --- machines accordion --- */
   .nav-machines-wrap {
     display: flex;
     flex-direction: column;
+  }
+  .nav-machines-label {
+    display: flex !important;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    text-decoration: none;
+    color: inherit;
+    padding: 14px 16px !important;
+    margin: 0 !important;
+    border-radius: 10px;
+  }
+  .nav-machines-label:active {
+    background: rgba(163,122,57,0.08);
+  }
+  .nav-link-row .nav-link-arrow {
+    padding: 14px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+  }
+  .nav-link-row .nav-link-arrow:active {
+    background: rgba(163,122,57,0.12);
   }
   .nav-cat-section {
     display: flex;
