@@ -387,7 +387,7 @@ footer a:hover {
     z-index: -1;
   }
   .nav-links.open {
-    display: flex;
+    display: flex !important;
   }
 
   /* --- staggered slide-in --- */
