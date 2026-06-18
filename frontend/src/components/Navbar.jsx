@@ -59,83 +59,110 @@ export default function Navbar() {
   const isMobile = () => window.innerWidth <= 900;
   const active = (path) => location.pathname === path ? { color: '#a37a39' } : {};
 
-  const mobileLink = (path) => ({
-    color: location.pathname === path ? '#a37a39' : '#ccc',
-    fontWeight: location.pathname === path ? 700 : 500,
-  });
+  const isActive = (path) => location.pathname === path || (typeof path === 'string' && path.startsWith && location.pathname.startsWith(path));
+  const isOurMachinesActive = location.pathname.startsWith('/our-machines') || location.pathname.startsWith('/machines/');
+
+  const NavLink = ({ to, icon, children, active: forceActive, arrow, onClick: extraClick, className = '', style: extraStyle }) => {
+    const active = forceActive !== undefined ? forceActive : isActive(to);
+    return (
+      <Link to={to} onClick={() => { closeAll(); extraClick?.(); }}
+        className={`nav-link-row ${active ? 'active' : ''} ${className}`}
+        style={extraStyle}
+      >
+        {icon && <span className="nav-link-icon">{icon}</span>}
+        <span className="nav-link-label">{children}</span>
+        {arrow !== undefined && <span className={`nav-link-arrow${arrow ? ' open' : ''}`}>&#9656;</span>}
+      </Link>
+    );
+  };
 
   const renderMobileMenu = () => (
     <>
       {user && (
-        <div className="nav-user-section">
+        <div className="nav-user-card" style={{ '--i': 0 }}>
           {user.avatar_url && !imgError ? (
             <img src={user.avatar_url} alt="avatar"
               onError={() => setImgError(true)}
-              style={{ width: '44px', height: '44px', borderRadius: '50%', border: '2px solid #a37a39', objectFit: 'cover', flexShrink: 0 }}
+              className="nav-user-avatar"
             />
           ) : (
-            <div style={{ width: '44px', height: '44px', borderRadius: '50%', border: '2px solid #a37a39', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#a37a39', fontSize: '20px', fontWeight: 700, flexShrink: 0 }}>
+            <div className="nav-user-avatar-placeholder">
               {user.name?.charAt(0).toUpperCase()}
             </div>
           )}
-          <div>
+          <div className="nav-user-info">
             <div className="nav-user-name">{user.name}</div>
             <div className="nav-user-role">{user.role === 'admin' ? 'Administrator' : 'Member'}</div>
           </div>
         </div>
       )}
 
-      <Link to="/" style={mobileLink('/')} onClick={closeAll}>Home</Link>
-      <Link to="/partner-map" style={mobileLink('/partner-map')} onClick={closeAll}>Partner Map</Link>
+      <NavLink to="/" icon="⌂" style={{ '--i': 1 }}>Home</NavLink>
+      <NavLink to="/partner-map" icon="⌖" style={{ '--i': 2 }}>Partner Map</NavLink>
 
-      <div className="nav-machines-wrap">
-        <div className="nav-machines-trigger" onClick={() => setMobileMachinesOpen(!mobileMachinesOpen)}
-          style={{ color: location.pathname.startsWith('/our-machines') || location.pathname.startsWith('/machines/') ? '#a37a39' : '#ccc', fontWeight: (location.pathname.startsWith('/our-machines') || location.pathname.startsWith('/machines/')) ? 700 : 500 }}
-        >
-          <span>Our Machines</span>
-          <span className={`nav-machines-arrow${mobileMachinesOpen ? ' open' : ''}`}>&#9656;</span>
-        </div>
-        {mobileMachinesOpen && categories.length > 0 && (
-          <div className="nav-cat-section">
-            {categories.map((cat) => (
-              <div key={cat.id}>
-                <div className="nav-cat-header" onClick={() => setMobileCatOpen(mobileCatOpen === cat.id ? null : cat.id)}>
-                  <span style={{ color: '#a37a39', flex: 1, fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>{cat.name}</span>
-                  {cat.machines?.length > 0 && (
-                    <span className={`arrow${mobileCatOpen === cat.id ? ' open' : ''}`}>&#9656;</span>
+      <div style={{ '--i': 3 }}>
+        <div className="nav-machines-wrap">
+          <div className={`nav-link-row ${isOurMachinesActive ? 'active' : ''}`}
+            onClick={() => setMobileMachinesOpen(!mobileMachinesOpen)}
+          >
+            <span className="nav-link-icon">⚙</span>
+            <span className="nav-link-label">Our Machines</span>
+            <span className={`nav-link-arrow${mobileMachinesOpen ? ' open' : ''}`}>&#9656;</span>
+          </div>
+          {mobileMachinesOpen && categories.length > 0 && (
+            <div className="nav-cat-section">
+              {categories.map((cat) => (
+                <div key={cat.id}>
+                  <div className="nav-cat-header" onClick={() => setMobileCatOpen(mobileCatOpen === cat.id ? null : cat.id)}>
+                    <span className="nav-cat-label">{cat.name}</span>
+                    {cat.machines?.length > 0 && (
+                      <span className={`nav-cat-arrow${mobileCatOpen === cat.id ? ' open' : ''}`}>&#9656;</span>
+                    )}
+                  </div>
+                  {mobileCatOpen === cat.id && cat.machines?.length > 0 && (
+                    <div className="nav-machine-list">
+                      {cat.machines.map((m, mi) => (
+                        <Link key={m.id} to={`/machines/${m.id}`} className="nav-machine-link" onClick={closeAll}>{m.title}</Link>
+                      ))}
+                    </div>
                   )}
                 </div>
-                {mobileCatOpen === cat.id && cat.machines?.length > 0 && (
-                  <div className="nav-machine-list">
-                    {cat.machines.map((m) => (
-                      <Link key={m.id} to={`/machines/${m.id}`} className="nav-machine-link" onClick={closeAll}>{m.title}</Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      <Link to="/products" style={mobileLink('/products')} onClick={closeAll}>Products</Link>
-      <Link to="/customer-gallery" style={mobileLink('/customer-gallery')} onClick={closeAll}>Customer Gallery</Link>
-      <Link to="/about-us" style={mobileLink('/about-us')} onClick={closeAll}>About Us</Link>
-      <Link to="/contact-us" style={mobileLink('/contact-us')} onClick={closeAll}>Contact Us</Link>
+      <NavLink to="/products" icon="▣" style={{ '--i': 4 }}>Products</NavLink>
+      <NavLink to="/customer-gallery" icon="◇" style={{ '--i': 5 }}>Customer Gallery</NavLink>
+      <NavLink to="/about-us" icon="ⓘ" style={{ '--i': 6 }}>About Us</NavLink>
+      <NavLink to="/contact-us" icon="✉" style={{ '--i': 7 }}>Contact Us</NavLink>
 
       {user ? (
-        <div className="nav-user-menu">
+        <div className="nav-user-menu-section" style={{ '--i': 8 }}>
           {user.role === 'admin' && (
-            <Link to="/dashboard" onClick={closeAll} style={{ color: '#a37a39' }}>Dashboard</Link>
+            <Link to="/dashboard" onClick={closeAll} className="nav-link-row active" style={{ color: '#a37a39' }}>
+              <span className="nav-link-icon" style={{ color: '#a37a39' }}>◈</span>
+              <span className="nav-link-label">Dashboard</span>
+            </Link>
           )}
-          <Link to="/my-gallery" onClick={closeAll}>My Gallery</Link>
-          <Link to="/profile" onClick={closeAll}>My Profile</Link>
-          <button className="nav-logout-btn" onClick={() => { handleLogout(); closeAll(); }}>Logout</button>
+          <Link to="/my-gallery" onClick={closeAll} className="nav-link-row">
+            <span className="nav-link-icon">▣</span>
+            <span className="nav-link-label">My Gallery</span>
+          </Link>
+          <Link to="/profile" onClick={closeAll} className="nav-link-row">
+            <span className="nav-link-icon">●</span>
+            <span className="nav-link-label">My Profile</span>
+          </Link>
+          <button className="nav-link-row danger" onClick={() => { handleLogout(); closeAll(); }}>
+            <span className="nav-link-icon">⏻</span>
+            <span className="nav-link-label">Logout</span>
+          </button>
         </div>
       ) : (
-        <div className="nav-auth-group">
-          <Link to="/login" className="nav-login-link" onClick={closeAll}>Login</Link>
-          <Link to="/signup" className="nav-signup-link" onClick={closeAll}>Signup</Link>
+        <div className="nav-auth-group" style={{ '--i': 8 }}>
+          <Link to="/login" className="nav-login-btn" onClick={closeAll}>🔒 Login</Link>
+          <Link to="/signup" className="nav-signup-btn" onClick={closeAll}>🚀 Signup</Link>
         </div>
       )}
     </>
@@ -150,7 +177,7 @@ export default function Navbar() {
       <Link to="/" style={styles.logo}>
         <span style={styles.logoText}>PRO CNC MAROC</span>
       </Link>
-      <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+      <button className={`hamburger${menuOpen ? ' open' : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
       <div className={`nav-links${menuOpen ? ' open' : ''}`} style={styles.links}>
