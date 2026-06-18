@@ -70,14 +70,14 @@ export default function Home() {
           .hero-tag { font-size: 5px !important; margin-bottom: 5px !important; }
           .hero-desc { font-size: 4.5px !important; }
           .hero-subtitle { margin: 0 !important; }
-          .overlay-cards { top: 50% !important; transform: translateY(-50%) !important; justify-content: center !important; flex-wrap: wrap !important; gap: 24px !important; }
-          .home-card { width: clamp(180px, 80vw, 340px) !important; }
-          .home-card img { height: clamp(100px, 20vw, 200px) !important; }
-          .card-body { padding: 8px 12px !important; }
-          .card-title { font-size: clamp(12px, 3.5vw, 16px) !important; margin-bottom: 6px !important; }
-          .card-text { font-size: clamp(10px, 2.8vw, 14px) !important; margin-bottom: 6px !important; -webkit-line-clamp: 3 !important; }
-          .card-location { font-size: clamp(10px, 2.8vw, 14px) !important; margin-bottom: 6px !important; }
-          .home-more-link { font-size: clamp(11px, 3vw, 14px) !important; margin-top: 6px !important; }
+          .overlay-cards { top: 50% !important; transform: translateY(-50%) !important; justify-content: center !important; flex-wrap: nowrap !important; gap: 36px !important; }
+          .home-card { width: clamp(110px, 38vw, 220px) !important; }
+          .home-card img { height: clamp(60px, 10vw, 140px) !important; }
+          .card-body { padding: 4px 6px !important; }
+          .card-title { font-size: 9px !important; margin-bottom: 3px !important; }
+          .card-text { font-size: 7px !important; margin-bottom: 3px !important; -webkit-line-clamp: 2 !important; }
+          .card-location { font-size: 7px !important; margin-bottom: 3px !important; }
+          .home-more-link { font-size: 8px !important; margin-top: 2px !important; }
         }
       `}</style>
       <motion.div style={styles.hero}
