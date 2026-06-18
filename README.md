@@ -9,6 +9,8 @@
     <img src="https://img.shields.io/badge/MySQL-8-4479A1?style=flat-square&logo=mysql" alt="MySQL" />
     <img src="https://img.shields.io/badge/JWT-auth-000000?style=flat-square&logo=jsonwebtokens" alt="JWT Auth" />
     <img src="https://img.shields.io/badge/Vite-8-646CFF?style=flat-square&logo=vite" alt="Vite" />
+    <img src="https://img.shields.io/badge/MinIO-S3-FE4600?style=flat-square&logo=minio" alt="MinIO" />
+    <img src="https://img.shields.io/badge/Nginx-1.24-009639?style=flat-square&logo=nginx" alt="Nginx" />
   </p>
 </div>
 
@@ -28,7 +30,9 @@ The platform features a **multi-step registration flow** requiring admin approva
 |-------|-----------|
 | **Backend** | Laravel 13 (PHP 8.3) |
 | **Frontend** | React 19 + Vite 8 |
-| **Database** | MySQL 8 (XAMPP) |
+| **Database** | MySQL 8 |
+| **Storage** | MinIO (S3-compatible, proxied through nginx) |
+| **Server** | Ubuntu 24.04 LTS + nginx + php-fpm |
 | **Authentication** | JWT (`php-open-source-saver/jwt-auth`) |
 | **API Style** | RESTful with DTO layer |
 | **SEO** | react-helmet-async, JSON-LD structured data, Open Graph, Twitter Cards |
@@ -138,7 +142,67 @@ Consistent API responses via Data Transfer Objects:
 
 ---
 
-## Installation
+## Production Deployment
+
+The platform runs on a **Ubuntu 24.04 LTS** VPS (11 GB RAM, 237 GB disk) with the following stack:
+
+| Component | Configuration |
+|-----------|---------------|
+| **Web Server** | nginx reverse proxy → php-fpm (Laravel API) + static files (React SPA) |
+| **Storage** | MinIO service on port 9000, proxied through nginx at `/storage/` |
+| **Database** | MySQL 8 on localhost |
+| **PHP** | PHP 8.3 with php-fpm |
+| **Security** | UFW (ports 22/80/443), Fail2ban, SSH key-only auth, unattended upgrades |
+| **Admin Access** | XFCE desktop + xrdp over SSH tunnel (port 3389, localhost-only) |
+
+### Deployment Architecture
+
+```
+Internet → nginx (443) → /api/* → php-fpm (Laravel)
+                      → /storage/* → MinIO (9000)
+                      → /* → React SPA (frontend/dist)
+```
+
+### Key Environment Variables (Production)
+
+```bash
+# Storage (MinIO)
+FILESYSTEM_DISK=minio
+FILESYSTEM_PUBLIC_DISK=minio
+MINIO_ENDPOINT=http://127.0.0.1:9000
+MINIO_KEY=your-access-key
+MINIO_SECRET=your-secret-key
+MINIO_BUCKET=procncmaroc
+MINIO_REGION=us-east-1
+MINIO_USE_PATH_STYLE_ENDPOINT=true
+
+# CORS (production origins)
+# cors.php allows https://procncmaroc.com and https://www.procncmaroc.com
+
+# JWT
+JWT_TTL=1440  # 24-hour tokens for SPA
+```
+
+### Build & Deploy
+
+```bash
+# Backend
+cd backend
+composer install --no-dev --optimize-autoloader
+php artisan optimize
+
+# Frontend
+cd frontend
+npm ci && npm run build  # outputs to frontend/dist/
+
+# nginx serves frontend/dist/ as root
+# php-fpm handles /api/* at localhost:8000
+# MinIO handles /storage/* at localhost:9000
+```
+
+---
+
+## Installation (Development)
 
 ### 1. Clone the repository
 
@@ -426,6 +490,13 @@ procncmaroc/
 | `MAIL_ENCRYPTION` | SMTP encryption | `tls` |
 | `MAIL_FROM_ADDRESS` | Sender email | *(sender address)* |
 | `MAIL_FROM_NAME` | Sender name | `PRO CNC MAROC` |
+| `FILESYSTEM_DISK` | Storage disk for uploads | `local` (dev) / `minio` (prod) |
+| `FILESYSTEM_PUBLIC_DISK` | Storage disk for public files | `public` (dev) / `minio` (prod) |
+| `MINIO_ENDPOINT` | MinIO server URL | `http://127.0.0.1:9000` |
+| `MINIO_KEY` | MinIO access key | *(generated)* |
+| `MINIO_SECRET` | MinIO secret key | *(generated)* |
+| `MINIO_BUCKET` | MinIO bucket name | `procncmaroc` |
+| `MINIO_USE_PATH_STYLE_ENDPOINT` | Force path-style S3 URLs | `true` |
 
 ---
 
