@@ -103,7 +103,13 @@ export default function Navbar() {
 
       <NavLink to="/" icon="⌂" style={{ '--i': 1 }}>Home</NavLink>
       <NavLink to="/customer-gallery" icon="◇" style={{ '--i': 2 }}>Story</NavLink>
-      <button onClick={() => setSearchOpen(true)} style={styles.mobileSearchBtn}>🔍  Search</button>
+      <button onClick={() => setSearchOpen(true)} style={styles.mobileSearchBtn}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a37a39" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        Search
+      </button>
       <NavLink to="/partner-map" icon="⌖" style={{ '--i': 3 }}>Partner Map</NavLink>
 
       <div style={{ '--i': 4 }}>
@@ -180,6 +186,7 @@ export default function Navbar() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
     >
+      <style>{`.search-btn:hover { opacity: 1 !important; color: #b8894a !important; } .search-btn:active { transform: scale(0.92) !important; }`}</style>
       <Link to="/" style={styles.logo}>
         <span style={styles.logoText}>PRO CNC MAROC</span>
       </Link>
@@ -233,7 +240,12 @@ export default function Navbar() {
             <Link to="/about-us" style={{...styles.link, ...active('/about-us')}} onClick={closeAll}>About Us</Link>
             <Link to="/contact-us" style={{...styles.link, ...active('/contact-us')}} onClick={closeAll}>Contact Us</Link>
 
-            <button onClick={(e) => { e.stopPropagation(); setSearchOpen(true); }} style={styles.searchBtn} aria-label="Search">🔍</button>
+            <button onClick={(e) => { e.stopPropagation(); setSearchOpen(true); }} className="search-btn" style={styles.searchBtn} aria-label="Search">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </button>
 
             {user ? (
               <div ref={userMenuRef} style={{ position: 'relative' }}>
@@ -434,8 +446,7 @@ const styles = {
   searchBtn: {
     background: 'transparent',
     border: 'none',
-    color: '#ddd',
-    fontSize: '18px',
+    color: '#a37a39',
     cursor: 'pointer',
     padding: '8px',
     borderRadius: '50%',
@@ -444,6 +455,7 @@ const styles = {
     justifyContent: 'center',
     transition: 'all 0.3s',
     lineHeight: 1,
+    opacity: 0.85,
   },
   mobileSearchBtn: {
     display: 'flex',
