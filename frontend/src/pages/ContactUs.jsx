@@ -89,6 +89,7 @@ export default function ContactUs() {
             {[
               { icon: '☎', label: 'Phone', text: ['+212 625 280 991', '+212 667 198 564'] },
               { icon: '✉', label: 'Email', text: ['contact.procncmaroc@gmail.com'] },
+              { icon: '💬', label: 'WhatsApp', text: ['+212 625 280 991'], link: 'https://wa.me/212625280991' },
               { icon: '📍', label: 'Address', text: ['PRO CNC MAROC, Casablanca, Morocco'] },
             ].map((card, i) => (
               <motion.div
@@ -99,6 +100,8 @@ export default function ContactUs() {
                   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
                 }}
                 whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                style={card.link ? { ...styles.infoCard, cursor: 'pointer' } : styles.infoCard}
+                onClick={card.link ? () => window.open(card.link, '_blank') : undefined}
               >
                 <span style={styles.infoIcon}>{card.icon}</span>
                 <h4 style={styles.infoLabel}>{card.label}</h4>
