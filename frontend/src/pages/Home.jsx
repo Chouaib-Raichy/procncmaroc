@@ -71,7 +71,7 @@ export default function Home() {
           .hero-subtitle { margin: 0 !important; }
           .overlay-cards { top: 50% !important; transform: translateY(-50%) !important; justify-content: center !important; flex-wrap: wrap !important; gap: 16px !important; }
           .home-card { width: clamp(140px, 70vw, 320px) !important; }
-          .home-card img { height: clamp(90px, 16vw, 180px) !important; }
+          .home-card img { height: clamp(98px, 49vw, 224px) !important; }
           .card-body { padding: 10px 6px 4px !important; }
           .card-title { font-size: 9px !important; margin-bottom: 3px !important; }
           .card-text { font-size: 7px !important; margin-bottom: 3px !important; -webkit-line-clamp: 3 !important; }
