@@ -29,9 +29,9 @@ export default function Home() {
   const [catIndex, setCatIndex] = useState(0);
 
   const catCards = [
-    { image: fibreImg, title: 'FIBRE MARKING', description: 'Durable & fast marking (titanium, acrylic, aluminum, gold, silver, brass...)' },
-    { image: laserImg, title: 'LASER CO2', description: 'Engraving & fine cutting (acrylic, wood, leather, paper, plastic...)' },
-    { image: cncImg, title: 'CNC ROUTER', description: 'Precision & power (aluminum, acrylic, wood, pvc, aluminum composite, nylon...)' },
+    { image: fibreImg, title: 'FIBRE MARKING +', description: 'Durable & fast marking (titanium, acrylic, aluminum, gold, silver, brass...)' },
+    { image: laserImg, title: 'LASER CO2 +', description: 'Engraving & fine cutting (acrylic, wood, leather, paper, plastic...)' },
+    { image: cncImg, title: 'CNC ROUTER +', description: 'Precision & power (aluminum, acrylic, wood, pvc, aluminum composite, nylon...)' },
   ];
 
   useEffect(() => {
@@ -156,8 +156,8 @@ export default function Home() {
                 />
               </div>
               <div className="card-body" style={styles.cardBody}>
-                <h3 className="card-title" style={styles.cardTitle}>{activeCat.title}</h3>
-                <p className="card-text" style={styles.cardText}>{activeCat.description}</p>
+                <h3 className="card-title" style={{ ...styles.cardTitle, cursor: 'pointer' }} onClick={() => setCatIndex((p) => (p + 1) % catCards.length)}>{activeCat.title}</h3>
+                <p className="card-text" style={{ ...styles.cardText, cursor: 'pointer' }} onClick={() => setCatIndex((p) => (p + 1) % catCards.length)}>{activeCat.description}</p>
                 <div style={styles.dots}>
                   {catCards.map((_, i) => (
                     <span
