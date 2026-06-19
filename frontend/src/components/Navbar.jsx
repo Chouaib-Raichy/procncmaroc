@@ -164,13 +164,14 @@ export default function Navbar() {
       </div>
 
       <div className="nav-mobile-icons" style={styles.mobileIcons}>
-        <Link to="/customer-gallery" onClick={closeAll} className="nav-mobile-icon" style={styles.mobileIcon} aria-label="Stories">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="2" y="7" width="20" height="15" rx="2" ry="2"/>
-            <polyline points="17 2 12 7 7 2"/>
+        <Link to="/customer-gallery" onClick={closeAll} className="nav-mobile-icon" style={{ ...styles.mobileIcon, color: location.pathname === '/customer-gallery' ? '#a37a39' : '#666', opacity: location.pathname === '/customer-gallery' ? 1 : 0.6 }} aria-label="Stories">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <circle cx="12" cy="12" r="4"/>
+            <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/>
           </svg>
         </Link>
-        <Link to="/partner-map" onClick={closeAll} className="nav-mobile-icon" style={styles.mobileIcon} aria-label="Partner Map">
+        <Link to="/partner-map" onClick={closeAll} className="nav-mobile-icon" style={{ ...styles.mobileIcon, color: location.pathname === '/partner-map' ? '#a37a39' : '#666', opacity: location.pathname === '/partner-map' ? 1 : 0.6 }} aria-label="Partner Map">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
             <circle cx="12" cy="10" r="3"/>
@@ -206,7 +207,7 @@ export default function Navbar() {
                   My Profile
                 </Link>
                 <Link to="/my-gallery" onClick={() => { setMobileProfileOpen(false); closeAll(); }} style={styles.mobileProfileItem}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px', verticalAlign: 'middle' }}><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px', verticalAlign: 'middle' }}><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
                   My Stories
                 </Link>
                 <div style={{ height: '1px', background: '#222', margin: '4px 0' }} />
