@@ -102,17 +102,8 @@ export default function Navbar() {
       )}
 
       <NavLink to="/" icon="⌂" style={{ '--i': 1 }}>Home</NavLink>
-      <NavLink to="/customer-gallery" icon="◇" style={{ '--i': 2 }}>Story</NavLink>
-      <button onClick={() => setSearchOpen(true)} style={styles.mobileSearchBtn}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a37a39" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="11" cy="11" r="8"/>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
-        Search
-      </button>
-      <NavLink to="/partner-map" icon="⌖" style={{ '--i': 3 }}>Partner Map</NavLink>
 
-      <div style={{ '--i': 4 }}>
+      <div style={{ '--i': 2 }}>
         <div className="nav-machines-wrap">
           <div className={`nav-link-row ${isOurMachinesActive ? 'active' : ''}`}>
             <Link to="/our-machines" onClick={closeAll} className="nav-machines-label">
@@ -145,12 +136,12 @@ export default function Navbar() {
         </div>
       </div>
 
-      <NavLink to="/products" icon="▣" style={{ '--i': 5 }}>Products</NavLink>
-      <NavLink to="/about-us" icon="ⓘ" style={{ '--i': 6 }}>About Us</NavLink>
-      <NavLink to="/contact-us" icon="✉" style={{ '--i': 7 }}>Contact Us</NavLink>
+      <NavLink to="/products" icon="▣" style={{ '--i': 3 }}>Products</NavLink>
+      <NavLink to="/about-us" icon="ⓘ" style={{ '--i': 4 }}>About Us</NavLink>
+      <NavLink to="/contact-us" icon="✉" style={{ '--i': 5 }}>Contact Us</NavLink>
 
       {user ? (
-        <div className="nav-user-menu-section" style={{ '--i': 8 }}>
+        <div className="nav-user-menu-section" style={{ '--i': 6 }}>
           <div className="nav-menu-section-label">Account</div>
           {user.role === 'admin' && (
             <Link to="/dashboard" onClick={closeAll} className="nav-link-row" style={{ color: '#a37a39' }}>
@@ -172,7 +163,7 @@ export default function Navbar() {
           </button>
         </div>
       ) : (
-        <div className="nav-auth-group" style={{ '--i': 8 }}>
+        <div className="nav-auth-group" style={{ '--i': 6 }}>
           <Link to="/login" className="nav-login-btn" onClick={closeAll}>🔒 Login</Link>
           <Link to="/signup" className="nav-signup-btn" onClick={closeAll}>🚀 Signup</Link>
         </div>
@@ -186,13 +177,55 @@ export default function Navbar() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
     >
-      <style>{`.search-btn:hover { opacity: 1 !important; color: #b8894a !important; } .search-btn:active { transform: scale(0.92) !important; }`}</style>
-      <Link to="/" style={styles.logo}>
-        <span style={styles.logoText}>PRO CNC MAROC</span>
-      </Link>
-      <button className={`hamburger${menuOpen ? ' open' : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
-        <span></span><span></span><span></span>
-      </button>
+      <style>{`.search-btn:hover { opacity: 1 !important; color: #b8894a !important; } .search-btn:active { transform: scale(0.92) !important; } .nav-mobile-icon:hover { opacity: 0.7 !important; } @media (min-width: 901px) { .nav-mobile-icons { display: none !important; } .nav-left { gap: 0 !important; } } @media (max-width: 900px) { .nav-mobile-icons { display: flex !important; } }`}</style>
+
+      <div style={styles.navLeft}>
+        <button className={`hamburger${menuOpen ? ' open' : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+        <Link to="/" style={styles.logo}>
+          <span style={styles.logoText}>PRO CNC MAROC</span>
+        </Link>
+      </div>
+
+      <div className="nav-mobile-icons" style={styles.mobileIcons}>
+        <Link to="/customer-gallery" onClick={closeAll} className="nav-mobile-icon" style={styles.mobileIcon} aria-label="Story">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            <line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/>
+            <line x1="8" y1="15" x2="12" y2="15"/>
+          </svg>
+        </Link>
+        <Link to="/partner-map" onClick={closeAll} className="nav-mobile-icon" style={styles.mobileIcon} aria-label="Partner Map">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+        </Link>
+        <button onClick={(e) => { e.stopPropagation(); setSearchOpen(true); }} className="nav-mobile-icon" style={styles.mobileIcon} aria-label="Search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
+        {user ? (
+          <Link to="/profile" onClick={closeAll} className="nav-mobile-icon" style={styles.mobileIcon} aria-label="Profile">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </Link>
+        ) : (
+          <Link to="/login" onClick={closeAll} className="nav-mobile-icon" style={styles.mobileIcon} aria-label="Login">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+              <polyline points="10 17 15 12 10 7"/>
+              <line x1="15" y1="12" x2="3" y2="12"/>
+            </svg>
+          </Link>
+        )}
+      </div>
       <div className={`nav-links${menuOpen ? ' open' : ''}`} style={styles.links}>
         {isMobile() ? renderMobileMenu() : (
           <>
@@ -333,11 +366,37 @@ const styles = {
     flexShrink: 0,
   },
   logoText: {
-    fontSize: 'clamp(18px, 3vw, 24px)',
+    fontSize: 'clamp(14px, 3vw, 24px)',
     fontWeight: '800',
     letterSpacing: '2px',
     color: '#a37a39',
     fontFamily: "Georgia, 'Times New Roman', Times, serif",
+  },
+  navLeft: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'clamp(4px, 1vw, 12px)',
+  },
+  mobileIcons: {
+    display: 'none',
+    alignItems: 'center',
+    gap: 'clamp(2px, 0.8vw, 6px)',
+    marginLeft: 'auto',
+  },
+  mobileIcon: {
+    background: 'transparent',
+    border: 'none',
+    color: '#a37a39',
+    cursor: 'pointer',
+    padding: '6px',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    opacity: 0.85,
+    transition: 'opacity 0.2s',
+    textDecoration: 'none',
+    lineHeight: 1,
   },
   links: {
     alignItems: 'center',
@@ -456,21 +515,5 @@ const styles = {
     transition: 'all 0.3s',
     lineHeight: 1,
     opacity: 0.85,
-  },
-  mobileSearchBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    width: '100%',
-    padding: '12px 16px',
-    background: '#111',
-    border: '1px solid #222',
-    borderRadius: '8px',
-    color: '#888',
-    fontSize: '14px',
-    cursor: 'pointer',
-    fontFamily: "Georgia, 'Times New Roman', Times, serif",
-    margin: '4px 0',
-    textAlign: 'left',
   },
 };
