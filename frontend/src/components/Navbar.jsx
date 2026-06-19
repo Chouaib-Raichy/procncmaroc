@@ -143,35 +143,6 @@ export default function Navbar() {
       <NavLink to="/products" icon="▣" style={{ '--i': 3 }}>Products</NavLink>
       <NavLink to="/about-us" icon="ⓘ" style={{ '--i': 4 }}>About Us</NavLink>
       <NavLink to="/contact-us" icon="✉" style={{ '--i': 5 }}>Contact Us</NavLink>
-
-      {user ? (
-        <div className="nav-user-menu-section" style={{ '--i': 6 }}>
-          <div className="nav-menu-section-label">Account</div>
-          {user.role === 'admin' && (
-            <Link to="/dashboard" onClick={closeAll} className="nav-link-row" style={{ color: '#a37a39' }}>
-              <span className="nav-link-icon" style={{ color: '#a37a39' }}>◈</span>
-              <span className="nav-link-label">Dashboard</span>
-            </Link>
-          )}
-          <Link to="/my-gallery" onClick={closeAll} className="nav-link-row">
-            <span className="nav-link-icon">▣</span>
-            <span className="nav-link-label">My Stories</span>
-          </Link>
-          <Link to="/profile" onClick={closeAll} className="nav-link-row">
-            <span className="nav-link-icon">●</span>
-            <span className="nav-link-label">My Profile</span>
-          </Link>
-          <button className="nav-link-row danger" onClick={() => { handleLogout(); closeAll(); }}>
-            <span className="nav-link-icon">⏻</span>
-            <span className="nav-link-label">Logout</span>
-          </button>
-        </div>
-      ) : (
-        <div className="nav-auth-group" style={{ '--i': 6 }}>
-          <Link to="/login" className="nav-login-btn" onClick={closeAll}>🔒 Login</Link>
-          <Link to="/signup" className="nav-signup-btn" onClick={closeAll}>🚀 Signup</Link>
-        </div>
-      )}
     </>
   );
 
