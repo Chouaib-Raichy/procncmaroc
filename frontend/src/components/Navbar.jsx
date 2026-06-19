@@ -195,10 +195,8 @@ export default function Navbar() {
       <div className="nav-mobile-icons" style={styles.mobileIcons}>
         <Link to="/customer-gallery" onClick={closeAll} className="nav-mobile-icon" style={styles.mobileIcon} aria-label="Story">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-            <line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/>
-            <line x1="8" y1="15" x2="12" y2="15"/>
+            <rect x="2" y="7" width="20" height="15" rx="2" ry="2"/>
+            <polyline points="17 2 12 7 7 2"/>
           </svg>
         </Link>
         <Link to="/partner-map" onClick={closeAll} className="nav-mobile-icon" style={styles.mobileIcon} aria-label="Partner Map">
