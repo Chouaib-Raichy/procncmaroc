@@ -72,6 +72,8 @@ export default function Home() {
           .overlay-cards { top: 0 !important; bottom: 0 !important; transform: none !important; justify-content: center !important; align-items: stretch !important; flex-wrap: nowrap !important; gap: 36px !important; }
           .home-card { width: clamp(110px, 38vw, 220px) !important; height: 100% !important; }
           .home-card img { height: 78% !important; }
+          .carousel-img-wrap { height: 78% !important; display: flex !important; }
+          .carousel-img-wrap img { height: 100% !important; width: 100% !important; object-fit: cover !important; }
           .card-body { padding: 6px 4px 2px !important; flex: 1 !important; }
           .card-title { font-size: 7px !important; margin-bottom: 2px !important; }
           .card-text { font-size: 5.5px !important; margin-bottom: 2px !important; -webkit-line-clamp: 2 !important; }
@@ -146,7 +148,7 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
             >
-              <div style={styles.carouselImgWrap}>
+              <div style={styles.carouselImgWrap} className="carousel-img-wrap">
                 <img
                   src={activeCat.image}
                   alt={activeCat.title}
