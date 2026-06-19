@@ -24,23 +24,20 @@ import SEO from '../components/SEO';
 
 export default function Home() {
   const [machines, setMachines] = useState([]);
-  const [featured, setFeatured] = useState([]);
-  const [current, setCurrent] = useState(0);
   const [lightboxVideo, setLightboxVideo] = useState(null);
   const [partner, setPartner] = useState(null);
+  const [catIndex, setCatIndex] = useState(0);
+
+  const catCards = [
+    { image: fibreImg, title: 'FIBRE MARKING', description: 'Durable & fast marking (titanium, acrylic, aluminum, gold, silver, brass...)' },
+    { image: laserImg, title: 'LASER CO2', description: 'Engraving & fine cutting (acrylic, wood, leather, paper, plastic...)' },
+    { image: cncImg, title: 'CNC ROUTER', description: 'Precision & power (aluminum, acrylic, wood, pvc, aluminum composite, nylon...)' },
+  ];
 
   useEffect(() => {
     getAllMachines()
       .then((res) => {
         setMachines(res.data);
-        const grouped = {};
-        res.data.forEach((m) => {
-          const cat = m.category?.name || 'Uncategorized';
-          if (!grouped[cat]) grouped[cat] = [];
-          grouped[cat].push(m);
-        });
-        const picks = Object.values(grouped).map((list) => list[Math.floor(Math.random() * list.length)]);
-        setFeatured(picks);
       })
       .catch(() => setMachines([]));
   }, []);
@@ -57,18 +54,11 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (featured.length === 0) return;
-    const timer = setInterval(() => setCurrent((p) => (p + 1) % featured.length), 4000);
+    const timer = setInterval(() => setCatIndex((p) => (p + 1) % catCards.length), 4000);
     return () => clearInterval(timer);
-  }, [featured.length]);
+  }, []);
 
-  const active = featured[current];
-
-  const catCards = [
-    { image: fibreImg, title: 'FIBRE MARKING', description: 'Durable & fast marking (titanium, acrylic, aluminum, gold, silver, brass...)' },
-    { image: laserImg, title: 'LASER CO2', description: 'Engraving & fine cutting (acrylic, wood, leather, paper, plastic...)' },
-    { image: cncImg, title: 'CNC ROUTER', description: 'Precision & power (aluminum, acrylic, wood, pvc, aluminum composite, nylon...)' },
-  ];
+  const activeCat = catCards[catIndex];
 
   return (
     <div>
@@ -79,17 +69,14 @@ export default function Home() {
           .hero-tag { font-size: 5px !important; margin-bottom: 5px !important; }
           .hero-desc { font-size: 4.5px !important; }
           .hero-subtitle { margin: 0 !important; }
-          .overlay-cards { top: 50% !important; transform: translateY(-50%) !important; justify-content: center !important; flex-wrap: wrap !important; gap: 12px !important; }
-          .home-card { width: clamp(120px, 38vw, 220px) !important; }
+          .overlay-cards { top: 50% !important; transform: translateY(-50%) !important; justify-content: center !important; flex-wrap: nowrap !important; gap: 36px !important; }
+          .home-card { width: clamp(110px, 38vw, 220px) !important; }
           .home-card img { height: clamp(60px, 10vw, 140px) !important; }
           .card-body { padding: 4px 6px !important; }
           .card-title { font-size: 9px !important; margin-bottom: 3px !important; }
           .card-text { font-size: 7px !important; margin-bottom: 3px !important; -webkit-line-clamp: 3 !important; }
           .card-location { font-size: 7px !important; margin-bottom: 3px !important; }
           .home-more-link { font-size: 8px !important; margin-top: 2px !important; }
-          .cat-right-col { max-width: none !important; width: clamp(120px, 38vw, 220px) !important; gap: 8px !important; }
-          .cat-right-col .home-card { flex-direction: column !important; }
-          .cat-right-col .home-card img { width: 100% !important; height: clamp(50px, 8vw, 100px) !important; }
         }
       `}</style>
       <motion.div style={styles.hero}
@@ -118,57 +105,69 @@ export default function Home() {
       </motion.div>
 
       <div style={styles.showroomSection}>
-        <div className="overlay-cards" style={styles.overlayCards}>
-          {/* LEFT CARD - PARTNER */}
-          <motion.div style={styles.card} className="home-card"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
-          >
-            {partner ? (
-              <>
-                <img
-                  src={partner.avatar_url || placeholderImg}
-                  alt={partner.name}
-                  style={styles.cardImg}
-                />
-                <div className="card-body" style={styles.cardBody}>
-                  <h3 className="card-title" style={styles.cardTitle}>{partner.name}</h3>
-                  <p className="card-text" style={styles.cardText}>
-                    {partner.business_bio || partner.business_location || 'No information provided.'}
-                  </p>
-                  <hr style={styles.cardHr} />
-                  <div className="card-location" style={styles.location}>
-                    📍 {partner.city}{partner.city && partner.country ? ', ' : ''}{partner.country || ''}
+          <div className="overlay-cards" style={styles.overlayCards}>
+            {/* LEFT CARD - PARTNER */}
+            <motion.div style={styles.card} className="home-card"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+            >
+              {partner ? (
+                <>
+                  <img
+                    src={partner.avatar_url || placeholderImg}
+                    alt={partner.name}
+                    style={styles.cardImg}
+                  />
+                  <div className="card-body" style={styles.cardBody}>
+                    <h3 className="card-title" style={styles.cardTitle}>{partner.name}</h3>
+                    <p className="card-text" style={styles.cardText}>
+                      {partner.business_bio || partner.business_location || 'No information provided.'}
+                    </p>
+                    <hr style={styles.cardHr} />
+                    <div className="card-location" style={styles.location}>
+                      📍 {partner.city}{partner.city && partner.country ? ', ' : ''}{partner.country || ''}
+                    </div>
+                    <Link to={`/profile/${partner.id}`} style={styles.moreLink} className="home-more-link">More infos</Link>
                   </div>
-                  <Link to={`/profile/${partner.id}`} style={styles.moreLink} className="home-more-link">More infos</Link>
+                </>
+              ) : (
+                <div style={{ ...styles.cardImg, background: '#222', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666', fontSize: '14px' }}>
+                  Loading partner...
                 </div>
-              </>
-            ) : (
-              <div style={{ ...styles.cardImg, background: '#222', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666', fontSize: '14px' }}>
-                Loading partner...
-              </div>
-            )}
-          </motion.div>
+              )}
+            </motion.div>
 
-          {/* RIGHT SIDE - 3 CATEGORY CARDS */}
-          <div className="cat-right-col" style={styles.catRightCol} key="cat-col">
-            {catCards.map((cat, i) => (
-              <motion.div key={i} style={styles.catCard} className="home-card"
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.1 * (i + 1), ease: 'easeOut' }}
-              >
-                <img src={cat.image} alt={cat.title} style={styles.catCardImg} />
-                <div className="card-body" style={styles.catCardBody}>
-                  <h3 className="card-title" style={styles.catCardTitle}>{cat.title}</h3>
-                  <p className="card-text" style={styles.catCardText}>{cat.description}</p>
+            {/* RIGHT CARD - CATEGORY CAROUSEL */}
+            <motion.div style={styles.card} className="home-card"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
+            >
+              <div style={styles.carouselImgWrap}>
+                <img
+                  src={activeCat.image}
+                  alt={activeCat.title}
+                  style={styles.carouselImg}
+                />
+              </div>
+              <div className="card-body" style={styles.cardBody}>
+                <h3 className="card-title" style={styles.cardTitle}>{activeCat.title}</h3>
+                <p className="card-text" style={styles.cardText}>{activeCat.description}</p>
+                <div style={styles.dots}>
+                  {catCards.map((_, i) => (
+                    <span
+                      key={i}
+                      style={{ ...styles.dot, background: i === catIndex ? '#a37a39' : '#555' }}
+                      onClick={() => setCatIndex(i)}
+                    />
+                  ))}
                 </div>
-              </motion.div>
-            ))}
-          </div>
+                <Link to="/our-machines" style={styles.moreLink} className="home-more-link">More infos</Link>
+              </div>
+            </motion.div>
 
         </div>
         <img src={showroom} alt="Showroom" style={styles.showroomImg} />
@@ -378,9 +377,7 @@ const styles = {
     right: 0,
     zIndex: 2,
     display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    gap: 'clamp(12px, 2vw, 24px)',
+    justifyContent: 'space-between',
     padding: '0 clamp(16px, 4vw, 60px)',
     flexWrap: 'wrap',
   },
@@ -401,53 +398,12 @@ const styles = {
     objectFit: 'cover',
     display: 'block',
   },
-  catRightCol: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 'clamp(6px, 0.8vw, 12px)',
-    maxWidth: 'clamp(200px, 26vw, 280px)',
-    flex: '1 1 auto',
-  },
-  catCard: {
+  carouselImgWrap: { width: '100%', background: '#000' },
+  carouselImg: {
     width: '100%',
-    background: '#000',
-    border: '2px solid #a37a39',
-    borderRadius: '8px',
-    overflow: 'hidden',
-    color: '#fff',
-    boxShadow: '0 8px 30px rgba(0,0,0,0.6)',
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'stretch',
-  },
-  catCardImg: {
-    width: 'clamp(60px, 8vw, 100px)',
-    height: 'clamp(60px, 8vw, 100px)',
-    objectFit: 'cover',
+    height: 'clamp(180px, 22vw, 240px)',
+    objectFit: 'contain',
     display: 'block',
-    flexShrink: 0,
-  },
-  catCardBody: {
-    padding: 'clamp(6px, 0.8vw, 12px)',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    flex: 1,
-  },
-  catCardTitle: {
-    color: '#d4af37',
-    fontSize: 'clamp(10px, 1.2vw, 14px)',
-    fontWeight: 'bold',
-    marginBottom: 'clamp(2px, 0.3vw, 6px)',
-  },
-  catCardText: {
-    color: '#ddd',
-    fontSize: 'clamp(8px, 0.9vw, 12px)',
-    lineHeight: 1.4,
-    display: '-webkit-box',
-    WebkitLineClamp: 3,
-    WebkitBoxOrient: 'vertical',
-    overflow: 'hidden',
   },
   cardBody: {
     padding: 'clamp(12px, 1.5vw, 20px)',
@@ -480,6 +436,18 @@ const styles = {
     border: 'none',
     borderTop: '1px solid #a37a39',
     margin: 'clamp(8px, 1vw, 12px) 0',
+  },
+  dots: {
+    display: 'flex',
+    gap: '6px',
+    marginBottom: 'clamp(8px, 1vw, 12px)',
+  },
+  dot: {
+    width: '8px',
+    height: '8px',
+    borderRadius: '50%',
+    cursor: 'pointer',
+    transition: '0.3s',
   },
   moreLink: {
     alignSelf: 'flex-end',
