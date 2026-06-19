@@ -100,9 +100,10 @@ export default function Navbar() {
       )}
 
       <NavLink to="/" icon="⌂" style={{ '--i': 1 }}>Home</NavLink>
-      <NavLink to="/partner-map" icon="⌖" style={{ '--i': 2 }}>Partner Map</NavLink>
+      <NavLink to="/customer-gallery" icon="◇" style={{ '--i': 2 }}>Story</NavLink>
+      <NavLink to="/partner-map" icon="⌖" style={{ '--i': 3 }}>Partner Map</NavLink>
 
-      <div style={{ '--i': 3 }}>
+      <div style={{ '--i': 4 }}>
         <div className="nav-machines-wrap">
           <div className={`nav-link-row ${isOurMachinesActive ? 'active' : ''}`}>
             <Link to="/our-machines" onClick={closeAll} className="nav-machines-label">
@@ -135,8 +136,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      <NavLink to="/products" icon="▣" style={{ '--i': 4 }}>Products</NavLink>
-      <NavLink to="/customer-gallery" icon="◇" style={{ '--i': 5 }}>Customer Gallery</NavLink>
+      <NavLink to="/products" icon="▣" style={{ '--i': 5 }}>Products</NavLink>
       <NavLink to="/about-us" icon="ⓘ" style={{ '--i': 6 }}>About Us</NavLink>
       <NavLink to="/contact-us" icon="✉" style={{ '--i': 7 }}>Contact Us</NavLink>
 
@@ -187,6 +187,7 @@ export default function Navbar() {
         {isMobile() ? renderMobileMenu() : (
           <>
             <Link to="/" style={{...styles.link, ...active('/')}} onClick={closeAll}>Home</Link>
+            <Link to="/customer-gallery" style={{...styles.link, ...active('/customer-gallery')}} onClick={closeAll}>Story</Link>
             <Link to="/partner-map" style={{...styles.link, ...active('/partner-map')}} onClick={closeAll}>Partner Map</Link>
 
             <div ref={ddRef} style={{ position: 'relative' }}
@@ -226,7 +227,6 @@ export default function Navbar() {
             </div>
 
             <Link to="/products" style={{...styles.link, ...active('/products')}} onClick={closeAll}>Products</Link>
-            <Link to="/customer-gallery" style={{...styles.link, ...active('/customer-gallery')}} onClick={closeAll}>Customer Gallery</Link>
             <Link to="/about-us" style={{...styles.link, ...active('/about-us')}} onClick={closeAll}>About Us</Link>
             <Link to="/contact-us" style={{...styles.link, ...active('/contact-us')}} onClick={closeAll}>Contact Us</Link>
 
