@@ -323,7 +323,7 @@ const styles = {
   },
   links: {
     alignItems: 'center',
-    gap: 'clamp(8px, 1.5vw, 20px)',
+    gap: 'clamp(8px, 0.8vw, 14px)',
     fontFamily: "Georgia, 'Times New Roman', Times, serif",
     flexWrap: 'wrap',
   },
