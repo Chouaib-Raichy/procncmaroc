@@ -15,11 +15,13 @@ export default function Navbar() {
   const [mobileMachinesOpen, setMobileMachinesOpen] = useState(false);
   const [mobileCatOpen, setMobileCatOpen] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mobileProfileOpen, setMobileProfileOpen] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const ddRef = useRef(null);
   const userMenuRef = useRef(null);
+  const mobileProfileRef = useRef(null);
 
   useEffect(() => {
     api.get('/categories')
@@ -40,15 +42,17 @@ export default function Navbar() {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
         setUserMenuOpen(false);
       }
+      if (mobileProfileRef.current && !mobileProfileRef.current.contains(e.target)) {
+        setMobileProfileOpen(false);
+      }
     };
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const [mobileUserMenuOpen, setMobileUserMenuOpen] = useState(false);
-
   const handleLogout = async () => {
     await logout();
+    setMobileProfileOpen(false);
     navigate('/');
   };
 
@@ -151,7 +155,7 @@ export default function Navbar() {
           )}
           <Link to="/my-gallery" onClick={closeAll} className="nav-link-row">
             <span className="nav-link-icon">▣</span>
-            <span className="nav-link-label">My Gallery</span>
+            <span className="nav-link-label">My Stories</span>
           </Link>
           <Link to="/profile" onClick={closeAll} className="nav-link-row">
             <span className="nav-link-icon">●</span>
@@ -210,12 +214,28 @@ export default function Navbar() {
           </svg>
         </button>
         {user ? (
-          <Link to="/profile" onClick={closeAll} className="nav-mobile-icon" style={styles.mobileIcon} aria-label="Profile">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
-          </Link>
+          <div ref={mobileProfileRef} style={{ position: 'relative' }}>
+            <button onClick={(e) => { e.stopPropagation(); setMobileProfileOpen(!mobileProfileOpen); }} className="nav-mobile-icon" style={{ ...styles.mobileIcon, padding: '2px', borderRadius: '50%', overflow: 'hidden' }} aria-label="Profile">
+              {user.avatar_url && !imgError ? (
+                <img src={user.avatar_url} alt="avatar" onError={() => setImgError(true)} style={{ width: '26px', height: '26px', borderRadius: '50%', objectFit: 'cover', display: 'block', border: '1.5px solid #a37a39' }} />
+              ) : (
+                <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#a37a39', fontSize: '13px', fontWeight: 700, border: '1.5px solid #a37a39' }}>
+                  {user.name?.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </button>
+            {mobileProfileOpen && (
+              <div style={styles.mobileProfileDropdown}>
+                {user.role === 'admin' && (
+                  <Link to="/dashboard" onClick={() => { setMobileProfileOpen(false); closeAll(); }} style={styles.mobileProfileItem}>◈  Dashboard</Link>
+                )}
+                <Link to="/profile" onClick={() => { setMobileProfileOpen(false); closeAll(); }} style={styles.mobileProfileItem}>●  My Profile</Link>
+                <Link to="/my-gallery" onClick={() => { setMobileProfileOpen(false); closeAll(); }} style={styles.mobileProfileItem}>▣  My Stories</Link>
+                <div style={{ height: '1px', background: '#222', margin: '4px 0' }} />
+                <button onClick={() => { setMobileProfileOpen(false); handleLogout(); }} style={{ ...styles.mobileProfileItem, color: '#e57373', background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left', fontSize: '13px', padding: '10px 16px', fontFamily: 'inherit' }}>⏻  Logout</button>
+              </div>
+            )}
+          </div>
         ) : (
           <Link to="/login" onClick={closeAll} className="nav-mobile-icon" style={styles.mobileIcon} aria-label="Login">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -315,7 +335,7 @@ export default function Navbar() {
                       style={{ display: 'block', padding: '10px 16px', color: '#ccc', textDecoration: 'none', fontSize: '14px', transition: 'background 0.2s' }}
                       onMouseEnter={(e) => e.target.style.background = '#111'}
                       onMouseLeave={(e) => e.target.style.background = 'transparent'}
-                    >My Gallery</Link>
+                      >My Stories</Link>
                     <Link to="/profile" onClick={() => { setUserMenuOpen(false); closeAll(); }}
                       style={{ display: 'block', padding: '10px 16px', color: '#ccc', textDecoration: 'none', fontSize: '14px', transition: 'background 0.2s' }}
                       onMouseEnter={(e) => e.target.style.background = '#111'}
@@ -515,5 +535,27 @@ const styles = {
     transition: 'all 0.3s',
     lineHeight: 1,
     opacity: 0.85,
+  },
+  mobileProfileDropdown: {
+    position: 'absolute',
+    top: '100%',
+    right: 0,
+    marginTop: '8px',
+    background: '#0d0d0d',
+    border: '1px solid #222',
+    borderRadius: '10px',
+    minWidth: '180px',
+    zIndex: 3000,
+    boxShadow: '0 12px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(163,122,57,0.1)',
+    padding: '6px 0',
+  },
+  mobileProfileItem: {
+    display: 'block',
+    padding: '10px 16px',
+    color: '#ccc',
+    textDecoration: 'none',
+    fontSize: '13px',
+    transition: 'background 0.15s',
+    fontFamily: "Georgia, 'Times New Roman', Times, serif",
   },
 };
