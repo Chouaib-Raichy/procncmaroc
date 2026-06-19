@@ -71,8 +71,8 @@ export default function Home() {
           .hero-subtitle { margin: 0 !important; }
           .overlay-cards { top: 50% !important; transform: translateY(-50%) !important; justify-content: center !important; flex-wrap: nowrap !important; gap: 36px !important; }
           .home-card { width: clamp(110px, 38vw, 220px) !important; }
-          .home-card img { height: clamp(60px, 10vw, 140px) !important; }
-          .card-body { padding: 4px 6px !important; }
+          .home-card img { height: clamp(90px, 16vw, 180px) !important; }
+          .card-body { padding: 10px 6px 4px !important; }
           .card-title { font-size: 9px !important; margin-bottom: 3px !important; }
           .card-text { font-size: 7px !important; margin-bottom: 3px !important; -webkit-line-clamp: 3 !important; }
           .card-location { font-size: 7px !important; margin-bottom: 3px !important; }
@@ -406,7 +406,7 @@ const styles = {
     display: 'block',
   },
   cardBody: {
-    padding: 'clamp(12px, 1.5vw, 20px)',
+    padding: '10px clamp(12px, 1.5vw, 20px) clamp(12px, 1.5vw, 20px)',
     display: 'flex',
     flexDirection: 'column',
     flex: 1,
