@@ -69,10 +69,10 @@ export default function Home() {
           .hero-tag { font-size: 5px !important; margin-bottom: 5px !important; }
           .hero-desc { font-size: 4.5px !important; }
           .hero-subtitle { margin: 0 !important; }
-          .overlay-cards { top: 0 !important; bottom: 0 !important; transform: none !important; justify-content: center !important; align-items: center !important; flex-wrap: nowrap !important; gap: 36px !important; }
-          .home-card { width: clamp(110px, 38vw, 220px) !important; }
-          .home-card img { height: clamp(77px, 26.6vw, 154px) !important; }
-          .card-body { padding: 6px 4px 2px !important; }
+          .overlay-cards { top: 0 !important; bottom: 0 !important; transform: none !important; justify-content: center !important; align-items: stretch !important; flex-wrap: nowrap !important; gap: 36px !important; }
+          .home-card { width: clamp(110px, 38vw, 220px) !important; height: 100% !important; }
+          .home-card img { height: 65% !important; }
+          .card-body { padding: 6px 4px 2px !important; flex: 1 !important; }
           .card-title { font-size: 7px !important; margin-bottom: 2px !important; }
           .card-text { font-size: 5.5px !important; margin-bottom: 2px !important; -webkit-line-clamp: 2 !important; }
           .card-location { font-size: 5.5px !important; margin-bottom: 2px !important; }
