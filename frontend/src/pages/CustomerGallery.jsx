@@ -335,7 +335,7 @@ export default function CustomerGallery() {
 
   return (
     <div style={styles.page}>
-      <SEO title="Customer Gallery" description="Discover our customers' achievements: CNC machining, laser cutting, engraving, and 3D printing projects in Morocco." canonicalUrl="/customer-gallery" />
+      <SEO title="Stories" description="Discover our customers' achievements: CNC machining, laser cutting, engraving, and 3D printing projects in Morocco." canonicalUrl="/customer-gallery" />
       <div style={styles.overlay}>
         <section style={styles.container}>
           <motion.div
@@ -344,13 +344,6 @@ export default function CustomerGallery() {
             transition={{ duration: 0.5 }}
             style={{ textAlign: 'center', marginBottom: 'clamp(32px, 5vw, 60px)' }}
           >
-            <h1 style={styles.title}>Customer Gallery</h1>
-            <div style={styles.titleDivider}>
-              <span style={styles.dividerLine} />
-              <span style={styles.dividerDiamond}>✦</span>
-              <span style={styles.dividerLine} />
-            </div>
-            <p style={styles.subtitle}>See what our customers have achieved with PRO CNC MAROC machines</p>
           </motion.div>
 
           {loading ? (
