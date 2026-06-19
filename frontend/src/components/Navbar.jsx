@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
+import SearchModal from './SearchModal';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -13,6 +14,7 @@ export default function Navbar() {
   const [imgError, setImgError] = useState(false);
   const [mobileMachinesOpen, setMobileMachinesOpen] = useState(false);
   const [mobileCatOpen, setMobileCatOpen] = useState(null);
+  const [searchOpen, setSearchOpen] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -101,6 +103,7 @@ export default function Navbar() {
 
       <NavLink to="/" icon="⌂" style={{ '--i': 1 }}>Home</NavLink>
       <NavLink to="/customer-gallery" icon="◇" style={{ '--i': 2 }}>Story</NavLink>
+      <button onClick={() => setSearchOpen(true)} style={styles.mobileSearchBtn}>🔍  Search</button>
       <NavLink to="/partner-map" icon="⌖" style={{ '--i': 3 }}>Partner Map</NavLink>
 
       <div style={{ '--i': 4 }}>
@@ -230,6 +233,8 @@ export default function Navbar() {
             <Link to="/about-us" style={{...styles.link, ...active('/about-us')}} onClick={closeAll}>About Us</Link>
             <Link to="/contact-us" style={{...styles.link, ...active('/contact-us')}} onClick={closeAll}>Contact Us</Link>
 
+            <button onClick={(e) => { e.stopPropagation(); setSearchOpen(true); }} style={styles.searchBtn} aria-label="Search">🔍</button>
+
             {user ? (
               <div ref={userMenuRef} style={{ position: 'relative' }}>
                 <div onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -288,6 +293,7 @@ export default function Navbar() {
           </>
         )}
       </div>
+      {searchOpen && <SearchModal onClose={() => setSearchOpen(false)} />}
     </motion.nav>
   );
 }
@@ -424,5 +430,35 @@ const styles = {
     fontWeight: '600',
     fontSize: 'clamp(13px, 1.3vw, 15px)',
     whiteSpace: 'nowrap',
+  },
+  searchBtn: {
+    background: 'transparent',
+    border: 'none',
+    color: '#ddd',
+    fontSize: '18px',
+    cursor: 'pointer',
+    padding: '8px',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'all 0.3s',
+    lineHeight: 1,
+  },
+  mobileSearchBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    width: '100%',
+    padding: '12px 16px',
+    background: '#111',
+    border: '1px solid #222',
+    borderRadius: '8px',
+    color: '#888',
+    fontSize: '14px',
+    cursor: 'pointer',
+    fontFamily: "Georgia, 'Times New Roman', Times, serif",
+    margin: '4px 0',
+    textAlign: 'left',
   },
 };

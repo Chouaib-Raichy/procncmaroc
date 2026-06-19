@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\MachineController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\SiteSettingController;
+use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +32,7 @@ Route::get('/partners/{id}', [App\Http\Controllers\Api\PartnerController::class,
 Route::post('/track-visit', [StatsController::class, 'trackVisit']);
 Route::get('/resolve-url', [AuthController::class, 'resolveLocation']);
 Route::get('/settings', [SiteSettingController::class, 'index']);
+Route::get('/search', [SearchController::class, 'search']);
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
