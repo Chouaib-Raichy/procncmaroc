@@ -397,6 +397,8 @@ const styles = {
     height: 'clamp(180px, 22vw, 240px)',
     objectFit: 'cover',
     display: 'block',
+    borderBottom: '3px solid #a37a39',
+    boxSizing: 'border-box',
   },
   carouselImgWrap: { width: '100%', background: '#000' },
   carouselImg: {
@@ -404,6 +406,8 @@ const styles = {
     height: 'clamp(180px, 22vw, 240px)',
     objectFit: 'contain',
     display: 'block',
+    borderBottom: '3px solid #a37a39',
+    boxSizing: 'border-box',
   },
   cardBody: {
     padding: '10px clamp(12px, 1.5vw, 20px) clamp(12px, 1.5vw, 20px)',
