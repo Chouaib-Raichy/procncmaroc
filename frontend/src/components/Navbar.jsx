@@ -105,13 +105,13 @@ export default function Navbar() {
         </div>
       )}
 
-      <NavLink to="/" icon="⌂" style={{ '--i': 1 }}>Home</NavLink>
+      <NavLink to="/" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>} style={{ '--i': 1 }}>Home</NavLink>
 
       <div style={{ '--i': 2 }}>
         <div className="nav-machines-wrap">
           <div className={`nav-link-row ${isOurMachinesActive ? 'active' : ''}`}>
             <Link to="/our-machines" onClick={closeAll} className="nav-machines-label">
-              <span className="nav-link-icon">⚙</span>
+              <span className="nav-link-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
               <span className="nav-link-label">Our Machines</span>
             </Link>
             <span className={`nav-link-arrow${mobileMachinesOpen ? ' open' : ''}`} onClick={() => setMobileMachinesOpen(!mobileMachinesOpen)}>&#9656;</span>
@@ -140,9 +140,9 @@ export default function Navbar() {
         </div>
       </div>
 
-      <NavLink to="/products" icon="▣" style={{ '--i': 3 }}>Products</NavLink>
-      <NavLink to="/about-us" icon="ⓘ" style={{ '--i': 4 }}>About Us</NavLink>
-      <NavLink to="/contact-us" icon="✉" style={{ '--i': 5 }}>Contact Us</NavLink>
+      <NavLink to="/products" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>} style={{ '--i': 3 }}>Products</NavLink>
+      <NavLink to="/about-us" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>} style={{ '--i': 4 }}>About Us</NavLink>
+      <NavLink to="/contact-us" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>} style={{ '--i': 5 }}>Contact Us</NavLink>
     </>
   );
 
@@ -165,19 +165,19 @@ export default function Navbar() {
 
       <div className="nav-mobile-icons" style={styles.mobileIcons}>
         <Link to="/customer-gallery" onClick={closeAll} className="nav-mobile-icon" style={styles.mobileIcon} aria-label="Story">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <rect x="2" y="7" width="20" height="15" rx="2" ry="2"/>
             <polyline points="17 2 12 7 7 2"/>
           </svg>
         </Link>
         <Link to="/partner-map" onClick={closeAll} className="nav-mobile-icon" style={styles.mobileIcon} aria-label="Partner Map">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
             <circle cx="12" cy="10" r="3"/>
           </svg>
         </Link>
         <button onClick={(e) => { e.stopPropagation(); setSearchOpen(true); }} className="nav-mobile-icon" style={styles.mobileIcon} aria-label="Search">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8"/>
             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
@@ -196,18 +196,30 @@ export default function Navbar() {
             {mobileProfileOpen && (
               <div style={styles.mobileProfileDropdown}>
                 {user.role === 'admin' && (
-                  <Link to="/dashboard" onClick={() => { setMobileProfileOpen(false); closeAll(); }} style={styles.mobileProfileItem}>◈  Dashboard</Link>
+                  <Link to="/dashboard" onClick={() => { setMobileProfileOpen(false); closeAll(); }} style={styles.mobileProfileItem}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a37a39" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px', verticalAlign: 'middle' }}><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    Dashboard
+                  </Link>
                 )}
-                <Link to="/profile" onClick={() => { setMobileProfileOpen(false); closeAll(); }} style={styles.mobileProfileItem}>●  My Profile</Link>
-                <Link to="/my-gallery" onClick={() => { setMobileProfileOpen(false); closeAll(); }} style={styles.mobileProfileItem}>▣  My Stories</Link>
+                <Link to="/profile" onClick={() => { setMobileProfileOpen(false); closeAll(); }} style={styles.mobileProfileItem}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px', verticalAlign: 'middle' }}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  My Profile
+                </Link>
+                <Link to="/my-gallery" onClick={() => { setMobileProfileOpen(false); closeAll(); }} style={styles.mobileProfileItem}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px', verticalAlign: 'middle' }}><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                  My Stories
+                </Link>
                 <div style={{ height: '1px', background: '#222', margin: '4px 0' }} />
-                <button onClick={() => { setMobileProfileOpen(false); handleLogout(); }} style={{ ...styles.mobileProfileItem, color: '#e57373', background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left', fontSize: '13px', padding: '10px 16px', fontFamily: 'inherit' }}>⏻  Logout</button>
+                <button onClick={() => { setMobileProfileOpen(false); handleLogout(); }} style={{ ...styles.mobileProfileItem, color: '#e57373', background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left', fontSize: '13px', padding: '10px 16px', fontFamily: 'inherit', display: 'flex', alignItems: 'center' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e57373" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px', flexShrink: 0 }}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                  Logout
+                </button>
               </div>
             )}
           </div>
         ) : (
           <Link to="/login" onClick={closeAll} className="nav-mobile-icon" style={styles.mobileIcon} aria-label="Login">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
               <polyline points="10 17 15 12 10 7"/>
               <line x1="15" y1="12" x2="3" y2="12"/>

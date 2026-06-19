@@ -448,11 +448,17 @@ footer a:hover {
   }
   .nav-link-icon {
     width: 22px;
-    text-align: center;
-    font-size: 16px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     color: #666;
     flex-shrink: 0;
     transition: color 0.2s;
+  }
+  .nav-link-icon svg {
+    width: 18px;
+    height: 18px;
   }
   .nav-link-row.active .nav-link-icon {
     color: #a37a39;
