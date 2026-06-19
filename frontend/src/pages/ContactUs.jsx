@@ -88,7 +88,7 @@ export default function ContactUs() {
           >
             {[
               { icon: '☎', label: 'Phone', text: ['+212 625 280 991', '+212 667 198 564'] },
-              { icon: '✉', label: 'Email', text: ['contact@procncmaroc.com'] },
+              { icon: '✉', label: 'Email', text: ['contact.procncmaroc@gmail.com'] },
               { icon: '📍', label: 'Address', text: ['PRO CNC MAROC, Casablanca, Morocco'] },
             ].map((card, i) => (
               <motion.div

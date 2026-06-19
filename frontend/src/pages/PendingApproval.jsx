@@ -25,7 +25,7 @@ export default function PendingApproval() {
             </p>
             <p style={styles.text}>
               You will be notified once your account is approved. If you have any questions,
-              please contact us at <a href="mailto:contact@procncmaroc.com" style={styles.link}>contact@procncmaroc.com</a>.
+              please contact us at <a href="mailto:contact.procncmaroc@gmail.com" style={styles.link}>contact.procncmaroc@gmail.com</a>.
             </p>
             <div style={styles.divider} />
             <button onClick={logout} style={styles.btn}>Logout</button>

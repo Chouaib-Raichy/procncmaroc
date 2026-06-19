@@ -70,7 +70,7 @@ export default function Footer() {
           </div>
           <div style={styles.contactItem}>
             <span style={styles.contactIcon}>&#9993;</span>
-            <span>contact@procncmaroc.com</span>
+            <span>contact.procncmaroc@gmail.com</span>
           </div>
           <div style={styles.contactItem}>
             <span style={styles.contactIcon}>&#9742;</span>
