@@ -376,6 +376,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: 0,
+    marginRight: 'clamp(12px, 3vw, 40px)',
   },
   mobileIcons: {
     display: 'none',
