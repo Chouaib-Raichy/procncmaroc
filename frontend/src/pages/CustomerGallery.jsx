@@ -291,6 +291,7 @@ export default function CustomerGallery() {
   const [likesUsers, setLikesUsers] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [sidebarPost, setSidebarPost] = useState(null);
 
   const fetch = (p) => {
     setLoading(true);
@@ -336,7 +337,7 @@ export default function CustomerGallery() {
   return (
     <div style={styles.page}>
       <SEO title="Stories" description="Discover our customers' achievements: CNC machining, laser cutting, engraving, and 3D printing projects in Morocco." canonicalUrl="/customer-gallery" />
-      <style>{`@media (min-width: 901px) { .story-card { display: flex !important; flex-direction: column !important; } .story-card-body { flex: 1 0 auto !important; } .story-action-bar { margin-top: auto !important; } }`}</style>
+      <style>{`@media (min-width: 901px) { .story-card { display: flex !important; flex-direction: column !important; } .story-card-body { flex: 1 0 auto !important; } .story-action-bar { margin-top: auto !important; } .story-sidebar-overlay { display: block !important; } } @media (max-width: 900px) { .story-sidebar-overlay { display: none !important; } }`}</style>
       <div style={styles.overlay}>
         <section style={styles.container}>
           <motion.div
@@ -482,7 +483,13 @@ export default function CustomerGallery() {
                       </motion.button>
                       <motion.button
                         style={styles.actionBtn}
-                        onClick={() => setExpanded((prev) => ({ ...prev, [post.id]: !prev[post.id] }))}
+                        onClick={() => {
+                          if (window.innerWidth > 900) {
+                            setSidebarPost(sidebarPost?.id === post.id ? null : post);
+                          } else {
+                            setExpanded((prev) => ({ ...prev, [post.id]: !prev[post.id] }));
+                          }
+                        }}
                         whileHover={{ background: 'rgba(255,255,255,0.06)' }}
                         whileTap={{ scale: 0.8 }}
                       >
@@ -576,6 +583,52 @@ export default function CustomerGallery() {
               exit={{ scale: 0.85, opacity: 0 }}
               transition={{ duration: 0.25 }}
             />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {sidebarPost && (
+          <motion.div
+            style={styles.sidebarOverlay}
+            className="story-sidebar-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSidebarPost(null)}
+          >
+            <motion.div
+              style={styles.sidebar}
+              initial={{ x: 400, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 400, opacity: 0 }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={styles.sidebarHeader}>
+                <div style={styles.sidebarHeaderLeft}>
+                  <CommentIcon />
+                  <span>Comments</span>
+                </div>
+                <button style={styles.sidebarClose} onClick={() => setSidebarPost(null)}>
+                  <CloseIcon />
+                </button>
+              </div>
+              <div style={styles.sidebarUser}>
+                <img src={sidebarPost.user?.avatar_url || placeholderImg} alt="" style={styles.sidebarAvatar} />
+                <div>
+                  <div style={styles.sidebarName}>{sidebarPost.user?.name}</div>
+                  <div style={styles.sidebarTime}>{formatTime(sidebarPost.created_at)}</div>
+                </div>
+              </div>
+              <div style={styles.sidebarTitle}>{sidebarPost.title}</div>
+              {sidebarPost.description && (
+                <p style={styles.sidebarDesc}>{sidebarPost.description}</p>
+              )}
+              <div style={styles.sidebarComments}>
+                <CommentSection postId={sidebarPost.id} user={user} onCommentCountChange={(c) => updateCommentCount(sidebarPost.id, c)} />
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -798,6 +851,51 @@ const styles = {
   replies: {
     marginLeft: '36px', borderLeft: '1px solid #2a2a2a',
     paddingLeft: '12px', marginTop: '4px',
+  },
+  sidebarOverlay: {
+    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
+    zIndex: 9998, display: 'flex', justifyContent: 'flex-end',
+  },
+  sidebar: {
+    width: '400px', maxWidth: '90vw', height: '100vh',
+    background: '#0d0d0d', borderLeft: '1px solid #2a2a2a',
+    display: 'flex', flexDirection: 'column',
+    boxShadow: '-8px 0 40px rgba(0,0,0,0.6)',
+  },
+  sidebarHeader: {
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    padding: '16px 20px', borderBottom: '1px solid #1e1e1e',
+  },
+  sidebarHeaderLeft: {
+    display: 'flex', alignItems: 'center', gap: '8px',
+    color: '#d4af37', fontSize: '15px', fontWeight: '700',
+  },
+  sidebarClose: {
+    background: 'transparent', border: 'none', color: '#888',
+    cursor: 'pointer', width: '32px', height: '32px',
+    borderRadius: '8px', display: 'flex', alignItems: 'center',
+    justifyContent: 'center', transition: 'background 0.2s',
+  },
+  sidebarUser: {
+    display: 'flex', alignItems: 'center', gap: '10px',
+    padding: '14px 20px', borderBottom: '1px solid #1a1a1a',
+  },
+  sidebarAvatar: {
+    width: '36px', height: '36px', borderRadius: '50%',
+    objectFit: 'cover', border: '2px solid #a37a39',
+  },
+  sidebarName: { color: '#d4af37', fontSize: '13px', fontWeight: 600 },
+  sidebarTime: { color: '#666', fontSize: '11px', marginTop: '1px' },
+  sidebarTitle: {
+    color: '#fff', fontSize: '15px', fontWeight: 700,
+    padding: '14px 20px 8px',
+  },
+  sidebarDesc: {
+    color: '#999', fontSize: '13px', lineHeight: 1.6,
+    padding: '0 20px 14px', margin: 0, borderBottom: '1px solid #1a1a1a',
+  },
+  sidebarComments: {
+    flex: 1, overflowY: 'auto', padding: '12px 20px',
   },
   lightbox: {
     position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
