@@ -154,10 +154,12 @@ export default function Navbar() {
     >
       <style>{`.search-btn:hover { opacity: 1 !important; color: #b8894a !important; } .search-btn:active { transform: scale(0.92) !important; } .nav-mobile-icon:hover { opacity: 0.7 !important; } @media (min-width: 901px) { .nav-mobile-icons { display: none !important; } .nav-left { gap: 0 !important; } } @media (max-width: 900px) { .nav-mobile-icons { display: flex !important; } }`}</style>
 
-      <div style={styles.navLeft}>
+      <div className="hamburger-wrap" style={styles.hamburgerWrap}>
         <button className={`hamburger${menuOpen ? ' open' : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
           <span></span><span></span><span></span>
         </button>
+      </div>
+      <div style={styles.navLeft}>
         <Link to="/" style={styles.logo}>
           <span style={styles.logoText}>PRO CNC MAROC</span>
         </Link>
@@ -371,6 +373,11 @@ const styles = {
     letterSpacing: '2px',
     color: '#a37a39',
     fontFamily: "Georgia, 'Times New Roman', Times, serif",
+  },
+  hamburgerWrap: {
+    display: 'none',
+    alignItems: 'center',
+    flexShrink: 0,
   },
   navLeft: {
     display: 'flex',
