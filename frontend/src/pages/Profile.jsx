@@ -188,7 +188,7 @@ export default function Profile() {
           .prof-settings-wrap { top: 8px !important; right: 8px !important; }
           .prof-stats-bar { flex-direction: column !important; gap: 8px !important; padding: 14px 16px 0 !important; }
           .prof-stat-card { flex: 1 1 auto !important; padding: 12px 14px !important; }
-          .prof-stat-value { font-size: 12px !important; }
+          .prof-stat-value { font-size: 12px !important; white-space: normal !important; overflow: visible !important; word-break: break-word !important; }
           .prof-stat-label { font-size: 10px !important; }
           .prof-divider { margin: 14px 16px !important; }
           .prof-content-area { flex-direction: column !important; padding: 0 16px 20px !important; gap: 16px !important; }
@@ -315,11 +315,19 @@ export default function Profile() {
               </div>
             </div>
           )}
-          {user.business_location && (
+          {user.business_location != null ? (
             <div style={s.statCard} className="prof-stat-card">
               <div style={s.statIcon}><BuildingIcon /></div>
               <div>
                 <div style={s.statValue} className="prof-stat-value">{user.business_location}</div>
+                <div style={s.statLabel} className="prof-stat-label">Business</div>
+              </div>
+            </div>
+          ) : (
+            <div style={s.statCard} className="prof-stat-card">
+              <div style={s.statIcon}><BuildingIcon /></div>
+              <div>
+                <div style={{ ...s.statValue, color: '#555' }} className="prof-stat-value">Not provided</div>
                 <div style={s.statLabel} className="prof-stat-label">Business</div>
               </div>
             </div>
