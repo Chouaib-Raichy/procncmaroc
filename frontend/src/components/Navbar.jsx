@@ -381,7 +381,7 @@ const styles = {
   mobileIcons: {
     display: 'none',
     alignItems: 'center',
-    gap: 'clamp(6px, 1.2vw, 12px)',
+    gap: 'clamp(2px, 0.8vw, 8px)',
     marginLeft: 'auto',
   },
   mobileIcon: {
