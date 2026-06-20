@@ -65,9 +65,9 @@ export default function Home() {
       <SEO title="Home" description="PRO CNC MAROC — Your partner in CNC machines, precision machining, laser cutting, and engraving in Morocco. Professional solutions for industry and crafts." canonicalUrl="/" />
       <style>{`
         @media (max-width: 768px) {
-          .hero-title { font-size: clamp(34px, 9vw, 48px) !important; margin-bottom: 10px !important; }
-          .hero-tag { font-size: clamp(28px, 7.5vw, 40px) !important; margin-bottom: 5px !important; }
-          .hero-desc { font-size: clamp(28px, 7.5vw, 40px) !important; }
+          .hero-title { font-size: clamp(11px, 3vw, 16px) !important; margin-bottom: 10px !important; }
+          .hero-tag { font-size: clamp(9px, 2.5vw, 13px) !important; margin-bottom: 5px !important; }
+          .hero-desc { font-size: clamp(9px, 2.5vw, 13px) !important; }
           .hero-subtitle { margin: 0 !important; }
           .overlay-cards { top: 0 !important; bottom: 0 !important; transform: none !important; justify-content: center !important; align-items: stretch !important; flex-wrap: nowrap !important; gap: 36px !important; }
           .home-card { width: clamp(110px, 38vw, 220px) !important; height: 100% !important; }
