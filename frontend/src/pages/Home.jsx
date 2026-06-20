@@ -78,7 +78,7 @@ export default function Home() {
           .card-body { padding: 6px 4px 2px !important; flex: 1 !important; }
           .card-title { font-size: 7px !important; margin-bottom: 2px !important; }
           .card-text { font-size: 5.5px !important; margin-bottom: 2px !important; -webkit-line-clamp: 2 !important; }
-          .card-location { font-size: 5.5px !important; margin-bottom: 2px !important; }
+          .card-location { font-size: 11px !important; margin-bottom: 2px !important; }
           .home-more-link { font-size: 6px !important; margin-top: 1px !important; padding: 2px 8px !important; }
         }
       `}</style>
