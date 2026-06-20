@@ -78,7 +78,7 @@ export default function Home() {
           .home-card:last-child { display: flex !important; flex-direction: column !important; }
           .home-card img { height: 78% !important; }
           .carousel-img-wrap { flex: 1 1 auto !important; display: flex !important; min-height: 0 !important; }
-          .carousel-img-wrap img { height: 100% !important; width: 100% !important; object-fit: contain !important; }
+          .carousel-img-wrap img { height: 100% !important; width: 100% !important; object-fit: fill !important; }
           .card-body { padding: 6px 4px 2px !important; }
           .home-card:last-child .card-body { flex: 0 0 auto !important; }
           .card-title { font-size: 7px !important; margin-bottom: 2px !important; }
