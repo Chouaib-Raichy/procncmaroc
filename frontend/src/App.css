@@ -357,7 +357,6 @@ footer a:hover {
 
 @media (max-width: 900px) {
   .hamburger { display: flex; }
-  .nav-left-group { gap: clamp(12px, 3vw, 24px) !important; }
 
   .nav-links {
     display: none !important;

@@ -154,7 +154,7 @@ export default function Navbar() {
     >
       <style>{`.search-btn:hover { opacity: 1 !important; color: #b8894a !important; } .search-btn:active { transform: scale(0.92) !important; } .nav-mobile-icon:hover { opacity: 0.7 !important; } @media (min-width: 901px) { .nav-mobile-icons { display: none !important; } } @media (max-width: 900px) { .nav-mobile-icons { display: flex !important; } }`}</style>
 
-      <div className="nav-left-group" style={styles.navLeftGroup}>
+      <div style={styles.navLeft}>
         <button className={`hamburger${menuOpen ? ' open' : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
           <span></span><span></span><span></span>
         </button>
@@ -372,17 +372,15 @@ const styles = {
     color: '#a37a39',
     fontFamily: "Georgia, 'Times New Roman', Times, serif",
   },
-  navLeftGroup: {
+  navLeft: {
     display: 'flex',
     alignItems: 'center',
-    gap: 'clamp(8px, 1.5vw, 20px)',
-    flexShrink: 0,
+    gap: 'clamp(8px, 1.5vw, 16px)',
   },
   mobileIcons: {
     display: 'none',
     alignItems: 'center',
     gap: 'clamp(6px, 1.2vw, 12px)',
-    flexShrink: 0,
   },
   mobileIcon: {
     background: 'transparent',
