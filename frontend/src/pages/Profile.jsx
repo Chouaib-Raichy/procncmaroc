@@ -171,6 +171,41 @@ export default function Profile() {
   return (
     <>
       <SEO title="My Profile" description="Edit your PRO CNC MAROC profile, manage your business information, and update your gallery." canonicalUrl="/profile" />
+      <style>{`
+        @media (max-width: 768px) {
+          .prof-cover-content { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; padding-bottom: 12px !important; }
+          .prof-avatar-wrap { align-self: flex-start !important; }
+          .prof-avatar-inner { width: 72px !important; height: 72px !important; }
+          .prof-avatar-badge { width: 22px !important; height: 22px !important; bottom: 2px !important; right: 2px !important; }
+          .prof-avatar-badge svg { width: 10px !important; height: 10px !important; }
+          .prof-name { font-size: 18px !important; }
+          .prof-role-row { margin-bottom: 4px !important; }
+          .prof-entreprise { font-size: 12px !important; }
+          .prof-role-badge { font-size: 10px !important; padding: 2px 8px !important; }
+          .prof-cover-meta { gap: 6px !important; }
+          .prof-cover-meta-item { font-size: 11px !important; }
+          .prof-settings-btn { padding: 6px 10px !important; font-size: 11px !important; gap: 4px !important; }
+          .prof-settings-wrap { top: 8px !important; right: 8px !important; }
+          .prof-stats-bar { flex-direction: column !important; gap: 8px !important; padding: 14px 16px 0 !important; }
+          .prof-stat-card { flex: 1 1 auto !important; padding: 12px 14px !important; }
+          .prof-stat-value { font-size: 12px !important; }
+          .prof-stat-label { font-size: 10px !important; }
+          .prof-divider { margin: 14px 16px !important; }
+          .prof-content-area { flex-direction: column !important; padding: 0 16px 20px !important; gap: 16px !important; }
+          .prof-left-col, .prof-right-col { min-width: 0 !important; flex: 1 1 auto !important; }
+          .prof-bio-box { padding: 12px 14px !important; }
+          .prof-bio-text { font-size: 13px !important; line-height: 1.6 !important; }
+          .prof-gallery-header { margin-bottom: 10px !important; }
+          .prof-gallery-title { font-size: 11px !important; }
+          .prof-carousel { min-height: 160px !important; }
+          .prof-carousel-img { height: 200px !important; }
+          .prof-no-images { min-height: 160px !important; }
+          .prof-modal { width: 95vw !important; padding: 16px !important; }
+          .prof-form-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+          .prof-field-label { font-size: 12px !important; }
+          .prof-input, .prof-select { padding: 10px 12px !important; font-size: 13px !important; }
+        }
+      `}</style>
       <div style={s.page}>
       <div style={s.overlay} />
 
@@ -179,11 +214,11 @@ export default function Profile() {
         <motion.div style={s.cover} {...fadeUp()}>
           <div style={{ ...s.coverBg, backgroundImage: `url(${currentBg || placeholderImg})` }} onClick={() => { modalRef.current = 'cover'; setModal('cover'); }}>
             <div style={s.coverGradient} />
-            <div style={s.coverContent}>
-              <div style={s.avatarWrap}>
-                <div style={s.avatarInner} onClick={(e) => { e.stopPropagation(); modalRef.current = 'avatar'; setModal('avatar'); }}>
+            <div style={s.coverContent} className="prof-cover-content">
+              <div style={s.avatarWrap} className="prof-avatar-wrap">
+                <div style={s.avatarInner} className="prof-avatar-inner" onClick={(e) => { e.stopPropagation(); modalRef.current = 'avatar'; setModal('avatar'); }}>
                   <img src={currentAvatar || placeholderImg} alt="" style={s.avatarImg} />
-                  <div style={s.avatarBadge}>
+                  <div style={s.avatarBadge} className="prof-avatar-badge">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" />
                     </svg>
@@ -193,14 +228,14 @@ export default function Profile() {
                 <input ref={avatarRef} type="file" accept="image/*" onChange={handleAvatarPick} style={{ display: 'none' }} />
               </div>
               <div style={s.identityInfo}>
-                <h1 style={s.name}>{user.name}</h1>
-                <div style={s.roleRow}>
-                  {user.entreprise_name && <span style={s.entreprise}>{user.entreprise_name}</span>}
-                  <span style={s.roleBadge}>{roleLabel}</span>
+                <h1 style={s.name} className="prof-name">{user.name}</h1>
+                <div style={s.roleRow} className="prof-role-row">
+                  {user.entreprise_name && <span style={s.entreprise} className="prof-entreprise">{user.entreprise_name}</span>}
+                  <span style={s.roleBadge} className="prof-role-badge">{roleLabel}</span>
                 </div>
-                <div style={s.coverMeta}>
+                <div style={s.coverMeta} className="prof-cover-meta">
                   {user.email && (
-                    <span style={s.coverMetaItem}>
+                    <span style={s.coverMetaItem} className="prof-cover-meta-item">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" />
                       </svg>
@@ -208,7 +243,7 @@ export default function Profile() {
                     </span>
                   )}
                   {user.phone && (
-                    <span style={s.coverMetaItem}>
+                    <span style={s.coverMetaItem} className="prof-cover-meta-item">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                       </svg>
@@ -220,9 +255,10 @@ export default function Profile() {
             </div>
             <input ref={bgRef} type="file" accept="image/*" onChange={handleBgPick} style={{ display: 'none' }} />
             {/* Settings dropdown */}
-            <div ref={dropdownRef} style={{ position: 'absolute', top: '16px', right: 'clamp(16px, 3vw, 28px)', zIndex: 5 }}>
+            <div ref={dropdownRef} className="prof-settings-wrap" style={{ position: 'absolute', top: '16px', right: 'clamp(16px, 3vw, 28px)', zIndex: 5 }}>
               <motion.button
                 style={s.settingsBtn}
+                className="prof-settings-btn"
                 onClick={(e) => { e.stopPropagation(); setSettingsDropdown(!settingsDropdown); }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -260,60 +296,60 @@ export default function Profile() {
         </motion.div>
 
         {/* Stats Bar */}
-        <motion.div style={s.statsBar} {...fadeUp(0.15)}>
+        <motion.div style={s.statsBar} className="prof-stats-bar" {...fadeUp(0.15)}>
           {user.city && user.country && (
-            <div style={s.statCard}>
+            <div style={s.statCard} className="prof-stat-card">
               <div style={s.statIcon}><LocationIcon /></div>
               <div>
-                <div style={s.statValue}>{user.city}, {user.country}</div>
-                <div style={s.statLabel}>Location</div>
+                <div style={s.statValue} className="prof-stat-value">{user.city}, {user.country}</div>
+                <div style={s.statLabel} className="prof-stat-label">Location</div>
               </div>
             </div>
           )}
           {memberSince && (
-            <div style={s.statCard}>
+            <div style={s.statCard} className="prof-stat-card">
               <div style={s.statIcon}><CalendarIcon /></div>
               <div>
-                <div style={s.statValue}>{memberSince}</div>
-                <div style={s.statLabel}>Member Since</div>
+                <div style={s.statValue} className="prof-stat-value">{memberSince}</div>
+                <div style={s.statLabel} className="prof-stat-label">Member Since</div>
               </div>
             </div>
           )}
           {user.business_location && (
-            <div style={s.statCard}>
+            <div style={s.statCard} className="prof-stat-card">
               <div style={s.statIcon}><BuildingIcon /></div>
               <div>
-                <div style={s.statValue}>{user.business_location}</div>
-                <div style={s.statLabel}>Business</div>
+                <div style={s.statValue} className="prof-stat-value">{user.business_location}</div>
+                <div style={s.statLabel} className="prof-stat-label">Business</div>
               </div>
             </div>
           )}
         </motion.div>
 
-        <div style={s.divider} />
+        <div style={s.divider} className="prof-divider" />
 
         {/* Content: About + Gallery */}
-        <div style={s.contentArea}>
-          <motion.div style={s.leftCol} {...fadeUp(0.2)}>
+        <div style={s.contentArea} className="prof-content-area">
+          <motion.div style={s.leftCol} className="prof-left-col" {...fadeUp(0.2)}>
             {user.business_bio && (
-              <div style={s.bioBox}>
+              <div style={s.bioBox} className="prof-bio-box">
                 <div style={s.bioLabel}>About</div>
-                <p style={s.bioText}>{user.business_bio}</p>
+                <p style={s.bioText} className="prof-bio-text">{user.business_bio}</p>
               </div>
             )}
 
           </motion.div>
 
-          <motion.div style={s.rightCol} {...fadeUp(0.25)}>
-            <div style={s.galleryHeader}>
+          <motion.div style={s.rightCol} className="prof-right-col" {...fadeUp(0.25)}>
+            <div style={s.galleryHeader} className="prof-gallery-header">
               <div style={s.galleryLine} />
-              <span style={s.galleryTitle}>Business Gallery {images.length > 0 ? `(${images.length})` : ''}</span>
+              <span style={s.galleryTitle} className="prof-gallery-title">Business Gallery {images.length > 0 ? `(${images.length})` : ''}</span>
               <div style={s.galleryLine} />
             </div>
             {images.length > 0 ? (
-              <div style={s.carousel}>
+              <div style={s.carousel} className="prof-carousel">
                 <AnimatePresence mode="wait">
-                  <motion.img key={carouselIndex} src={images[carouselIndex]} alt="" style={s.carouselImg}
+                  <motion.img key={carouselIndex} src={images[carouselIndex]} alt="" style={s.carouselImg} className="prof-carousel-img"
                     initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.25 }}
                     onClick={() => window.open(images[carouselIndex], '_blank')}
                   />
@@ -336,7 +372,7 @@ export default function Profile() {
                 )}
               </div>
             ) : (
-              <div style={s.noImages}>
+              <div style={s.noImages} className="prof-no-images">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
                 </svg>
@@ -351,7 +387,7 @@ export default function Profile() {
       <AnimatePresence>
         {settingsModal && (
           <motion.div style={s.modalOverlay} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSettingsModal(null)}>
-            <motion.div style={s.modal} initial={{ opacity: 0, scale: 0.85, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.85, y: 20 }} onClick={(e) => e.stopPropagation()}>
+            <motion.div style={s.modal} className="prof-modal" initial={{ opacity: 0, scale: 0.85, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.85, y: 20 }} onClick={(e) => e.stopPropagation()}>
               {settingsModal === 'info' && (
                 <>
                   <div style={s.modalTitleBar}>
@@ -368,21 +404,21 @@ export default function Profile() {
                     )}
                   </AnimatePresence>
                   <form onSubmit={handleInfoSubmit}>
-                    <div style={s.formGrid}>
+                    <div style={s.formGrid} className="prof-form-grid">
                       {fields.map((f) => (
                         <div key={f.key} style={s.field}>
-                          <label style={s.fieldLabel}>{f.label}</label>
+                          <label style={s.fieldLabel} className="prof-field-label">{f.label}</label>
                           {f.component === 'phone' ? (
                             <PhoneInput value={form.phone} onChange={(v) => setForm((p) => ({ ...p, phone: v }))} style={{ width: '100%' }} />
                           ) : (
-                            <input type={f.type || 'text'} value={form[f.key]} onChange={(e) => setForm((p) => ({ ...p, [f.key]: e.target.value }))} placeholder={f.placeholder} autoComplete={f.autoComplete} style={s.input} />
+                            <input type={f.type || 'text'} value={form[f.key]} onChange={(e) => setForm((p) => ({ ...p, [f.key]: e.target.value }))} placeholder={f.placeholder} autoComplete={f.autoComplete} style={s.input} className="prof-input" />
                           )}
                         </div>
                       ))}
                       <div style={s.field}>
-                        <label style={s.fieldLabel}>Country</label>
+                        <label style={s.fieldLabel} className="prof-field-label">Country</label>
                         <div style={s.selectWrap}>
-                          <select style={s.select} value={form.country} onChange={(e) => setForm((p) => ({ ...p, country: e.target.value, city: '' }))}>
+                          <select style={s.select} className="prof-select" value={form.country} onChange={(e) => setForm((p) => ({ ...p, country: e.target.value, city: '' }))}>
                             <option value="">{countryList.length ? 'Select your country' : 'Loading...'}</option>
                             {countryList.map((c) => <option key={c} value={c}>{c}</option>)}
                           </select>
@@ -390,9 +426,9 @@ export default function Profile() {
                         </div>
                       </div>
                       <div style={s.field}>
-                        <label style={s.fieldLabel}>City</label>
+                        <label style={s.fieldLabel} className="prof-field-label">City</label>
                         <div style={s.selectWrap}>
-                          <select style={{ ...s.select, opacity: !form.country || loadingCities ? 0.5 : 1, cursor: !form.country || loadingCities ? 'not-allowed' : 'pointer' }} value={form.city} onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))} disabled={!form.country || loadingCities}>
+                          <select style={{ ...s.select, opacity: !form.country || loadingCities ? 0.5 : 1, cursor: !form.country || loadingCities ? 'not-allowed' : 'pointer' }} className="prof-select" value={form.city} onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))} disabled={!form.country || loadingCities}>
                             <option value="">{loadingCities ? 'Loading cities...' : form.country ? `Select city (${cityList.length})` : 'Select a country first'}</option>
                             {cityList.map((city) => <option key={city} value={city}>{city}</option>)}
                           </select>
@@ -424,12 +460,12 @@ export default function Profile() {
                   <form onSubmit={handlePassSubmit}>
                     <div style={s.formGrid}>
                       <div style={s.field}>
-                        <label style={s.fieldLabel}>New Password</label>
-                        <input type="password" autoComplete="new-password" value={form.password} onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))} placeholder="Enter new password" style={s.input} />
+                        <label style={s.fieldLabel} className="prof-field-label">New Password</label>
+                        <input type="password" autoComplete="new-password" value={form.password} onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))} placeholder="Enter new password" style={s.input} className="prof-input" />
                       </div>
                       <div style={s.field}>
-                        <label style={s.fieldLabel}>Confirm Password</label>
-                        <input type="password" autoComplete="new-password" value={form.password_confirmation} onChange={(e) => setForm((p) => ({ ...p, password_confirmation: e.target.value }))} placeholder="Confirm new password" style={s.input} />
+                        <label style={s.fieldLabel} className="prof-field-label">Confirm Password</label>
+                        <input type="password" autoComplete="new-password" value={form.password_confirmation} onChange={(e) => setForm((p) => ({ ...p, password_confirmation: e.target.value }))} placeholder="Confirm new password" style={s.input} className="prof-input" />
                       </div>
                     </div>
                     <motion.button type="submit" disabled={savingPass} style={s.btn(savingPass)} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
@@ -461,7 +497,7 @@ export default function Profile() {
       <AnimatePresence>
         {modal && (
           <motion.div style={s.modalOverlay} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setModal(null)}>
-            <motion.div style={{ ...s.modal, maxWidth: '420px' }} initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.85 }} onClick={(e) => e.stopPropagation()}>
+            <motion.div style={{ ...s.modal, maxWidth: '420px' }} className="prof-modal" initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.85 }} onClick={(e) => e.stopPropagation()}>
               <div style={s.modalTitle}>{modal === 'avatar' ? 'Profile Picture' : 'Cover Photo'}</div>
               <div style={s.modalPreviewWrap}>
                 <img src={modal === 'avatar' ? currentAvatar : currentBg} alt="" style={s.modalPreview} />
