@@ -152,14 +152,14 @@ export default function Navbar() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
     >
-      <style>{`.search-btn:hover { opacity: 1 !important; color: #b8894a !important; } .search-btn:active { transform: scale(0.92) !important; } .nav-mobile-icon:hover { opacity: 0.7 !important; } @media (min-width: 901px) { .nav-mobile-icons { display: none !important; } } @media (max-width: 900px) { .nav-mobile-icons { display: flex !important; } }`}</style>
+      <style>{`.search-btn:hover { opacity: 1 !important; color: #b8894a !important; } .search-btn:active { transform: scale(0.92) !important; } .nav-mobile-icon:hover { opacity: 0.7 !important; } @media (min-width: 901px) { .nav-mobile-icons { display: none !important; } .nav-left { gap: clamp(8px, 1.5vw, 16px) !important; margin-right: 0 !important; } .logo-text { font-size: clamp(20px, 4vw, 26px) !important; } } @media (max-width: 900px) { .nav-mobile-icons { display: flex !important; } }`}</style>
 
-      <div style={styles.navLeft}>
+      <div style={styles.navLeft} className="nav-left">
         <button className={`hamburger${menuOpen ? ' open' : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
           <span></span><span></span><span></span>
         </button>
         <Link to="/" style={styles.logo}>
-          <span style={styles.logoText}>PRO CNC MAROC</span>
+          <span style={styles.logoText} className="logo-text">PRO CNC MAROC</span>
         </Link>
       </div>
 
