@@ -366,7 +366,7 @@ const styles = {
     flexShrink: 0,
   },
   logoText: {
-    fontSize: 'clamp(14px, 3vw, 24px)',
+    fontSize: 'clamp(20px, 4vw, 26px)',
     fontWeight: '800',
     letterSpacing: '2px',
     color: '#a37a39',
