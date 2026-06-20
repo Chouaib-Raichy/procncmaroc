@@ -14,14 +14,13 @@ export default function AboutUs() {
   const [orders] = useState(() => rand(20, 50));
   const [completed] = useState(() => rand(2, 5));
   return (
-    <div style={styles.page}>
+    <div style={styles.page} className="about-page">
       <SEO title="About Us" description="Discover PRO CNC MAROC, your expert in CNC machines and precision machining in Morocco. Our team supports you in your industrial and craft projects." canonicalUrl="/about-us" />
-      <style>{`@media (max-width: 768px) { .about-container { padding: 20px 12px !important; min-height: auto !important; } .about-img-wrap { min-width: 0 !important; width: 100% !important; } .about-content { min-width: 0 !important; width: 100% !important; } }`}</style>
+      <style>{`@media (max-width: 768px) { .about-page { overflow-x: hidden !important; } }`}</style>
       <div style={styles.overlay}>
-        <section style={styles.container} className="about-container">
+        <section style={styles.container}>
             <motion.div
               style={styles.imageContainer}
-              className="about-img-wrap"
             initial={{ opacity: 0, x: -60 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, ease: 'easeOut' }}
@@ -29,7 +28,7 @@ export default function AboutUs() {
             <img src={about} alt="About" style={styles.image} />
           </motion.div>
 
-          <div style={styles.content} className="about-content">
+          <div style={styles.content}>
             <motion.h1
               style={styles.title}
               initial={{ opacity: 0, y: 40 }}
