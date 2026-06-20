@@ -366,7 +366,7 @@ const styles = {
     flexShrink: 0,
   },
   logoText: {
-    fontSize: 'clamp(16px, 3.5vw, 24px)',
+    fontSize: 'clamp(19px, 4vw, 26px)',
     fontWeight: '800',
     letterSpacing: '2px',
     color: '#a37a39',
@@ -375,7 +375,7 @@ const styles = {
   navLeft: {
     display: 'flex',
     alignItems: 'center',
-    gap: 'clamp(8px, 1.5vw, 16px)',
+    gap: 0,
   },
   mobileIcons: {
     display: 'none',
