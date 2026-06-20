@@ -65,6 +65,7 @@ export default function Home() {
       <SEO title="Home" description="PRO CNC MAROC — Your partner in CNC machines, precision machining, laser cutting, and engraving in Morocco. Professional solutions for industry and crafts." canonicalUrl="/" />
       <style>{`
         @media (max-width: 768px) {
+          .hero-content { left: 10% !important; }
           .hero-title { font-size: 10px !important; margin-bottom: 16px !important; }
           .hero-tag { font-size: 8px !important; margin-bottom: 12px !important; }
           .hero-desc { font-size: 8px !important; display: block !important; }
@@ -87,7 +88,7 @@ export default function Home() {
         transition={{ duration: 0.8 }}
       >
         <img src={heroBg} alt="" style={styles.heroImg} />
-        <div style={styles.heroContent}>
+        <div className="hero-content" style={styles.heroContent}>
             <motion.h1 className="hero-title" style={styles.heroTitle}
               initial={{ opacity: 0, x: -60 }}
               animate={{ opacity: 1, x: 0 }}
