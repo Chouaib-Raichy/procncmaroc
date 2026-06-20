@@ -75,10 +75,12 @@ export default function Home() {
           .hero-subtitle { margin: 0 !important; }
           .overlay-cards { top: 0 !important; bottom: 0 !important; transform: none !important; justify-content: center !important; align-items: stretch !important; flex-wrap: nowrap !important; gap: 36px !important; }
           .home-card { width: clamp(110px, 38vw, 220px) !important; height: 100% !important; }
+          .home-card:last-child { display: flex !important; flex-direction: column !important; }
           .home-card img { height: 78% !important; }
-          .carousel-img-wrap { height: 78% !important; display: flex !important; }
+          .carousel-img-wrap { flex: 1 1 auto !important; display: flex !important; min-height: 0 !important; }
           .carousel-img-wrap img { height: 100% !important; width: 100% !important; object-fit: cover !important; }
-          .card-body { padding: 6px 4px 2px !important; flex: 1 !important; }
+          .card-body { padding: 6px 4px 2px !important; }
+          .home-card:last-child .card-body { flex: 0 0 auto !important; }
           .card-title { font-size: 7px !important; margin-bottom: 2px !important; }
           .card-text { font-size: 5.5px !important; margin-bottom: 2px !important; -webkit-line-clamp: 2 !important; }
           .card-location { font-size: 7px !important; margin-bottom: 2px !important; }
@@ -153,7 +155,7 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
             >
               <div style={styles.carouselImgWrap} className="carousel-img-wrap">
-                <picture style={{ display: 'block', width: '100%' }}>
+                <picture style={{ display: 'block', width: '100%', height: '100%' }}>
                   <source media="(max-width: 768px)" srcSet={activeCat.mobileImage} />
                   <img
                     src={activeCat.image}
