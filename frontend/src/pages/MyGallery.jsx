@@ -221,6 +221,7 @@ export default function MyGallery() {
   const [showLikesPopover, setShowLikesPopover] = useState(null);
   const [likesUsers, setLikesUsers] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     api.get('/gallery/my')
@@ -259,6 +260,7 @@ export default function MyGallery() {
       setForm({ title: '', description: '', business_location: user?.business_location || '', contact_phone: user?.phone || '' });
       setFiles([]);
       setPreviews([]);
+      setShowModal(false);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create post');
     } finally {
@@ -306,6 +308,7 @@ export default function MyGallery() {
   return (
     <>
       <SEO title="My Gallery" description="Manage your photo gallery on PRO CNC MAROC — upload, organize, and share your CNC projects." canonicalUrl="/my-gallery" />
+      <style>{`@media (max-width: 480px) { .my-gallery-header-bar { flex-wrap: wrap !important; gap: 12px !important; } }`}</style>
       <div style={styles.page}>
       <div style={styles.overlay}>
         <div style={styles.container}>
@@ -321,56 +324,23 @@ export default function MyGallery() {
           </motion.div>
 
           <div className="my-gallery-layout" style={styles.layout}>
-            <motion.div style={styles.formCard}
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <div style={styles.formHeader}>
-                <ImageIcon />
-                Add New Post
+            <div style={styles.headerBar} className="my-gallery-header-bar">
+              <div>
+                <h2 style={styles.headerBarTitle}>Your Posts</h2>
+                <p style={styles.headerBarSub}>{posts.length} {posts.length === 1 ? 'post' : 'posts'}</p>
               </div>
-              {error && <p style={styles.error}>{error}</p>}
-              <form onSubmit={handleSubmit}>
-                <div style={styles.formRow}>
-                  <div style={styles.formField}>
-                    <label style={styles.fieldLabel}>Title</label>
-                    <input style={styles.input} placeholder="Post title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
-                  </div>
-                  <div style={styles.formField}>
-                    <label style={styles.fieldLabel}>Business Location</label>
-                    <input style={styles.input} placeholder="Google Maps link or address" value={form.business_location} onChange={(e) => setForm({ ...form, business_location: e.target.value })} required />
-                  </div>
-                </div>
-                <div style={styles.formField}>
-                  <label style={styles.fieldLabel}>Description</label>
-                  <textarea style={{ ...styles.input, minHeight: '80px', resize: 'vertical' }} placeholder="Describe your work..." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
-                </div>
-                <div style={styles.formField}>
-                  <label style={styles.fieldLabel}>Contact Phone</label>
-                  <PhoneInput value={form.contact_phone} onChange={(v) => setForm({ ...form, contact_phone: v })} style={{ width: '100%' }} />
-                </div>
-                <div style={styles.fileArea}>
-                  <label style={styles.fileLabel}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
-                    </svg>
-                    {files.length > 0 ? `${files.length} image(s) selected` : 'Choose Images (1-5)'}
-                    <input type="file" accept="image/*" multiple onChange={handleFiles} style={{ display: 'none' }} />
-                  </label>
-                </div>
-                {previews.length > 0 && (
-                  <div style={styles.previews}>
-                    {previews.map((p, i) => (
-                      <img key={i} src={p} style={styles.previewImg} alt="preview" />
-                    ))}
-                  </div>
-                )}
-                <motion.button type="submit" style={{ ...styles.btn, opacity: submitting ? 0.6 : 1 }} disabled={submitting} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}>
-                  {submitting ? 'Posting...' : 'Post to Gallery'}
-                </motion.button>
-              </form>
-            </motion.div>
+              <motion.button
+                style={styles.newPostBtn}
+                onClick={() => { setShowModal(true); setError(''); }}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                New Post
+              </motion.button>
+            </div>
 
             <div style={styles.postsSection}>
               {loading ? (
@@ -530,6 +500,86 @@ export default function MyGallery() {
         title="Delete this post?"
         message="This action cannot be undone. The post and all its comments will be permanently removed."
       />
+
+      <AnimatePresence>
+        {showModal && (
+          <motion.div
+            style={styles.modalOverlay}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={(e) => { if (e.target === e.currentTarget) { setShowModal(false); setError(''); } }}
+          >
+            <motion.div
+              style={styles.modal}
+              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 20 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+            >
+              <div style={styles.modalHeader}>
+                <div style={styles.modalHeaderLeft}>
+                  <ImageIcon />
+                  <span>Add New Post</span>
+                </div>
+                <button style={styles.modalClose} onClick={() => { setShowModal(false); setError(''); }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+              {error && <p style={styles.error}>{error}</p>}
+              <form onSubmit={handleSubmit}>
+                <div style={styles.modalBody}>
+                  <div style={styles.formField}>
+                    <label style={styles.fieldLabel}>Title</label>
+                    <input style={styles.input} placeholder="Post title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+                  </div>
+                  <div style={styles.formField}>
+                    <label style={styles.fieldLabel}>Description</label>
+                    <textarea style={{ ...styles.input, minHeight: '80px', resize: 'vertical' }} placeholder="Describe your work..." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
+                  </div>
+                  <div style={styles.formRow}>
+                    <div style={styles.formField}>
+                      <label style={styles.fieldLabel}>Business Location</label>
+                      <input style={styles.input} placeholder="Google Maps link or address" value={form.business_location} onChange={(e) => setForm({ ...form, business_location: e.target.value })} required />
+                    </div>
+                    <div style={styles.formField}>
+                      <label style={styles.fieldLabel}>Contact Phone</label>
+                      <PhoneInput value={form.contact_phone} onChange={(v) => setForm({ ...form, contact_phone: v })} style={{ width: '100%' }} />
+                    </div>
+                  </div>
+                  <div style={styles.fileArea}>
+                    <label style={styles.fileLabel}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
+                      </svg>
+                      {files.length > 0 ? `${files.length} image(s) selected` : 'Choose Images (1-5)'}
+                      <input type="file" accept="image/*" multiple onChange={handleFiles} style={{ display: 'none' }} />
+                    </label>
+                  </div>
+                  {previews.length > 0 && (
+                    <div style={styles.previews}>
+                      {previews.map((p, i) => (
+                        <img key={i} src={p} style={styles.previewImg} alt="preview" />
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <motion.button
+                  type="submit"
+                  style={{ ...styles.btn, opacity: submitting ? 0.6 : 1, borderRadius: 0 }}
+                  disabled={submitting}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {submitting ? 'Posting...' : 'Post to Gallery'}
+                </motion.button>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
     </>
   );
@@ -547,11 +597,43 @@ const styles = {
   subtitle: { color: '#888', fontSize: '14px', margin: '0 0 16px', maxWidth: '500px', marginLeft: 'auto', marginRight: 'auto' },
   titleDivider: { width: '60px', height: '2px', background: 'linear-gradient(90deg, transparent, #d4af37, transparent)', margin: '0 auto' },
 
-  layout: { display: 'grid', gridTemplateColumns: '380px 1fr', gap: 'clamp(20px, 3vw, 36px)', alignItems: 'start' },
+  layout: { display: 'flex', flexDirection: 'column', gap: 'clamp(20px, 3vw, 28px)' },
 
-  formCard: { background: '#0a0a0a', border: '1px solid #1e1e1e', borderRadius: '16px', padding: 'clamp(20px, 2.5vw, 28px)' },
-  formHeader: { display: 'flex', alignItems: 'center', gap: '8px', color: '#d4af37', fontSize: '15px', fontWeight: '700', marginBottom: '20px', textTransform: 'uppercase', letterSpacing: '0.3px' },
-  formRow: { display: 'flex', flexDirection: 'column', gap: '14px' },
+  headerBar: {
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    background: '#0a0a0a', border: '1px solid #1e1e1e', borderRadius: '16px',
+    padding: 'clamp(14px, 2vw, 20px) clamp(18px, 2.5vw, 24px)',
+  },
+  headerBarTitle: { color: '#d4af37', fontSize: 'clamp(16px, 2vw, 20px)', fontWeight: '700', margin: 0 },
+  headerBarSub: { color: '#666', fontSize: '13px', margin: '2px 0 0' },
+  newPostBtn: {
+    display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 22px',
+    background: 'linear-gradient(135deg, #a37a39, #d4af37)', color: '#000',
+    border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700',
+    cursor: 'pointer', whiteSpace: 'nowrap',
+  },
+
+  modalOverlay: {
+    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px',
+  },
+  modal: {
+    background: '#0d0d0d', border: '1px solid #2a2a2a', borderRadius: '16px',
+    width: '100%', maxWidth: '560px', maxHeight: '90vh', overflowY: 'auto',
+    boxShadow: '0 24px 60px rgba(0,0,0,0.7)',
+  },
+  modalHeader: {
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    padding: '18px 22px', borderBottom: '1px solid #1e1e1e',
+  },
+  modalHeaderLeft: { display: 'flex', alignItems: 'center', gap: '8px', color: '#d4af37', fontSize: '15px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.3px' },
+  modalClose: {
+    background: 'transparent', border: 'none', color: '#888', cursor: 'pointer',
+    width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    borderRadius: '8px', transition: 'background 0.2s',
+  },
+  modalBody: { padding: '20px 22px' },
+  formRow: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' },
   formField: { marginBottom: '0' },
   fieldLabel: { color: '#d4af37', fontSize: '12px', fontWeight: '600', display: 'block', marginBottom: '5px', textTransform: 'uppercase', letterSpacing: '0.3px' },
   input: {
