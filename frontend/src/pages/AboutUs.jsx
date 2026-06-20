@@ -16,10 +16,12 @@ export default function AboutUs() {
   return (
     <div style={styles.page}>
       <SEO title="About Us" description="Discover PRO CNC MAROC, your expert in CNC machines and precision machining in Morocco. Our team supports you in your industrial and craft projects." canonicalUrl="/about-us" />
+      <style>{`@media (max-width: 768px) { .about-container { padding: 20px 12px !important; min-height: auto !important; } .about-img-wrap { min-width: 0 !important; width: 100% !important; } .about-content { min-width: 0 !important; width: 100% !important; } }`}</style>
       <div style={styles.overlay}>
-        <section style={styles.container}>
-          <motion.div
-            style={styles.imageContainer}
+        <section style={styles.container} className="about-container">
+            <motion.div
+              style={styles.imageContainer}
+              className="about-img-wrap"
             initial={{ opacity: 0, x: -60 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, ease: 'easeOut' }}
@@ -27,7 +29,7 @@ export default function AboutUs() {
             <img src={about} alt="About" style={styles.image} />
           </motion.div>
 
-          <div style={styles.content}>
+          <div style={styles.content} className="about-content">
             <motion.h1
               style={styles.title}
               initial={{ opacity: 0, y: 40 }}
