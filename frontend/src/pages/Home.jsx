@@ -69,8 +69,8 @@ export default function Home() {
       <style>{`
         @media (max-width: 768px) {
           .hero-content { left: 5% !important; top: 9px !important; }
-          .hero-title { font-size: 10px !important; margin-bottom: 10px !important; }
-          .hero-tag { font-size: 8px !important; margin-bottom: 6px !important; }
+          .hero-title { font-size: 10px !important; margin-bottom: 14px !important; }
+          .hero-tag { font-size: 8px !important; margin-bottom: 10px !important; }
           .hero-desc { font-size: 8px !important; display: block !important; }
           .hero-subtitle { margin: 0 !important; }
           .overlay-cards { top: 0 !important; bottom: 0 !important; transform: none !important; justify-content: center !important; align-items: stretch !important; flex-wrap: nowrap !important; gap: 36px !important; }
