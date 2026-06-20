@@ -8,6 +8,9 @@ import bgWhyChooseUs from '../assets/bg_whychooseus.png';
 import fibreImg from '../assets/1.png';
 import laserImg from '../assets/2.png';
 import cncImg from '../assets/3.png';
+import mobile1Img from '../assets/mobile1.png';
+import mobile2Img from '../assets/mobile2.png';
+import mobile3Img from '../assets/mobile3.png';
 import showcase1 from '../assets/showcase1.mp4';
 import showcase2 from '../assets/showcase2.mp4';
 import showcase3 from '../assets/showcase3.mp4';
@@ -29,9 +32,9 @@ export default function Home() {
   const [catIndex, setCatIndex] = useState(0);
 
   const catCards = [
-    { image: fibreImg, title: 'FIBRE MARKING +', description: 'Durable & fast marking (titanium, acrylic, aluminum, gold, silver, brass...)' },
-    { image: laserImg, title: 'LASER CO2 +', description: 'Engraving & fine cutting (acrylic, wood, leather, paper, plastic...)' },
-    { image: cncImg, title: 'CNC ROUTER +', description: 'Precision & power (aluminum, acrylic, wood, pvc, aluminum composite, nylon...)' },
+    { image: fibreImg, mobileImage: mobile1Img, title: 'FIBRE MARKING +', description: 'Durable & fast marking (titanium, acrylic, aluminum, gold, silver, brass...)' },
+    { image: laserImg, mobileImage: mobile2Img, title: 'LASER CO2 +', description: 'Engraving & fine cutting (acrylic, wood, leather, paper, plastic...)' },
+    { image: cncImg, mobileImage: mobile3Img, title: 'CNC ROUTER +', description: 'Precision & power (aluminum, acrylic, wood, pvc, aluminum composite, nylon...)' },
   ];
 
   useEffect(() => {
@@ -150,11 +153,14 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
             >
               <div style={styles.carouselImgWrap} className="carousel-img-wrap">
-                <img
-                  src={activeCat.image}
-                  alt={activeCat.title}
-                  style={styles.carouselImg}
-                />
+                <picture style={{ display: 'block', width: '100%' }}>
+                  <source media="(max-width: 768px)" srcSet={activeCat.mobileImage} />
+                  <img
+                    src={activeCat.image}
+                    alt={activeCat.title}
+                    style={styles.carouselImg}
+                  />
+                </picture>
               </div>
               <div className="card-body" style={styles.cardBody}>
                 <h3 className="card-title" style={{ ...styles.cardTitle, cursor: 'pointer' }} onClick={() => setCatIndex((p) => (p + 1) % catCards.length)}>{activeCat.title}</h3>
