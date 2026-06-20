@@ -69,7 +69,7 @@ export default function Home() {
       <style>{`
         @media (max-width: 768px) {
           .hero-content { left: 5% !important; margin-top: -1px !important; }
-          .hero-title { font-size: 10px !important; margin-top: 0 !important; padding-top: 0 !important; margin-bottom: 10px !important; }
+          .hero-title { font-size: 10px !important; margin-bottom: 10px !important; }
           .hero-tag { font-size: 8px !important; margin-bottom: 6px !important; }
           .hero-desc { font-size: 8px !important; display: block !important; }
           .hero-subtitle { margin: 0 !important; }
