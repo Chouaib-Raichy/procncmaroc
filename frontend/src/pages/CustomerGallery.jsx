@@ -336,6 +336,7 @@ export default function CustomerGallery() {
   return (
     <div style={styles.page}>
       <SEO title="Stories" description="Discover our customers' achievements: CNC machining, laser cutting, engraving, and 3D printing projects in Morocco." canonicalUrl="/customer-gallery" />
+      <style>{`@media (min-width: 901px) { .story-card { display: flex !important; flex-direction: column !important; } .story-card-body { flex: 1 0 auto !important; } .story-action-bar { margin-top: auto !important; } }`}</style>
       <div style={styles.overlay}>
         <section style={styles.container}>
           <motion.div
@@ -385,6 +386,7 @@ export default function CustomerGallery() {
                   variants={cardVariants}
                   whileHover={{ y: -6, boxShadow: '0 16px 40px rgba(0,0,0,0.5)', borderColor: 'rgba(163,122,57,0.4)' }}
                   style={styles.card}
+                  className="story-card"
                   layout
                 >
                   <motion.div
@@ -401,7 +403,7 @@ export default function CustomerGallery() {
 
                   <ImageCarousel images={post.images_url} title={post.title} onImageClick={(url) => setFullImg(url)} />
 
-                  <div style={styles.cardBody}>
+                  <div style={styles.cardBody} className="story-card-body">
                     <div style={styles.cardHeader}>
                       <h3 style={styles.cardTitle}>{post.title}</h3>
                       {post.business_location && (() => {
@@ -441,7 +443,7 @@ export default function CustomerGallery() {
                     </div>
                   </div>
 
-                  <div style={styles.actionBar}>
+                  <div style={styles.actionBar} className="story-action-bar">
                     <div style={styles.actionBarLeft}>
                       <motion.button
                         style={{ ...styles.actionBtn, color: likes[post.id]?.liked ? '#e74c3c' : '#ccc' }}
