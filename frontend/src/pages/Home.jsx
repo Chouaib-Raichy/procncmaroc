@@ -346,7 +346,7 @@ const styles = {
     maxWidth: 'clamp(200px, 40%, 600px)',
   },
   heroTitle: {
-    fontSize: 'clamp(14px, 1.8vw, 22px)',
+    fontSize: 'clamp(18px, 1.8vw, 22px)',
     fontWeight: '900',
     color: '#d4af37',
     textShadow: '2px 2px 10px rgba(0,0,0,0.8)',
@@ -356,7 +356,7 @@ const styles = {
   heroSubtitle: { margin: 0 },
   heroTag: {
     display: 'block',
-    fontSize: 'clamp(11px, 1.2vw, 18px)',
+    fontSize: 'clamp(15px, 1.2vw, 18px)',
     fontWeight: '700',
     textShadow: '2px 2px 8px rgba(0,0,0,0.8)',
     marginBottom: 'clamp(8px, 1.5vw, 32px)',
@@ -364,7 +364,7 @@ const styles = {
   },
   heroDesc: {
     display: 'block',
-    fontSize: 'clamp(10px, 1.1vw, 16px)',
+    fontSize: 'clamp(15px, 1.5vw, 18px)',
     fontWeight: '700',
     textShadow: '2px 2px 8px rgba(0,0,0,0.8)',
     marginTop: 0,
