@@ -366,7 +366,7 @@ const styles = {
     flexShrink: 0,
   },
   logoText: {
-    fontSize: 'clamp(20px, 4vw, 26px)',
+    fontSize: 'clamp(16px, 3.5vw, 24px)',
     fontWeight: '800',
     letterSpacing: '2px',
     color: '#a37a39',
@@ -381,6 +381,7 @@ const styles = {
     display: 'none',
     alignItems: 'center',
     gap: 'clamp(6px, 1.2vw, 12px)',
+    marginLeft: 'auto',
   },
   mobileIcon: {
     background: 'transparent',
