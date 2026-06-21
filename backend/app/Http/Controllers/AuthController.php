@@ -20,8 +20,8 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'entreprise_name' => 'nullable|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'phone' => 'required|string|max:20|unique:users',
+            'email' => 'required|string|email|max:255|unique:users,email,NULL,id,deleted_at,NULL',
+            'phone' => 'required|string|max:20|unique:users,phone,NULL,id,deleted_at,NULL',
             'business_location' => 'required|string|max:255',
             'city' => 'required|string|max:100',
             'country' => 'required|string|max:100',
