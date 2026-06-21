@@ -57,14 +57,15 @@ export default function PublicProfile() {
   const [error, setError] = useState(null);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [lightboxImg, setLightboxImg] = useState(null);
+  const [bioModal, setBioModal] = useState(false);
   const [siteSettings, setSiteSettings] = useState({ show_whatsapp: '1', show_maps: '1', show_email: '1' });
 
   useEffect(() => {
-    if (!lightboxImg) return;
-    const handler = (e) => { if (e.key === 'Escape') setLightboxImg(null); };
+    if (!lightboxImg && !bioModal) return;
+    const handler = (e) => { if (e.key === 'Escape') { setLightboxImg(null); setBioModal(false); } };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [lightboxImg]);
+  }, [lightboxImg, bioModal]);
 
   useEffect(() => { getSettings().then((r) => setSiteSettings(r.data)).catch(() => {}); }, []);
 
@@ -128,6 +129,37 @@ export default function PublicProfile() {
 
   return (
     <div style={styles.wrapper}>
+      <style>{`
+        .prof-carousel:hover .prof-carousel-btn { opacity: 1; }
+        .prof-bio-text { display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
+        .prof-stat-card { transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s; }
+        .prof-stat-card:hover { transform: translateY(-2px); border-color: rgba(163,122,57,0.3) !important; box-shadow: 0 8px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(163,122,57,0.08); }
+        .prof-stat-card:hover .prof-stat-icon { background: rgba(163,122,57,0.2) !important; }
+        .prof-contact-btn { position: relative; overflow: hidden; }
+        .prof-contact-btn::before { content: ''; position: absolute; inset: 0; border-radius: 7px; opacity: 0; transition: opacity 0.3s; background: currentColor; }
+        .prof-contact-btn:hover::before { opacity: 0.1; }
+        .prof-contact-btn:hover { background: rgba(255,255,255,0.05) !important; transform: translateY(-1px); }
+        .prof-contact-btn { transition: transform 0.2s; }
+        @keyframes prof-avatar-glow { 0%, 100% { box-shadow: 0 0 0 3px rgba(163,122,57,0.2), 0 8px 32px rgba(0,0,0,0.6), 0 0 20px rgba(163,122,57,0.1); } 50% { box-shadow: 0 0 0 3px rgba(163,122,57,0.3), 0 8px 32px rgba(0,0,0,0.6), 0 0 35px rgba(163,122,57,0.2); } }
+        .prof-avatar-wrap { animation: prof-avatar-glow 3s ease-in-out infinite; }
+        .prof-thumb { transition: all 0.2s; cursor: pointer; border: 2px solid transparent; border-radius: 6px; opacity: 0.6; }
+        .prof-thumb:hover { border-color: rgba(163,122,57,0.5); opacity: 0.9; transform: translateY(-2px); }
+        .prof-thumb.active { border-color: #d4af37; opacity: 1; }
+        .prof-lightbox-nav { transition: all 0.25s; opacity: 0; }
+        .prof-lightbox-show:hover .prof-lightbox-nav { opacity: 1; }
+        .prof-bio-more:hover { opacity: 1 !important; }
+        .prof-bio-modal-close:hover { background: rgba(255,255,255,0.1) !important; color: #fff !important; }
+        .prof-bio-modal-content::-webkit-scrollbar { width: 4px; }
+        .prof-bio-modal-content::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 4px; }
+        .prof-bio-modal-content::-webkit-scrollbar-thumb { background: rgba(163,122,57,0.4); border-radius: 4px; }
+        .prof-name { background: linear-gradient(135deg, #d4af37 0%, #f0d68a 50%, #d4af37 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .prof-thumbs::-webkit-scrollbar { height: 3px; }
+        .prof-thumbs::-webkit-scrollbar-track { background: transparent; }
+        .prof-thumbs::-webkit-scrollbar-thumb { background: rgba(163,122,57,0.3); border-radius: 3px; }
+        @media (max-width: 768px) {
+          .prof-content-area { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
       <SEO title={u.name + ' | PRO CNC MAROC'} description={u.business_bio || ('Profile of ' + u.name)} canonicalUrl={'/profile/' + id} />
       <motion.div style={styles.card} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
 
@@ -139,6 +171,7 @@ export default function PublicProfile() {
         {/* Avatar + Identity */}
         <div style={styles.identityWrap}>
           <motion.div
+            className="prof-avatar-wrap"
             style={{ ...styles.avatarWrap, cursor: u.avatar_url ? 'pointer' : 'default' }}
             initial={{ scale: 0 }} animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 200, delay: 0.15 }}
@@ -147,7 +180,7 @@ export default function PublicProfile() {
             <img src={u.avatar_url || placeholderImg} alt={u.name} style={styles.avatarImg} />
           </motion.div>
           <div style={styles.identityInfo}>
-            <motion.h1 style={styles.name} {...fadeUp(0.2)}>{u.name}</motion.h1>
+            <motion.h1 className="prof-name" style={styles.name} {...fadeUp(0.2)}>{u.name}</motion.h1>
             <motion.div style={styles.roleRow} {...fadeUp(0.25)}>
               {u.entreprise_name && <span style={styles.entreprise}>{u.entreprise_name}</span>}
               <span style={styles.roleBadge}>{roleLabel}</span>
@@ -159,8 +192,8 @@ export default function PublicProfile() {
         {/* Stats Bar */}
         <motion.div style={styles.statsBar} {...fadeUp(0.35)}>
           {u.city && u.country && (
-            <div style={styles.statCard}>
-              <div style={styles.statIcon}><LocationIcon /></div>
+              <div className="prof-stat-card" style={styles.statCard}>
+              <div className="prof-stat-icon" style={styles.statIcon}><LocationIcon /></div>
               <div>
                 <div style={styles.statValue}>{u.city}, {u.country}</div>
                 <div style={styles.statLabel}>Location</div>
@@ -168,8 +201,8 @@ export default function PublicProfile() {
             </div>
           )}
           {memberSince && (
-            <div style={styles.statCard}>
-              <div style={styles.statIcon}><CalendarIcon /></div>
+              <div className="prof-stat-card" style={styles.statCard}>
+              <div className="prof-stat-icon" style={styles.statIcon}><CalendarIcon /></div>
               <div>
                 <div style={styles.statValue}>{memberSince}</div>
                 <div style={styles.statLabel}>Member Since</div>
@@ -177,16 +210,16 @@ export default function PublicProfile() {
             </div>
           )}
           {u.entreprise_name && (
-            <div style={styles.statCard}>
-              <div style={styles.statIcon}><BuildingIcon /></div>
+              <div className="prof-stat-card" style={styles.statCard}>
+              <div className="prof-stat-icon" style={styles.statIcon}><BuildingIcon /></div>
               <div>
                 <div style={styles.statValue}>{u.entreprise_name}</div>
                 <div style={styles.statLabel}>Company</div>
               </div>
             </div>
           )}
-          <div style={styles.statCard}>
-            <div style={styles.statIcon}>
+          <div className="prof-stat-card" style={styles.statCard}>
+            <div className="prof-stat-icon" style={styles.statIcon}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             </div>
             <div>
@@ -199,30 +232,34 @@ export default function PublicProfile() {
         <div style={styles.divider} />
 
         {/* Content: Bio + Contact | Gallery */}
-        <div style={styles.contentArea}>
+        <div className="prof-content-area" style={styles.contentArea}>
           <motion.div style={styles.leftCol} {...fadeUp(0.4)}>
             {u.business_bio && (
               <div style={styles.bioBox}>
-                <div style={styles.bioLabel}>About</div>
-                <p style={styles.bioText}>{u.business_bio}</p>
+                <div style={styles.bioLabel}><span style={styles.bioLabelDot} />About</div>
+                <p className="prof-bio-text" style={styles.bioText}>{u.business_bio}</p>
+                <button className="prof-bio-more" style={styles.bioViewMore} onClick={() => setBioModal(true)}>
+                  View more
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
+                </button>
               </div>
             )}
 
             <div style={styles.contactSection}>
-              <div style={styles.contactLabel}>Contact</div>
+              <div style={styles.contactLabel}><span style={styles.bioLabelDot} />Contact</div>
               <div style={styles.contactButtons}>
                 {u.phone && siteSettings.show_whatsapp === '1' && (
-                  <a href={`https://wa.me/${u.phone.replace(/[^\d+]/g, '')}`} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#25D366', color: '#25D366' }}>
+                  <a className="prof-contact-btn" href={`https://wa.me/${u.phone.replace(/[^\d+]/g, '')}`} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#25D366', color: '#25D366' }}>
                     <WhatsAppIcon /> WhatsApp
                   </a>
                 )}
                 {u.business_location && siteSettings.show_maps === '1' && (
-                  <a href={mapsLink(u.business_location)} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#4285F4', color: '#4285F4' }}>
+                  <a className="prof-contact-btn" href={mapsLink(u.business_location)} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#4285F4', color: '#4285F4' }}>
                     <MapsIcon /> Google Maps
                   </a>
                 )}
                 {u.email && siteSettings.show_email === '1' && (
-                  <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(u.email)}`} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#d4af37', color: '#d4af37' }}>
+                  <a className="prof-contact-btn" href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(u.email)}`} target="_blank" rel="noopener noreferrer" style={{ ...styles.contactBtn, borderColor: '#d4af37', color: '#d4af37' }}>
                     <MailIcon /> Email
                   </a>
                 )}
@@ -237,34 +274,47 @@ export default function PublicProfile() {
               <div style={styles.galleryLine} />
             </div>
             {images.length > 0 ? (
-              <div style={styles.carousel}>
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={carouselIndex} src={images[carouselIndex]} alt=""
-                    style={styles.carouselImg}
-                    initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.25 }}
-                    onClick={() => setLightboxImg(images[carouselIndex])}
-                  />
-                </AnimatePresence>
-                <div style={styles.carouselGradientLeft} />
-                <div style={styles.carouselGradientRight} />
-                <span style={styles.carouselCounter}>{carouselIndex + 1} / {images.length}</span>
+              <>
+                <div className="prof-carousel" style={styles.carousel}>
+                  <AnimatePresence mode="wait">
+                    <motion.img
+                      key={carouselIndex} src={images[carouselIndex]} alt=""
+                      className="prof-carousel-img"
+                      style={styles.carouselImg}
+                      initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.25 }}
+                      whileHover={{ scale: 1.03 }} onClick={() => setLightboxImg(images[carouselIndex])}
+                    />
+                  </AnimatePresence>
+                  <div style={styles.carouselGradientLeft} />
+                  <div style={styles.carouselGradientRight} />
+                  <span style={styles.carouselCounter}>{carouselIndex + 1} / {images.length}</span>
+                  {images.length > 1 && (
+                    <>
+                      <button className="prof-carousel-btn" style={{ ...styles.carouselBtn, left: '8px' }} onClick={() => setCarouselIndex((p) => (p - 1 + images.length) % images.length)} aria-label="Previous">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
+                      </button>
+                      <button className="prof-carousel-btn" style={{ ...styles.carouselBtn, right: '8px' }} onClick={() => setCarouselIndex((p) => (p + 1) % images.length)} aria-label="Next">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
+                      </button>
+                      <div style={styles.dots}>
+                        {images.map((_, i) => (
+                          <button key={i} style={styles.dot(i === carouselIndex)} onClick={() => setCarouselIndex(i)} />
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
                 {images.length > 1 && (
-                  <>
-                    <button style={{ ...styles.carouselBtn, left: '8px' }} onClick={() => setCarouselIndex((p) => (p - 1 + images.length) % images.length)} aria-label="Previous">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
-                    </button>
-                    <button style={{ ...styles.carouselBtn, right: '8px' }} onClick={() => setCarouselIndex((p) => (p + 1) % images.length)} aria-label="Next">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
-                    </button>
-                    <div style={styles.dots}>
-                      {images.map((_, i) => (
-                        <button key={i} style={styles.dot(i === carouselIndex)} onClick={() => setCarouselIndex(i)} />
-                      ))}
-                    </div>
-                  </>
+                  <div className="prof-thumbs" style={styles.thumbsStrip}>
+                    {images.map((img, i) => (
+                      <img key={i} src={img} alt=""
+                        className={`prof-thumb${i === carouselIndex ? ' active' : ''}`}
+                        style={{ ...styles.thumbImg, ...(i === carouselIndex ? styles.thumbActive : {}) }}
+                        onClick={() => setCarouselIndex(i)} />
+                    ))}
+                  </div>
                 )}
-              </div>
+              </>
             ) : (
               <div style={styles.noImages}>
                 <ImageIcon />
@@ -278,12 +328,54 @@ export default function PublicProfile() {
       {/* Lightbox */}
       <AnimatePresence>
         {lightboxImg && (
-          <motion.div style={styles.lightboxOverlay} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setLightboxImg(null)}>
+          <motion.div className="prof-lightbox-show" style={styles.lightboxOverlay} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setLightboxImg(null)}>
             <button style={styles.lightboxClose} onClick={() => setLightboxImg(null)}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
-            <motion.img src={lightboxImg} alt="" style={styles.lightboxImg} onClick={(e) => e.stopPropagation()}
-              initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.85 }} transition={{ duration: 0.25 }} />
+            {images.length > 1 && (
+              <>
+                <button className="prof-lightbox-nav" style={{ ...styles.lightboxNav, left: '24px' }} onClick={(e) => { e.stopPropagation(); setCarouselIndex((p) => (p - 1 + images.length) % images.length); setLightboxImg(images[(carouselIndex - 1 + images.length) % images.length]); }} aria-label="Previous">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg>
+                </button>
+                <button className="prof-lightbox-nav" style={{ ...styles.lightboxNav, right: '24px' }} onClick={(e) => { e.stopPropagation(); setCarouselIndex((p) => (p + 1) % images.length); setLightboxImg(images[(carouselIndex + 1) % images.length]); }} aria-label="Next">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+                </button>
+              </>
+            )}
+            <AnimatePresence mode="wait">
+              <motion.img key={lightboxImg} src={lightboxImg} alt="" style={styles.lightboxImg} onClick={(e) => e.stopPropagation()}
+                initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.85 }} transition={{ duration: 0.2 }} />
+            </AnimatePresence>
+            {images.length > 1 && (
+              <div style={styles.lightboxCounter}>{carouselIndex + 1} / {images.length}</div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Bio Modal */}
+      <AnimatePresence>
+        {bioModal && (
+          <motion.div style={styles.bioModalOverlay}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setBioModal(false)}
+          >
+            <motion.div style={styles.bioModalCard}
+              initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ duration: 0.3 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={styles.bioModalHeader}>
+                <div style={styles.bioModalTitle}><span style={styles.bioLabelDot} />About</div>
+                <button className="prof-bio-modal-close" style={styles.bioModalClose} onClick={() => setBioModal(false)}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+              <div className="prof-bio-modal-content" style={styles.bioModalContent}>
+                {u.entreprise_name && <div style={styles.bioModalSub}>{u.entreprise_name}</div>}
+                <p style={styles.bioModalText}>{u.business_bio}</p>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -358,28 +450,54 @@ const styles = {
   },
 
   contentArea: {
-    display: 'flex', flexWrap: 'wrap', gap: 'clamp(20px, 3vw, 40px)',
+    display: 'grid',
+    gridTemplateColumns: '1.25fr 1fr',
+    gap: 'clamp(20px, 3vw, 40px)',
     padding: '0 clamp(20px, 5vw, 60px) clamp(28px, 4vw, 60px)',
   },
-  leftCol: { flex: '1 1 50%', minWidth: '280px', display: 'flex', flexDirection: 'column', gap: '20px' },
-  rightCol: { flex: '1 1 40%', minWidth: '280px', display: 'flex', flexDirection: 'column' },
+  leftCol: { display: 'flex', flexDirection: 'column', gap: '20px' },
+  rightCol: { display: 'flex', flexDirection: 'column' },
 
   bioBox: {
-    borderLeft: '3px solid #a37a39',
-    padding: '16px 20px',
-    background: 'rgba(0,0,0,0.3)',
-    borderRadius: '0 12px 12px 0',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+    padding: '20px',
+    background: 'rgba(255,255,255,0.015)',
+    border: '1px solid rgba(255,255,255,0.06)',
+    borderRadius: '12px',
+    borderLeft: '2px solid rgba(163,122,57,0.5)',
   },
   bioLabel: {
     color: '#d4af37', fontSize: '11px', fontWeight: 700,
-    textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px',
+    textTransform: 'uppercase', letterSpacing: '1.5px',
+    display: 'flex', alignItems: 'center', gap: '10px',
+    padding: 0, margin: 0,
   },
-  bioText: { color: '#bbb', fontSize: '14px', lineHeight: 1.8, margin: 0, whiteSpace: 'pre-wrap', overflowWrap: 'break-word', wordBreak: 'break-word' },
+  bioLabelDot: {
+    width: '6px', height: '6px', borderRadius: '50%',
+    background: '#d4af37', flexShrink: 0,
+  },
+  bioText: { color: '#bbb', fontSize: '14px', lineHeight: 1.8, margin: 0, whiteSpace: 'pre-wrap', overflowWrap: 'break-word', wordBreak: 'break-word', overflow: 'hidden' },
+  bioViewMore: {
+    display: 'flex', alignItems: 'center', gap: '6px',
+    background: 'none', border: 'none', color: '#d4af37',
+    fontSize: '12px', fontWeight: 600, cursor: 'pointer',
+    padding: '4px 0 0', alignSelf: 'flex-start',
+    transition: 'opacity 0.2s', opacity: 0.8,
+  },
 
-  contactSection: {},
+  contactSection: {
+    display: 'flex', flexDirection: 'column', gap: '12px',
+    padding: '20px', background: 'rgba(255,255,255,0.015)',
+    border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px',
+    borderLeft: '2px solid rgba(163,122,57,0.5)',
+  },
   contactLabel: {
     color: '#d4af37', fontSize: '11px', fontWeight: 700,
-    textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px',
+    textTransform: 'uppercase', letterSpacing: '1.5px',
+    display: 'flex', alignItems: 'center', gap: '10px',
+    padding: 0, margin: 0,
   },
   contactButtons: { display: 'flex', flexWrap: 'wrap', gap: '8px' },
   contactBtn: {
@@ -404,32 +522,59 @@ const styles = {
   carousel: {
     position: 'relative', borderRadius: '12px', overflow: 'hidden', background: '#0d0d0d',
     flex: 1, minHeight: '220px',
+    border: '1px solid rgba(255,255,255,0.06)',
   },
-  carouselGradientLeft: { position: 'absolute', top: 0, left: 0, width: '30px', height: '100%', background: 'linear-gradient(90deg, rgba(0,0,0,0.25), transparent)', pointerEvents: 'none', zIndex: 1 },
-  carouselGradientRight: { position: 'absolute', top: 0, right: 0, width: '30px', height: '100%', background: 'linear-gradient(270deg, rgba(0,0,0,0.25), transparent)', pointerEvents: 'none', zIndex: 1 },
-  carouselCounter: { position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.6)', color: '#d4af37', fontSize: '11px', fontWeight: 700, padding: '2px 10px', borderRadius: '12px', zIndex: 2, letterSpacing: '0.3px' },
+  carouselGradientLeft: { position: 'absolute', top: 0, left: 0, width: '50px', height: '100%', background: 'linear-gradient(90deg, rgba(0,0,0,0.5), transparent)', pointerEvents: 'none', zIndex: 1 },
+  carouselGradientRight: { position: 'absolute', top: 0, right: 0, width: '50px', height: '100%', background: 'linear-gradient(270deg, rgba(0,0,0,0.5), transparent)', pointerEvents: 'none', zIndex: 1 },
+  carouselCounter: {
+    position: 'absolute', top: '14px', right: '14px',
+    background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)',
+    color: '#d4af37', fontSize: '11px', fontWeight: 700,
+    padding: '4px 14px', borderRadius: '20px', zIndex: 2,
+    letterSpacing: '0.5px', border: '1px solid rgba(163,122,57,0.2)',
+  },
   carouselImg: {
     width: '100%', height: 'clamp(220px, 30vw, 420px)',
     objectFit: 'cover', display: 'block', cursor: 'pointer',
+    transition: 'transform 0.4s',
   },
   carouselBtn: {
     position: 'absolute', top: '50%', transform: 'translateY(-50%)',
-    background: 'rgba(0,0,0,0.55)', border: 'none',
-    color: '#fff', borderRadius: '50%', width: '32px', height: '32px',
+    background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+    border: '1px solid rgba(255,255,255,0.08)',
+    color: '#fff', borderRadius: '50%', width: '38px', height: '38px',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    cursor: 'pointer', zIndex: 2, transition: 'background 0.2s',
+    cursor: 'pointer', zIndex: 2, transition: 'all 0.25s',
+    opacity: 0.7,
   },
   dots: {
-    display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '10px',
+    position: 'absolute', bottom: '16px', left: '50%', transform: 'translateX(-50%)',
+    display: 'flex', justifyContent: 'center', gap: '8px',
+    background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
+    padding: '6px 14px', borderRadius: '20px',
+    zIndex: 2,
   },
   dot: (active) => ({
     width: '8px', height: '8px', borderRadius: '50%', border: 'none',
-    cursor: 'pointer', background: active ? '#a37a39' : '#333',
-    transition: 'background 0.2s', padding: 0,
+    cursor: 'pointer', background: active ? '#d4af37' : '#333',
+    transition: 'all 0.3s', padding: 0,
+    transform: active ? 'scale(1.3)' : 'scale(1)',
+    boxShadow: active ? '0 0 6px rgba(212,175,55,0.4)' : 'none',
   }),
+  thumbsStrip: {
+    display: 'flex', gap: '8px', marginTop: '12px',
+    overflowX: 'auto', paddingBottom: '4px',
+    scrollbarWidth: 'thin', scrollbarColor: 'rgba(163,122,57,0.3) transparent',
+  },
+  thumbImg: {
+    width: '64px', height: '48px', borderRadius: '6px', objectFit: 'cover',
+    flexShrink: 0, border: '2px solid transparent', transition: 'all 0.2s',
+  },
+  thumbActive: { borderColor: '#d4af37', opacity: 1 },
   noImages: {
     flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
     color: '#555', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', minHeight: '220px',
+    border: '1px solid rgba(255,255,255,0.06)',
   },
 
   lightboxOverlay: {
@@ -445,9 +590,66 @@ const styles = {
   },
   lightboxClose: {
     position: 'fixed', top: '20px', right: '24px',
-    background: 'rgba(255,255,255,0.08)', border: 'none',
-    color: '#fff', width: '44px', height: '44px', borderRadius: '50%',
+    background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(8px)',
+    border: '1px solid rgba(255,255,255,0.1)', color: '#fff',
+    width: '44px', height: '44px', borderRadius: '50%',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    cursor: 'pointer', zIndex: 10000,
+    cursor: 'pointer', zIndex: 10000, transition: 'all 0.2s',
+  },
+  lightboxNav: {
+    position: 'fixed', top: '50%', transform: 'translateY(-50%)',
+    background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(8px)',
+    border: '1px solid rgba(255,255,255,0.1)', color: '#fff',
+    width: '48px', height: '48px', borderRadius: '50%',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    cursor: 'pointer', zIndex: 10000, transition: 'all 0.25s',
+  },
+  lightboxCounter: {
+    position: 'fixed', bottom: '30px', left: '50%', transform: 'translateX(-50%)',
+    background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)',
+    border: '1px solid rgba(163,122,57,0.2)', color: '#d4af37',
+    fontSize: '13px', fontWeight: 700, padding: '8px 20px',
+    borderRadius: '20px', zIndex: 10000, letterSpacing: '0.5px',
+  },
+
+  bioModalOverlay: {
+    position: 'fixed', inset: 0, zIndex: 9998,
+    background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(6px)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    padding: '20px',
+  },
+  bioModalCard: {
+    width: '100%', maxWidth: '600px', maxHeight: '80vh',
+    background: 'rgba(15,15,15,0.98)', border: '1px solid rgba(163,122,57,0.3)',
+    borderRadius: '16px', overflow: 'hidden',
+    display: 'flex', flexDirection: 'column',
+    boxShadow: '0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(163,122,57,0.15)',
+  },
+  bioModalHeader: {
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    padding: '20px 24px 0',
+  },
+  bioModalTitle: {
+    color: '#d4af37', fontSize: '12px', fontWeight: 700,
+    textTransform: 'uppercase', letterSpacing: '1.5px',
+    display: 'flex', alignItems: 'center', gap: '10px',
+  },
+  bioModalClose: {
+    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)',
+    color: '#999', width: '32px', height: '32px', borderRadius: '8px',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    cursor: 'pointer', transition: 'all 0.2s',
+  },
+  bioModalContent: {
+    padding: '16px 24px 24px', overflowY: 'auto', flex: 1,
+    scrollbarWidth: 'thin', scrollbarColor: '#a37a39 rgba(255,255,255,0.03)',
+  },
+  bioModalSub: {
+    color: '#888', fontSize: '12px', fontWeight: 500, marginBottom: '12px',
+    letterSpacing: '0.3px',
+  },
+  bioModalText: {
+    color: '#ccc', fontSize: '15px', lineHeight: 1.9, margin: 0,
+    whiteSpace: 'pre-wrap', overflowWrap: 'break-word', wordBreak: 'break-word',
   },
 };
