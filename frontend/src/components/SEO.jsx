@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 
 const SITE_NAME = 'PRO CNC MAROC';
-const BASE_URL = 'https://procncmaroc.com';
+const BASE_URL = 'https://www.procncmaroc.com';
 const DEFAULT_OG_IMAGE = '/og-image.png';
 const DEFAULT_DESC = 'PRO CNC MAROC — Your partner in CNC machines, precision machining, laser cutting, and engraving in Morocco. Professional solutions for industry and crafts.';
 
@@ -55,6 +55,7 @@ export default function SEO({
   ogType = 'website',
   twitterCard = 'summary_large_image',
   jsonLd,
+  noindex = false,
 }) {
   const fullTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
   const path = canonicalUrl || '/';
@@ -73,6 +74,7 @@ export default function SEO({
       <link rel="canonical" href={fullUrl} />
 
       <link rel="alternate" hrefLang="en" href={fullUrl} />
+      <link rel="alternate" hrefLang="fr" href={`${BASE_URL}/fr${path === '/' ? '' : path}`} />
       <link rel="alternate" hrefLang="x-default" href={fullUrl} />
 
       <meta property="og:title" content={fullTitle} />
@@ -91,7 +93,11 @@ export default function SEO({
       <meta name="twitter:image" content={`${BASE_URL}${ogImage.startsWith('/') ? ogImage : '/' + ogImage}`} />
       <meta name="twitter:site" content="@procncmaroc" />
 
-      <meta name="robots" content="index, follow" />
+      {noindex ? (
+        <meta name="robots" content="noindex, nofollow" />
+      ) : (
+        <meta name="robots" content="index, follow" />
+      )}
       <meta name="author" content={SITE_NAME} />
       <meta name="language" content="en" />
       <meta name="geo.region" content="MA" />

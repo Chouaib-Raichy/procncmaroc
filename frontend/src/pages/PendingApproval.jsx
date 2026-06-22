@@ -13,7 +13,7 @@ export default function PendingApproval() {
 
   return (
     <>
-      <SEO title="Pending Approval" description="Your PRO CNC MAROC account is under review. You will be notified once approved." canonicalUrl="/pending-approval" />
+      <SEO title="Pending Approval" description="Your PRO CNC MAROC account is under review. You will be notified once approved." canonicalUrl="/pending-approval" noindex={true} />
       <div style={styles.page}>
         <div style={styles.overlay}>
           <div style={styles.card}>

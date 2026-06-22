@@ -64,7 +64,7 @@ export default function CompleteRegistration() {
 
   return (
     <>
-      <SEO title="Complete Registration" description="Complete your PRO CNC MAROC business registration to get your account approved." canonicalUrl="/complete-registration" />
+      <SEO title="Complete Registration" description="Complete your PRO CNC MAROC business registration to get your account approved." canonicalUrl="/complete-registration" noindex={true} />
       <div style={styles.page}>
       <div style={styles.overlay}>
         <form style={styles.form} onSubmit={handleSubmit}>
