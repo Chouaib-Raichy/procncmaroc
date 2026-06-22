@@ -39,6 +39,8 @@ export default function Profile() {
   const [verifyModal, setVerifyModal] = useState(null);
   const [pendingChanges, setPendingChanges] = useState(null);
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const [lightboxImg, setLightboxImg] = useState(null);
+  const [bioModal, setBioModal] = useState(false);
   const [modal, setModal] = useState(null);
   const [countryList, setCountryList] = useState([]);
   const [countryIndex, setCountryIndex] = useState(null);
@@ -76,6 +78,13 @@ export default function Profile() {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [settingsDropdown]);
+
+  useEffect(() => {
+    if (!lightboxImg && !bioModal) return;
+    const handler = (e) => { if (e.key === 'Escape') { setLightboxImg(null); setBioModal(false); } };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [lightboxImg, bioModal]);
 
   useEffect(() => {
     if (user) setForm((f) => ({ ...f, name: user.name || '', email: user.email || '', phone: user.phone || '', business_location: user.business_location || '', city: user.city || '', country: user.country || '' }));
@@ -172,6 +181,23 @@ export default function Profile() {
     <>
       <SEO title="My Profile" description="Edit your PRO CNC MAROC profile, manage your business information, and update your gallery." canonicalUrl="/profile" />
       <style>{`
+        .prof-carousel:hover .prof-carousel-btn { opacity: 1; }
+        .prof-bio-text { display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
+        .prof-stat-card { transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s; }
+        .prof-stat-card:hover .prof-stat-icon { background: rgba(163,122,57,0.2) !important; }
+        .prof-thumb { transition: all 0.2s; cursor: pointer; border: 2px solid transparent; border-radius: 6px; opacity: 0.6; }
+        .prof-thumb:hover { border-color: rgba(163,122,57,0.5); opacity: 0.9; transform: translateY(-2px); }
+        .prof-thumb.active { border-color: #d4af37; opacity: 1; }
+        .prof-lightbox-nav { transition: all 0.25s; opacity: 0; }
+        .prof-lightbox-show:hover .prof-lightbox-nav { opacity: 1; }
+        .prof-bio-more:hover { opacity: 1 !important; }
+        .prof-bio-modal-close:hover { background: rgba(255,255,255,0.1) !important; color: #fff !important; }
+        .prof-bio-modal-content::-webkit-scrollbar { width: 4px; }
+        .prof-bio-modal-content::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 4px; }
+        .prof-bio-modal-content::-webkit-scrollbar-thumb { background: rgba(163,122,57,0.4); border-radius: 4px; }
+        .prof-thumbs::-webkit-scrollbar { height: 3px; }
+        .prof-thumbs::-webkit-scrollbar-track { background: transparent; }
+        .prof-thumbs::-webkit-scrollbar-thumb { background: rgba(163,122,57,0.3); border-radius: 3px; }
         @media (max-width: 768px) {
           .prof-cover-content { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; padding-bottom: 12px !important; }
           .prof-avatar-wrap { align-self: flex-start !important; }
@@ -204,6 +230,8 @@ export default function Profile() {
           .prof-form-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
           .prof-field-label { font-size: 12px !important; }
           .prof-input, .prof-select { padding: 10px 12px !important; font-size: 13px !important; }
+          .prof-thumbs { gap: 4px !important; }
+          .prof-thumb { width: 48px !important; height: 36px !important; }
         }
       `}</style>
       <div style={s.page}>
@@ -340,9 +368,13 @@ export default function Profile() {
         <div style={s.contentArea} className="prof-content-area">
           <motion.div style={s.leftCol} className="prof-left-col" {...fadeUp(0.2)}>
             {user.business_bio && (
-              <div style={s.bioBox} className="prof-bio-box">
-                <div style={s.bioLabel}>About</div>
-                <p style={s.bioText} className="prof-bio-text">{user.business_bio}</p>
+              <div className="prof-bio-box" style={s.bioBox}>
+                <div style={s.bioLabel}><span style={s.bioLabelDot} />About</div>
+                <p className="prof-bio-text" style={s.bioText}>{user.business_bio}</p>
+                <button className="prof-bio-more" style={s.bioViewMore} onClick={() => setBioModal(true)}>
+                  View more
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
+                </button>
               </div>
             )}
 
@@ -355,30 +387,42 @@ export default function Profile() {
               <div style={s.galleryLine} />
             </div>
             {images.length > 0 ? (
-              <div style={s.carousel} className="prof-carousel">
-                <AnimatePresence mode="wait">
-                  <motion.img key={carouselIndex} src={images[carouselIndex]} alt="" style={s.carouselImg} className="prof-carousel-img"
-                    initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.25 }}
-                    onClick={() => window.open(images[carouselIndex], '_blank')}
-                  />
-                </AnimatePresence>
-                <div style={s.carouselGradientLeft} />
-                <div style={s.carouselGradientRight} />
-                <span style={s.carouselCounter}>{carouselIndex + 1} / {images.length}</span>
+              <>
+                <div className="prof-carousel" style={s.carousel}>
+                  <AnimatePresence mode="wait">
+                    <motion.img key={carouselIndex} src={images[carouselIndex]} alt="" style={s.carouselImg} className="prof-carousel-img"
+                      initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.25 }}
+                      whileHover={{ scale: 1.03 }} onClick={() => setLightboxImg(images[carouselIndex])}
+                    />
+                  </AnimatePresence>
+                  <div style={s.carouselGradientLeft} />
+                  <div style={s.carouselGradientRight} />
+                  <span style={s.carouselCounter}>{carouselIndex + 1} / {images.length}</span>
+                  {images.length > 1 && (
+                    <>
+                      <button className="prof-carousel-btn" style={{ ...s.carouselBtn, left: '8px' }} onClick={() => setCarouselIndex((p) => (p - 1 + images.length) % images.length)} aria-label="Previous">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
+                      </button>
+                      <button className="prof-carousel-btn" style={{ ...s.carouselBtn, right: '8px' }} onClick={() => setCarouselIndex((p) => (p + 1) % images.length)} aria-label="Next">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
+                      </button>
+                      <div style={s.dots}>
+                        {images.map((_, i) => (<button key={i} style={s.dot(i === carouselIndex)} onClick={() => setCarouselIndex(i)} />))}
+                      </div>
+                    </>
+                  )}
+                </div>
                 {images.length > 1 && (
-                  <>
-                    <button style={{ ...s.carouselBtn, left: '8px' }} onClick={() => setCarouselIndex((p) => (p - 1 + images.length) % images.length)} aria-label="Previous">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
-                    </button>
-                    <button style={{ ...s.carouselBtn, right: '8px' }} onClick={() => setCarouselIndex((p) => (p + 1) % images.length)} aria-label="Next">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
-                    </button>
-                    <div style={s.dots}>
-                      {images.map((_, i) => (<button key={i} style={s.dot(i === carouselIndex)} onClick={() => setCarouselIndex(i)} />))}
-                    </div>
-                  </>
+                  <div className="prof-thumbs" style={s.thumbsStrip}>
+                    {images.map((img, i) => (
+                      <img key={i} src={img} alt=""
+                        className={`prof-thumb${i === carouselIndex ? ' active' : ''}`}
+                        style={{ ...s.thumbImg, ...(i === carouselIndex ? s.thumbActive : {}) }}
+                        onClick={() => setCarouselIndex(i)} />
+                    ))}
+                  </div>
                 )}
-              </div>
+              </>
             ) : (
               <div style={s.noImages} className="prof-no-images">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -529,6 +573,61 @@ export default function Profile() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Lightbox */}
+      <AnimatePresence>
+        {lightboxImg && (
+          <motion.div className="prof-lightbox-show" style={s.lightboxOverlay} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setLightboxImg(null)}>
+            <button style={s.lightboxClose} onClick={() => setLightboxImg(null)}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            {images.length > 1 && (
+              <>
+                <button className="prof-lightbox-nav" style={{ ...s.lightboxNav, left: '24px' }} onClick={(e) => { e.stopPropagation(); setCarouselIndex((p) => (p - 1 + images.length) % images.length); setLightboxImg(images[(carouselIndex - 1 + images.length) % images.length]); }} aria-label="Previous">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg>
+                </button>
+                <button className="prof-lightbox-nav" style={{ ...s.lightboxNav, right: '24px' }} onClick={(e) => { e.stopPropagation(); setCarouselIndex((p) => (p + 1) % images.length); setLightboxImg(images[(carouselIndex + 1) % images.length]); }} aria-label="Next">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+                </button>
+              </>
+            )}
+            <AnimatePresence mode="wait">
+              <motion.img key={lightboxImg} src={lightboxImg} alt="" style={s.lightboxImg} onClick={(e) => e.stopPropagation()}
+                initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.85 }} transition={{ duration: 0.2 }} />
+            </AnimatePresence>
+            {images.length > 1 && (
+              <div style={s.lightboxCounter}>{carouselIndex + 1} / {images.length}</div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Bio Modal */}
+      <AnimatePresence>
+        {bioModal && (
+          <motion.div style={s.bioModalOverlay}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setBioModal(false)}
+          >
+            <motion.div style={s.bioModalCard}
+              initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ duration: 0.3 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={s.bioModalHeader}>
+                <div style={s.bioModalTitle}><span style={s.bioLabelDot} />About</div>
+                <button className="prof-bio-modal-close" style={s.bioModalClose} onClick={() => setBioModal(false)}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+              <div className="prof-bio-modal-content" style={s.bioModalContent}>
+                {user.entreprise_name && <div style={s.bioModalSub}>{user.entreprise_name}</div>}
+                <p style={s.bioModalText}>{user.business_bio}</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
     </>
   );
@@ -610,9 +709,11 @@ const s = {
   leftCol: { flex: '1 1 50%', minWidth: '280px', display: 'flex', flexDirection: 'column', gap: '20px' },
   rightCol: { flex: '1 1 40%', minWidth: '280px', display: 'flex', flexDirection: 'column' },
 
-  bioBox: { borderLeft: '3px solid #a37a39', padding: '16px 20px', background: 'rgba(0,0,0,0.3)', borderRadius: '0 12px 12px 0' },
-  bioLabel: { color: '#d4af37', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' },
-  bioText: { color: '#bbb', fontSize: '14px', lineHeight: 1.8, margin: 0, whiteSpace: 'pre-wrap', overflowWrap: 'break-word', wordBreak: 'break-word' },
+  bioBox: { display: 'flex', flexDirection: 'column', gap: '12px', padding: '20px', background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', borderLeft: '2px solid rgba(163,122,57,0.5)' },
+  bioLabel: { color: '#d4af37', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', display: 'flex', alignItems: 'center', gap: '10px', padding: 0, margin: 0 },
+  bioLabelDot: { width: '6px', height: '6px', borderRadius: '50%', background: '#d4af37', flexShrink: 0 },
+  bioText: { color: '#bbb', fontSize: '14px', lineHeight: 1.8, margin: 0, whiteSpace: 'pre-wrap', overflowWrap: 'break-word', wordBreak: 'break-word', overflow: 'hidden' },
+  bioViewMore: { display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: '#d4af37', fontSize: '12px', fontWeight: 600, cursor: 'pointer', padding: '4px 0 0', alignSelf: 'flex-start', transition: 'opacity 0.2s', opacity: 0.8 },
 
 
   galleryHeader: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' },
@@ -622,21 +723,27 @@ const s = {
   carousel: {
     position: 'relative', borderRadius: '12px', overflow: 'hidden', background: '#0d0d0d',
     flex: 1, minHeight: '220px',
+    border: '1px solid rgba(255,255,255,0.06)',
   },
-  carouselGradientLeft: { position: 'absolute', top: 0, left: 0, width: '30px', height: '100%', background: 'linear-gradient(90deg, rgba(0,0,0,0.25), transparent)', pointerEvents: 'none', zIndex: 1 },
-  carouselGradientRight: { position: 'absolute', top: 0, right: 0, width: '30px', height: '100%', background: 'linear-gradient(270deg, rgba(0,0,0,0.25), transparent)', pointerEvents: 'none', zIndex: 1 },
-  carouselCounter: { position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.6)', color: '#d4af37', fontSize: '11px', fontWeight: 700, padding: '2px 10px', borderRadius: '12px', zIndex: 2, letterSpacing: '0.3px' },
-  carouselImg: { width: '100%', height: 'clamp(220px, 30vw, 420px)', objectFit: 'cover', display: 'block', cursor: 'pointer' },
+  carouselGradientLeft: { position: 'absolute', top: 0, left: 0, width: '50px', height: '100%', background: 'linear-gradient(90deg, rgba(0,0,0,0.5), transparent)', pointerEvents: 'none', zIndex: 1 },
+  carouselGradientRight: { position: 'absolute', top: 0, right: 0, width: '50px', height: '100%', background: 'linear-gradient(270deg, rgba(0,0,0,0.5), transparent)', pointerEvents: 'none', zIndex: 1 },
+  carouselCounter: { position: 'absolute', top: '14px', right: '14px', background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', color: '#d4af37', fontSize: '11px', fontWeight: 700, padding: '4px 14px', borderRadius: '20px', zIndex: 2, letterSpacing: '0.5px', border: '1px solid rgba(163,122,57,0.2)' },
+  carouselImg: { width: '100%', height: 'clamp(220px, 30vw, 420px)', objectFit: 'cover', display: 'block', cursor: 'pointer', transition: 'transform 0.4s' },
   carouselBtn: {
     position: 'absolute', top: '50%', transform: 'translateY(-50%)',
-    background: 'rgba(0,0,0,0.55)', border: 'none',
-    color: '#fff', borderRadius: '50%', width: '32px', height: '32px',
+    background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+    border: '1px solid rgba(255,255,255,0.08)',
+    color: '#fff', borderRadius: '50%', width: '38px', height: '38px',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    cursor: 'pointer', zIndex: 2, transition: 'background 0.2s',
+    cursor: 'pointer', zIndex: 2, transition: 'all 0.25s',
+    opacity: 0.7,
   },
-  dots: { display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '10px' },
-  dot: (active) => ({ width: '8px', height: '8px', borderRadius: '50%', border: 'none', cursor: 'pointer', background: active ? '#a37a39' : '#333', transition: 'background 0.2s', padding: 0 }),
-  noImages: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#555', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', minHeight: '220px' },
+  dots: { position: 'absolute', bottom: '16px', left: '50%', transform: 'translateX(-50%)', display: 'flex', justifyContent: 'center', gap: '8px', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', padding: '6px 14px', borderRadius: '20px', zIndex: 2 },
+  dot: (active) => ({ width: '8px', height: '8px', borderRadius: '50%', border: 'none', cursor: 'pointer', background: active ? '#d4af37' : '#333', transition: 'all 0.3s', padding: 0, transform: active ? 'scale(1.3)' : 'scale(1)', boxShadow: active ? '0 0 6px rgba(212,175,55,0.4)' : 'none' }),
+  thumbsStrip: { display: 'flex', gap: '8px', marginTop: '12px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'thin', scrollbarColor: 'rgba(163,122,57,0.3) transparent' },
+  thumbImg: { width: '64px', height: '48px', borderRadius: '6px', objectFit: 'cover', flexShrink: 0, border: '2px solid transparent', transition: 'all 0.2s' },
+  thumbActive: { borderColor: '#d4af37', opacity: 1 },
+  noImages: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#555', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', minHeight: '220px', border: '1px solid rgba(255,255,255,0.06)' },
 
   msg: { padding: '12px 16px', borderRadius: '10px', marginBottom: '18px', border: '1px solid', fontSize: '14px' },
   formGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 'clamp(14px, 2vw, 20px)' },
@@ -657,4 +764,19 @@ const s = {
   modalPreview: { maxWidth: '100%', maxHeight: '260px', objectFit: 'contain' },
   modalBtn: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '11px', background: '#1a1a1a', border: '1px solid #333', color: '#ccc', borderRadius: '10px', cursor: 'pointer', fontSize: '13px', fontWeight: '600', transition: 'all 0.2s' },
   modalClose: { position: 'absolute', top: '12px', right: '12px', background: 'none', border: 'none', color: '#666', cursor: 'pointer', padding: '4px' },
+
+  lightboxOverlay: { position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out' },
+  lightboxImg: { maxWidth: '92vw', maxHeight: '92vh', objectFit: 'contain', borderRadius: '8px', cursor: 'default', boxShadow: '0 0 60px rgba(0,0,0,0.6)' },
+  lightboxClose: { position: 'fixed', top: '20px', right: '24px', background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', width: '44px', height: '44px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10000, transition: 'all 0.2s' },
+  lightboxNav: { position: 'fixed', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', width: '48px', height: '48px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10000, transition: 'all 0.25s' },
+  lightboxCounter: { position: 'fixed', bottom: '30px', left: '50%', transform: 'translateX(-50%)', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', border: '1px solid rgba(163,122,57,0.2)', color: '#d4af37', fontSize: '13px', fontWeight: 700, padding: '8px 20px', borderRadius: '20px', zIndex: 10000, letterSpacing: '0.5px' },
+
+  bioModalOverlay: { position: 'fixed', inset: 0, zIndex: 9998, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' },
+  bioModalCard: { width: '100%', maxWidth: '600px', maxHeight: '80vh', background: 'rgba(15,15,15,0.98)', border: '1px solid rgba(163,122,57,0.3)', borderRadius: '16px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(163,122,57,0.15)' },
+  bioModalHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px 0' },
+  bioModalTitle: { color: '#d4af37', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', display: 'flex', alignItems: 'center', gap: '10px' },
+  bioModalClose: { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: '#999', width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s' },
+  bioModalContent: { padding: '16px 24px 24px', overflowY: 'auto', flex: 1, scrollbarWidth: 'thin', scrollbarColor: '#a37a39 rgba(255,255,255,0.03)' },
+  bioModalSub: { color: '#888', fontSize: '12px', fontWeight: 500, marginBottom: '12px', letterSpacing: '0.3px' },
+  bioModalText: { color: '#ccc', fontSize: '15px', lineHeight: 1.9, margin: 0, whiteSpace: 'pre-wrap', overflowWrap: 'break-word', wordBreak: 'break-word' },
 };
