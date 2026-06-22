@@ -4,6 +4,7 @@
   <url>
     <loc>https://procncmaroc.com/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://procncmaroc.com/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://procncmaroc.com/fr" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://procncmaroc.com/" />
     <priority>1.0</priority>
     <changefreq>weekly</changefreq>
@@ -11,6 +12,7 @@
   <url>
     <loc>https://procncmaroc.com/our-machines</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://procncmaroc.com/our-machines" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://procncmaroc.com/fr/our-machines" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://procncmaroc.com/our-machines" />
     <priority>0.9</priority>
     <changefreq>weekly</changefreq>
@@ -18,6 +20,7 @@
   <url>
     <loc>https://procncmaroc.com/products</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://procncmaroc.com/products" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://procncmaroc.com/fr/products" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://procncmaroc.com/products" />
     <priority>0.8</priority>
     <changefreq>weekly</changefreq>
@@ -25,6 +28,7 @@
   <url>
     <loc>https://procncmaroc.com/about-us</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://procncmaroc.com/about-us" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://procncmaroc.com/fr/about-us" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://procncmaroc.com/about-us" />
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
@@ -32,6 +36,7 @@
   <url>
     <loc>https://procncmaroc.com/contact-us</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://procncmaroc.com/contact-us" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://procncmaroc.com/fr/contact-us" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://procncmaroc.com/contact-us" />
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
@@ -39,6 +44,7 @@
   <url>
     <loc>https://procncmaroc.com/customer-gallery</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://procncmaroc.com/customer-gallery" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://procncmaroc.com/fr/customer-gallery" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://procncmaroc.com/customer-gallery" />
     <priority>0.7</priority>
     <changefreq>weekly</changefreq>
@@ -46,13 +52,20 @@
   <url>
     <loc>https://procncmaroc.com/partner-map</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://procncmaroc.com/partner-map" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://procncmaroc.com/fr/partner-map" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://procncmaroc.com/partner-map" />
     <priority>0.6</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://procncmaroc.com/my-gallery</loc>
+    <priority>0.5</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
     <loc>https://procncmaroc.com/terms</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://procncmaroc.com/terms" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://procncmaroc.com/fr/terms" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://procncmaroc.com/terms" />
     <priority>0.3</priority>
     <changefreq>yearly</changefreq>
