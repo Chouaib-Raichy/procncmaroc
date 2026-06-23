@@ -70,7 +70,11 @@ export default function MachineDetail() {
 
   return (
     <div style={styles.page}>
-      <SEO title={machine.title + ' | PRO CNC MAROC'} description={machine.description} canonicalUrl={'/machines/' + id} ogImage={machine.image_url || undefined} ogType="product" jsonLd={{
+      <SEO title={machine.title} description={machine.description + ' — Available at PRO CNC MAROC in Morocco. Call +212625280991 for pricing &amp; demo.'} canonicalUrl={'/machines/' + id} ogImage={machine.image_url || undefined} ogType="product" keywords={machine.title + ', CNC machine Morocco, ' + (machine.category?.name || 'CNC') + ' Morocco, buy CNC Morocco'} breadcrumbs={[
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.procncmaroc.com' },
+        { '@type': 'ListItem', position: 2, name: 'Our Machines', item: 'https://www.procncmaroc.com/our-machines' },
+        { '@type': 'ListItem', position: 3, name: machine.title, item: 'https://www.procncmaroc.com/machines/' + id },
+      ]} jsonLd={{
         '@type': 'Product',
         name: machine.title,
         description: machine.description,
@@ -80,9 +84,11 @@ export default function MachineDetail() {
           price: parseFloat(machine.price),
           priceCurrency: 'MAD',
           availability: 'https://schema.org/InStock',
-          url: `https://procncmaroc.com/machines/${id}`,
+          url: `https://www.procncmaroc.com/machines/${id}`,
+          seller: { '@type': 'Organization', name: 'PRO CNC MAROC' },
         } : undefined,
         category: machine.category?.name || undefined,
+        brand: { '@type': 'Brand', name: 'PRO CNC MAROC' },
       }} />
       <div style={styles.overlay}>
         <div style={styles.inner}>

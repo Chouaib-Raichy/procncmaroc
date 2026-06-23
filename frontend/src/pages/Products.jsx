@@ -69,7 +69,7 @@ export default function Products() {
 
   return (
     <div style={styles.page}>
-      <SEO title="Products" description="Explore all our CNC products and services in Morocco: precision machining, laser cutting, engraving, and 3D printing." canonicalUrl="/products" />
+      <SEO title="Products" description="PRO CNC MAROC — Premium CNC products &amp; services in Morocco. Precision machining, laser cutting, engraving, 3D printing &amp; industrial maintenance. Quality guaranteed." canonicalUrl="/products" keywords="CNC products Morocco, machining services, laser cutting service, 3D printing service, metal fabrication Morocco" />
       <div style={styles.overlay}>
         <div style={styles.header}>
           <motion.h1 style={styles.title} {...fadeUp()}>Products</motion.h1>

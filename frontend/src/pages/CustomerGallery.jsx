@@ -336,7 +336,7 @@ export default function CustomerGallery() {
 
   return (
     <div style={styles.page}>
-      <SEO title="Stories" description="Discover our customers' achievements: CNC machining, laser cutting, engraving, and 3D printing projects in Morocco." canonicalUrl="/stories" />
+      <SEO title="Stories — Customer Projects" description="Browse real customer projects at PRO CNC MAROC — CNC machining, laser cutting, engraving &amp; 3D printing. See what our clients in Morocco &amp; beyond have created with our machines." canonicalUrl="/stories" keywords="CNC projects Morocco, laser cutting projects, CNC customer stories, engraving examples" jsonLd={{ '@type': 'ItemList', name: 'Customer Stories', description: 'Real customer projects showcasing CNC machining, laser cutting, engraving, and 3D printing work by PRO CNC MAROC clients in Morocco.' }} />
       <style>{`@media (min-width: 901px) { .story-card { display: flex !important; flex-direction: column !important; } .story-card-body { flex: 1 0 auto !important; } .story-action-bar { margin-top: auto !important; } .story-sidebar-overlay { display: block !important; } } @media (max-width: 900px) { .story-sidebar-overlay { display: none !important; } }`}</style>
       <div style={styles.overlay}>
         <section style={styles.container}>

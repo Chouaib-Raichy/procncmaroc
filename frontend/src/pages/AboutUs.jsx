@@ -15,7 +15,7 @@ export default function AboutUs() {
   const [completed] = useState(() => rand(2, 5));
   return (
     <div style={styles.page} className="about-page">
-      <SEO title="About Us" description="Discover PRO CNC MAROC, your expert in CNC machines and precision machining in Morocco. Our team supports you in your industrial and craft projects." canonicalUrl="/about-us" />
+      <SEO title="About Us — CNC Experts in Morocco" description="PRO CNC MAROC — Trusted CNC machining &amp; laser cutting experts in Casablanca, Morocco since 2024. We deliver precision, quality &amp; innovation for industrial &amp; craft projects across Morocco &amp; beyond." canonicalUrl="/about-us" keywords="about PRO CNC MAROC, CNC company Morocco, CNC Casablanca, machining experts Morocco" />
       <style>{`@media (max-width: 768px) { .about-page { overflow-x: hidden !important; } }`}</style>
       <div style={styles.overlay}>
         <section style={styles.container}>

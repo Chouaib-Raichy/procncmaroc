@@ -74,7 +74,7 @@ const itemVariants = {
 export default function TermsOfUse() {
   return (
     <div style={styles.page}>
-      <SEO title="Terms of Use" description="Terms and conditions of use for PRO CNC MAROC. Read our policies and terms of service." canonicalUrl="/terms" />
+      <SEO title="Terms of Use" description="PRO CNC MAROC terms and conditions of use. Read our policies regarding services, payments, shipping, and warranties for CNC machining in Morocco." canonicalUrl="/terms" />
       <div style={styles.overlay}>
         <div style={styles.container}>
           <motion.div

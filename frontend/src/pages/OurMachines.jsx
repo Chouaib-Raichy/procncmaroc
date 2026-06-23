@@ -64,7 +64,7 @@ export default function OurMachines() {
 
   return (
     <div style={styles.pageWrapper}>
-      <SEO title="Our Machines" description="Discover our complete range of professional CNC machines in Morocco: milling machines, laser cutters, engravers, and 3D printers." canonicalUrl="/our-machines" />
+      <SEO title="Our Machines" description="Explore PRO CNC MAROC's complete range of professional CNC machines in Morocco — CNC routers, laser cutters, CO2 engravers, fibre markers &amp; 3D printers. Premium quality for industry &amp; crafts." canonicalUrl="/our-machines" keywords="CNC machines, CNC router Morocco, laser cutter Morocco, engraving machine, CO2 laser, fibre laser, 3D printer Morocco, CNC price Morocco" jsonLd={{ '@type': 'ItemList', name: 'Our Machines', itemListElement: [] }} />
       <div style={styles.overlay}>
         <div style={styles.titleWrap}>
           <h1 style={styles.title}>Our Machines</h1>

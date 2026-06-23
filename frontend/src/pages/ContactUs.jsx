@@ -41,7 +41,7 @@ export default function ContactUs() {
 
   return (
     <div style={styles.page}>
-      <SEO title="Contact" description="Contact PRO CNC MAROC for any questions about our CNC machines, machining services, laser cutting, and engraving in Morocco." canonicalUrl="/contact-us" />
+      <SEO title="Contact Us" description="Contact PRO CNC MAROC in Casablanca, Morocco. Get a quote for CNC machines, laser cutting, engraving &amp; 3D printing. Call +212625280991 or visit our showroom." canonicalUrl="/contact-us" keywords="contact PRO CNC MAROC, CNC quote Morocco, CNC machines Casablanca, laser cutting quote" />
       {/* Hero Banner */}
       <motion.div
         style={styles.hero}

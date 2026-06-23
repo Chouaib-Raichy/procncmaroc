@@ -65,7 +65,7 @@ export default function Home() {
 
   return (
     <div>
-      <SEO title="Home" description="PRO CNC MAROC — Your partner in CNC machines, precision machining, laser cutting, and engraving in Morocco. Professional solutions for industry and crafts." canonicalUrl="/" />
+      <SEO title="Home" description="PRO CNC MAROC — Morocco's leading CNC machining, laser cutting, engraving &amp; 3D printing company. Premium machines for industry, crafts &amp; professionals. Visit our Casablanca showroom." canonicalUrl="/" keywords="CNC machines Morocco, precision machining, laser cutting, engraving services, 3D printing, CNC router, CNC Morocco, industrial machining" />
       <style>{`
         @media (max-width: 768px) {
           .hero-content { left: 5% !important; top: 9px !important; }
