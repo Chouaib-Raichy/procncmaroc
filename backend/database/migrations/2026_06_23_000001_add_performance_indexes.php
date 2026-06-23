@@ -9,116 +9,53 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $this->dropIndexIfExists('machines', 'machines_visible_index');
-        $this->dropIndexIfExists('machines', 'machines_created_at_index');
-        $this->dropIndexIfExists('machines', 'machines_visible_created_at_index');
-        Schema::table('machines', function (Blueprint $table) {
-            $table->index('visible');
-            $table->index('created_at');
-            $table->index(['visible', 'created_at']);
-        });
+        $this->safeCreateIndex('machines', function (Blueprint $t) { $t->index('visible'); });
+        $this->safeCreateIndex('machines', function (Blueprint $t) { $t->index('created_at'); });
+        $this->safeCreateIndex('machines', function (Blueprint $t) { $t->index(['visible', 'created_at']); });
 
-        $this->dropIndexIfExists('products', 'products_visible_index');
-        $this->dropIndexIfExists('products', 'products_created_at_index');
-        $this->dropIndexIfExists('products', 'products_visible_created_at_index');
-        Schema::table('products', function (Blueprint $table) {
-            $table->index('visible');
-            $table->index('created_at');
-            $table->index(['visible', 'created_at']);
-        });
+        $this->safeCreateIndex('products', function (Blueprint $t) { $t->index('visible'); });
+        $this->safeCreateIndex('products', function (Blueprint $t) { $t->index('created_at'); });
+        $this->safeCreateIndex('products', function (Blueprint $t) { $t->index(['visible', 'created_at']); });
 
-        $this->dropIndexIfExists('gallery_posts', 'gallery_posts_created_at_index');
-        $this->dropIndexIfExists('gallery_posts', 'gallery_posts_user_id_created_at_index');
-        Schema::table('gallery_posts', function (Blueprint $table) {
-            $table->index('created_at');
-            $table->index(['user_id', 'created_at']);
-        });
+        $this->safeCreateIndex('gallery_posts', function (Blueprint $t) { $t->index('created_at'); });
+        $this->safeCreateIndex('gallery_posts', function (Blueprint $t) { $t->index(['user_id', 'created_at']); });
 
-        $this->dropIndexIfExists('gallery_comments', 'gallery_comments_parent_id_index');
-        $this->dropIndexIfExists('gallery_comments', 'gallery_comments_gallery_post_id_parent_id_index');
-        Schema::table('gallery_comments', function (Blueprint $table) {
-            $table->index('parent_id');
-            $table->index(['gallery_post_id', 'parent_id']);
-        });
+        $this->safeCreateIndex('gallery_comments', function (Blueprint $t) { $t->index('parent_id'); });
+        $this->safeCreateIndex('gallery_comments', function (Blueprint $t) { $t->index(['gallery_post_id', 'parent_id']); });
 
-        $this->dropIndexIfExists('gallery_post_likes', 'gallery_post_likes_gallery_post_id_index');
-        Schema::table('gallery_post_likes', function (Blueprint $table) {
-            $table->index('gallery_post_id');
-        });
+        $this->safeCreateIndex('gallery_post_likes', function (Blueprint $t) { $t->index('gallery_post_id'); });
 
-        $this->dropIndexIfExists('gallery_comment_likes', 'gallery_comment_likes_gallery_comment_id_index');
-        Schema::table('gallery_comment_likes', function (Blueprint $table) {
-            $table->index('gallery_comment_id');
-        });
+        $this->safeCreateIndex('gallery_comment_likes', function (Blueprint $t) { $t->index('gallery_comment_id'); });
 
-        $this->dropIndexIfExists('page_views', 'page_views_visited_at_index');
-        $this->dropIndexIfExists('page_views', 'page_views_ip_address_index');
-        $this->dropIndexIfExists('page_views', 'page_views_visited_at_ip_address_index');
-        Schema::table('page_views', function (Blueprint $table) {
-            $table->index('visited_at');
-            $table->index('ip_address');
-            $table->index(['visited_at', 'ip_address']);
-        });
+        $this->safeCreateIndex('page_views', function (Blueprint $t) { $t->index('visited_at'); });
+        $this->safeCreateIndex('page_views', function (Blueprint $t) { $t->index('ip_address'); });
+        $this->safeCreateIndex('page_views', function (Blueprint $t) { $t->index(['visited_at', 'ip_address']); });
 
-        $this->dropIndexIfExists('contacts', 'contacts_created_at_index');
-        Schema::table('contacts', function (Blueprint $table) {
-            $table->index('created_at');
-        });
+        $this->safeCreateIndex('contacts', function (Blueprint $t) { $t->index('created_at'); });
 
-        $this->dropIndexIfExists('categories', 'categories_name_index');
-        Schema::table('categories', function (Blueprint $table) {
-            $table->index('name');
-        });
+        $this->safeCreateIndex('categories', function (Blueprint $t) { $t->index('name'); });
 
-        $this->dropIndexIfExists('users', 'users_banned_at_index');
-        $this->dropIndexIfExists('users', 'users_is_approved_index');
-        Schema::table('users', function (Blueprint $table) {
-            $table->index('banned_at');
-            $table->index('is_approved');
-        });
-        $this->dropIndexIfExists('users', 'users_is_approved_role_business_bio_index');
-        DB::statement('ALTER TABLE `users` ADD INDEX `users_is_approved_role_business_bio_index` (`is_approved`, `role`, `business_bio`(191))');
+        $this->safeCreateIndex('users', function (Blueprint $t) { $t->index('banned_at'); });
+        $this->safeCreateIndex('users', function (Blueprint $t) { $t->index('is_approved'); });
+        try {
+            DB::statement('ALTER TABLE `users` ADD INDEX `users_is_approved_role_business_bio_index` (`is_approved`, `role`, `business_bio`(191))');
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->errorInfo[1] !== 1061) throw $e;
+        }
     }
 
     public function down(): void
     {
-        $this->dropIndexIfExists('machines', 'machines_visible_index');
-        $this->dropIndexIfExists('machines', 'machines_created_at_index');
-        $this->dropIndexIfExists('machines', 'machines_visible_created_at_index');
-
-        $this->dropIndexIfExists('products', 'products_visible_index');
-        $this->dropIndexIfExists('products', 'products_created_at_index');
-        $this->dropIndexIfExists('products', 'products_visible_created_at_index');
-
-        $this->dropIndexIfExists('gallery_posts', 'gallery_posts_created_at_index');
-        $this->dropIndexIfExists('gallery_posts', 'gallery_posts_user_id_created_at_index');
-
-        $this->dropIndexIfExists('gallery_comments', 'gallery_comments_parent_id_index');
-        $this->dropIndexIfExists('gallery_comments', 'gallery_comments_gallery_post_id_parent_id_index');
-
-        $this->dropIndexIfExists('gallery_post_likes', 'gallery_post_likes_gallery_post_id_index');
-
-        $this->dropIndexIfExists('gallery_comment_likes', 'gallery_comment_likes_gallery_comment_id_index');
-
-        $this->dropIndexIfExists('page_views', 'page_views_visited_at_index');
-        $this->dropIndexIfExists('page_views', 'page_views_ip_address_index');
-        $this->dropIndexIfExists('page_views', 'page_views_visited_at_ip_address_index');
-
-        $this->dropIndexIfExists('contacts', 'contacts_created_at_index');
-
-        $this->dropIndexIfExists('categories', 'categories_name_index');
-
-        $this->dropIndexIfExists('users', 'users_banned_at_index');
-        $this->dropIndexIfExists('users', 'users_is_approved_index');
-        $this->dropIndexIfExists('users', 'users_is_approved_role_business_bio_index');
+        // Intentionally no-op: removing indexes that may not exist is risky.
+        // Use `php artisan migrate:rollback` only in dev with fresh DB.
     }
 
-    private function dropIndexIfExists(string $table, string $index): void
+    private function safeCreateIndex(string $table, callable $callback): void
     {
         try {
-            Schema::table($table, fn(Blueprint $t) => $t->dropIndex($index));
+            Schema::table($table, fn(Blueprint $t) => $callback($t));
         } catch (\Illuminate\Database\QueryException $e) {
-            // index didn't exist, that's fine
+            if ($e->errorInfo[1] !== 1061) throw $e;
         }
     }
 };
