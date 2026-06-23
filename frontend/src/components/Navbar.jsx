@@ -494,7 +494,7 @@ const styles = {
     fontSize: '13px',
   },
   signupBtn: {
-    background: '#a37a39',
+    background: '#8b682f',
     color: '#fff',
     textDecoration: 'none',
     padding: '8px 20px',
