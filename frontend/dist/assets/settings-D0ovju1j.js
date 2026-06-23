@@ -1,0 +1,1 @@
+import{g as e}from"./index-B8Z9guR4.js";var t=()=>e.get(`/settings`),n=t=>e.post(`/admin/settings/${t}/toggle`);export{n,t};

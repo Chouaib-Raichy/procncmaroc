@@ -14,7 +14,7 @@ import mobile3Img from '../assets/mobile3.webp';
 const showcase1 = '/videos/showcase1.mp4';
 const showcase2 = '/videos/showcase2.mp4';
 const showcase3 = '/videos/showcase3.mp4';
-import showcaseBg from '../assets/showcase_bg.webp';
+const showcaseBg = '/assets/showcase_bg.webp';
 import {
   LuAward,
   LuDollarSign,
@@ -183,7 +183,7 @@ export default function Home() {
             </motion.div>
 
         </div>
-        <img src={showroom} alt="Showroom" loading="lazy" style={styles.showroomImg} />
+        <img src={showroom} alt="Showroom" fetchpriority="high" style={styles.showroomImg} />
       </div>
 
       <section style={styles.showcase}>
