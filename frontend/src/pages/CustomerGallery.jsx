@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getComments, addComment, replyToComment, togglePostLike, toggleCommentLike, getPostLikes } from '../api/gallery';
 import api from '../api/axios';
-import machineBg from '../assets/machineBG.jpeg';
+import machineBg from '../assets/machineBG.webp';
 import placeholderImg from '../assets/placeholder.svg';
 import SEO from '../components/SEO';
 

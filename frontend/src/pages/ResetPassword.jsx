@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import api from '../api/axios';
-import machineBg from '../assets/machineBG.jpeg';
+import machineBg from '../assets/machineBG.webp';
 import SEO from '../components/SEO';
 
 const requirements = [

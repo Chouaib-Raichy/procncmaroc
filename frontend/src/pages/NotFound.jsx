@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import machineBg from '../assets/machineBG.jpeg';
+import machineBg from '../assets/machineBG.webp';
 import SEO from '../components/SEO';
 
 export default function NotFound() {

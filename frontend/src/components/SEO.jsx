@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 const SITE_NAME = 'PRO CNC MAROC';
 const BASE_URL = 'https://www.procncmaroc.com';
-const DEFAULT_OG_IMAGE = '/og-image.png';
+const DEFAULT_OG_IMAGE = '/og-image.webp';
 const DEFAULT_DESC = 'PRO CNC MAROC — Your partner in CNC machines, precision machining, laser cutting, and engraving in Morocco. Professional solutions for industry and crafts.';
 
 const CRUMB_LABELS = {
@@ -63,7 +63,7 @@ const localBusinessJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'LocalBusiness',
   name: SITE_NAME,
-  image: `${BASE_URL}/og-image.png`,
+  image: `${BASE_URL}/og-image.webp`,
   url: BASE_URL,
   telephone: '+212625280991',
   email: 'contact@procncmaroc.com',

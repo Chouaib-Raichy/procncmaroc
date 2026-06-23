@@ -1,20 +1,20 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import heroBg from '../assets/dq-1.jpg';
-import showroom from '../assets/showroom.png';
+import heroBg from '../assets/dq-1.webp';
+import showroom from '../assets/showroom.webp';
 import placeholderImg from '../assets/placeholder.svg';
-import bgWhyChooseUs from '../assets/bg_whychooseus.png';
-import fibreImg from '../assets/1.png';
-import laserImg from '../assets/2.png';
-import cncImg from '../assets/3.png';
-import mobile1Img from '../assets/mobile1.png';
-import mobile2Img from '../assets/mobile2.png';
-import mobile3Img from '../assets/mobile3.png';
+import bgWhyChooseUs from '../assets/bg_whychooseus.webp';
+import fibreImg from '../assets/1.webp';
+import laserImg from '../assets/2.webp';
+import cncImg from '../assets/3.webp';
+import mobile1Img from '../assets/mobile1.webp';
+import mobile2Img from '../assets/mobile2.webp';
+import mobile3Img from '../assets/mobile3.webp';
 import showcase1 from '../assets/showcase1.mp4';
 import showcase2 from '../assets/showcase2.mp4';
 import showcase3 from '../assets/showcase3.mp4';
-import showcaseBg from '../assets/showcase_bg.png';
+import showcaseBg from '../assets/showcase_bg.webp';
 import {
   LuAward,
   LuDollarSign,
@@ -347,7 +347,7 @@ const cardWidth = 'clamp(260px, 30vw, 340px)';
 
 const styles = {
   hero: { position: 'relative', lineHeight: 0 },
-  heroImg: { width: '100%', height: 'auto', display: 'block' },
+  heroImg: { width: '100%', height: 'auto', display: 'block', aspectRatio: '1004 / 259' },
   heroContent: {
     position: 'absolute',
     top: 'clamp(10px, 4vw, 80px)',
@@ -477,7 +477,7 @@ const styles = {
     alignSelf: 'flex-end',
     marginTop: 'clamp(4px, 0.5vw, 8px)',
   },
-  showroomImg: { width: '100%', height: 'auto', display: 'block' },
+  showroomImg: { width: '100%', height: 'auto', display: 'block', aspectRatio: '1672 / 941' },
 
   showcase: {
     padding: 'clamp(30px, 4vw, 50px) clamp(16px, 4vw, 60px)',

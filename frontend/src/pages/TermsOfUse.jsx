@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import machineBg from '../assets/machineBG.jpeg';
+import machineBg from '../assets/machineBG.webp';
 import SEO from '../components/SEO';
 
 const sections = [

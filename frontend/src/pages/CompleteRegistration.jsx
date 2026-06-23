@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
-import machineBg from '../assets/machineBG.jpeg';
+import machineBg from '../assets/machineBG.webp';
 import SEO from '../components/SEO';
 
 const MAX_IMAGES = 6;

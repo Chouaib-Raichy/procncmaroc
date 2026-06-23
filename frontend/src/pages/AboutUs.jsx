@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import machineBg from '../assets/machineBG.jpeg';
-import about from '../assets/about.jpg';
+import machineBg from '../assets/machineBG.webp';
+import about from '../assets/about.webp';
 import premiumIcon from '../assets/premium-icon.svg';
 import SEO from '../components/SEO';
 

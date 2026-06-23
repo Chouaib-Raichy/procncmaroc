@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import PhoneInput from '../components/PhoneInput';
 import VerificationCodeModal from '../components/VerificationCodeModal';
-import machineBg from '../assets/machineBG.jpeg';
+import machineBg from '../assets/machineBG.webp';
 import placeholderImg from '../assets/placeholder.svg';
 import SEO from '../components/SEO';
 

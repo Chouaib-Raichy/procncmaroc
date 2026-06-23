@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getPartner } from '../api/partners';
 import { getSettings } from '../api/settings';
 import ErrorState from '../components/ErrorState';
-import machineBg from '../assets/machineBG.jpeg';
+import machineBg from '../assets/machineBG.webp';
 import placeholderImg from '../assets/placeholder.svg';
 import SEO from '../components/SEO';
 

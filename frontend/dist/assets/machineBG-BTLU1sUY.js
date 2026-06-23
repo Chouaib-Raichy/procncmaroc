@@ -1,1 +1,0 @@
-var e=`/assets/machineBG-ByV430MZ.jpeg`;export{e as t};

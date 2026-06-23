@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import api from '../api/axios';
 import Loading from '../components/Loading';
 import ErrorState from '../components/ErrorState';
-import machineBg from '../assets/machineBG.jpeg';
+import machineBg from '../assets/machineBG.webp';
 import placeholderImg from '../assets/placeholder.svg';
 import SEO from '../components/SEO';
 

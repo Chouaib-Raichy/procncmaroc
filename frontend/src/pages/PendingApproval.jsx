@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import machineBg from '../assets/machineBG.jpeg';
+import machineBg from '../assets/machineBG.webp';
 import SEO from '../components/SEO';
 
 export default function PendingApproval() {

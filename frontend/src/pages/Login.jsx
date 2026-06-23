@@ -3,7 +3,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import machineBg from '../assets/machineBG.jpeg';
+import machineBg from '../assets/machineBG.webp';
 import SEO from '../components/SEO';
 
 const validators = {

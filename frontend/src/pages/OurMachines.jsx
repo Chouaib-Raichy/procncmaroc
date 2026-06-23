@@ -4,7 +4,7 @@ import { getAllMachines } from '../api/machines';
 import Loading from '../components/Loading';
 import ErrorState from '../components/ErrorState';
 import { getCategories } from '../api/categories';
-import machineBg from '../assets/machineBG.jpeg';
+import machineBg from '../assets/machineBG.webp';
 import placeholderImg from '../assets/placeholder.svg';
 import SEO from '../components/SEO';
 
