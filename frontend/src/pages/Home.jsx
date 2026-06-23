@@ -126,6 +126,7 @@ export default function Home() {
                   <img
                     src={partner.avatar_url || placeholderImg}
                     alt={partner.name}
+                    loading="lazy"
                     style={styles.cardImg}
                   />
                   <div className="card-body" style={styles.cardBody}>
@@ -160,6 +161,7 @@ export default function Home() {
                   <img
                     src={activeCat.image}
                     alt={activeCat.title}
+                    loading="lazy"
                     style={styles.carouselImg}
                   />
                 </picture>
@@ -181,7 +183,7 @@ export default function Home() {
             </motion.div>
 
         </div>
-        <img src={showroom} alt="Showroom" style={styles.showroomImg} />
+        <img src={showroom} alt="Showroom" loading="lazy" style={styles.showroomImg} />
       </div>
 
       <section style={styles.showcase}>
@@ -219,7 +221,7 @@ export default function Home() {
               transition={{ duration: 0.5, delay: 0.15 * i, ease: 'easeOut' }}
               whileHover={{ y: -6, transition: { duration: 0.3 } }}
             >
-              <video src={item.src} style={styles.showcaseVideo} autoPlay muted loop playsInline />
+              <video src={item.src} style={styles.showcaseVideo} autoPlay muted loop playsInline preload="none" />
               <div style={styles.showcaseOverlay}>
                 <div style={styles.showcaseOverlayContent} className="showcase-overlay-content">
                   <motion.span

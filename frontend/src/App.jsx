@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -9,27 +9,28 @@ import Footer from './components/Footer';
 import Loading from './components/Loading';
 import SEO from './components/SEO';
 import Home from './pages/Home';
-import PartnerMap from './pages/PartnerMap';
-import OurMachines from './pages/OurMachines';
-import Products from './pages/Products';
-import AboutUs from './pages/AboutUs';
-import ContactUs from './pages/ContactUs';
-import CustomerGallery from './pages/CustomerGallery';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import Dashboard from './pages/Dashboard';
-import MachineDetail from './pages/MachineDetail';
-import MyGallery from './pages/MyGallery';
-import Profile from './pages/Profile';
-import PublicProfile from './pages/PublicProfile';
-import CompleteRegistration from './pages/CompleteRegistration';
-import PendingApproval from './pages/PendingApproval';
-import TermsOfUse from './pages/TermsOfUse';
-import NotFound from './pages/NotFound';
 import { trackVisit } from './api/visitors';
 import './App.css';
+
+const PartnerMap = lazy(() => import('./pages/PartnerMap'));
+const OurMachines = lazy(() => import('./pages/OurMachines'));
+const Products = lazy(() => import('./pages/Products'));
+const AboutUs = lazy(() => import('./pages/AboutUs'));
+const ContactUs = lazy(() => import('./pages/ContactUs'));
+const CustomerGallery = lazy(() => import('./pages/CustomerGallery'));
+const Login = lazy(() => import('./pages/Login'));
+const Signup = lazy(() => import('./pages/Signup'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const MachineDetail = lazy(() => import('./pages/MachineDetail'));
+const MyGallery = lazy(() => import('./pages/MyGallery'));
+const Profile = lazy(() => import('./pages/Profile'));
+const PublicProfile = lazy(() => import('./pages/PublicProfile'));
+const CompleteRegistration = lazy(() => import('./pages/CompleteRegistration'));
+const PendingApproval = lazy(() => import('./pages/PendingApproval'));
+const TermsOfUse = lazy(() => import('./pages/TermsOfUse'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageTracker() {
   const location = useLocation();
@@ -72,28 +73,30 @@ function AppContent() {
       <Navbar />
       <PageTracker />
       <main className="main-content">
-        <Routes>
-          <Route path="/" element={<PublicPage><Home /></PublicPage>} />
-          <Route path="/partner-map" element={<PublicPage><ErrorBoundary><PartnerMap /></ErrorBoundary></PublicPage>} />
-          <Route path="/our-machines" element={<PublicPage><ErrorBoundary><OurMachines /></ErrorBoundary></PublicPage>} />
-          <Route path="/products" element={<PublicPage><ErrorBoundary><Products /></ErrorBoundary></PublicPage>} />
-          <Route path="/about-us" element={<PublicPage><ErrorBoundary><AboutUs /></ErrorBoundary></PublicPage>} />
-          <Route path="/contact-us" element={<PublicPage><ErrorBoundary><ContactUs /></ErrorBoundary></PublicPage>} />
-          <Route path="/stories" element={<PublicPage><ErrorBoundary><CustomerGallery /></ErrorBoundary></PublicPage>} />
-          <Route path="/machines/:id" element={<PublicPage><ErrorBoundary><MachineDetail /></ErrorBoundary></PublicPage>} />
-          <Route path="/profile/:id" element={<PublicPage><ErrorBoundary><PublicProfile /></ErrorBoundary></PublicPage>} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/complete-registration" element={<CompleteRegistration />} />
-          <Route path="/pending-approval" element={<PendingApproval />} />
-          <Route path="/terms" element={<TermsOfUse />} />
-          <Route path="/profile" element={<ProtectedRoute approved><ErrorBoundary><Profile /></ErrorBoundary></ProtectedRoute>} />
-          <Route path="/my-gallery" element={<ProtectedRoute approved><ErrorBoundary><MyGallery /></ErrorBoundary></ProtectedRoute>} />
-          <Route path="/dashboard" element={<ProtectedRoute approved><ErrorBoundary><Dashboard /></ErrorBoundary></ProtectedRoute>} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Suspense fallback={<Loading text="Loading..." />}>
+          <Routes>
+            <Route path="/" element={<PublicPage><Home /></PublicPage>} />
+            <Route path="/partner-map" element={<PublicPage><ErrorBoundary><PartnerMap /></ErrorBoundary></PublicPage>} />
+            <Route path="/our-machines" element={<PublicPage><ErrorBoundary><OurMachines /></ErrorBoundary></PublicPage>} />
+            <Route path="/products" element={<PublicPage><ErrorBoundary><Products /></ErrorBoundary></PublicPage>} />
+            <Route path="/about-us" element={<PublicPage><ErrorBoundary><AboutUs /></ErrorBoundary></PublicPage>} />
+            <Route path="/contact-us" element={<PublicPage><ErrorBoundary><ContactUs /></ErrorBoundary></PublicPage>} />
+            <Route path="/stories" element={<PublicPage><ErrorBoundary><CustomerGallery /></ErrorBoundary></PublicPage>} />
+            <Route path="/machines/:id" element={<PublicPage><ErrorBoundary><MachineDetail /></ErrorBoundary></PublicPage>} />
+            <Route path="/profile/:id" element={<PublicPage><ErrorBoundary><PublicProfile /></ErrorBoundary></PublicPage>} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/complete-registration" element={<CompleteRegistration />} />
+            <Route path="/pending-approval" element={<PendingApproval />} />
+            <Route path="/terms" element={<TermsOfUse />} />
+            <Route path="/profile" element={<ProtectedRoute approved><ErrorBoundary><Profile /></ErrorBoundary></ProtectedRoute>} />
+            <Route path="/my-gallery" element={<ProtectedRoute approved><ErrorBoundary><MyGallery /></ErrorBoundary></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute approved><ErrorBoundary><Dashboard /></ErrorBoundary></ProtectedRoute>} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </main>
       <Footer />
     </div>

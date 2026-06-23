@@ -395,7 +395,7 @@ export default function CustomerGallery() {
                     whileTap={{ scale: 0.98 }}
                     style={{ ...styles.userBar, cursor: post.user?.id ? 'pointer' : 'default' }}
                   >
-                    <img src={post.user?.avatar_url || placeholderImg} alt="" style={styles.userBarAvatar} />
+                    <img src={post.user?.avatar_url || placeholderImg} alt="" loading="lazy" style={styles.userBarAvatar} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={styles.userBarName}>{post.user?.name}</div>
                       <div style={styles.userBarTime}>{formatTime(post.created_at)}</div>

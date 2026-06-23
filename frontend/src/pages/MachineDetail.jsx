@@ -123,8 +123,9 @@ export default function MachineDetail() {
               transition={{ duration: 0.6, ease: 'easeOut' }}
             >
               <img
-                src={machine.image_url || placeholderImg}
+                src={machine.image_url || machineBg}
                 alt={machine.title}
+                loading="lazy"
                 style={styles.image}
               />
             </motion.div>

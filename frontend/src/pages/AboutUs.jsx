@@ -25,7 +25,7 @@ export default function AboutUs() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, ease: 'easeOut' }}
           >
-            <img src={about} alt="About" style={styles.image} />
+            <img src={about} alt="About" loading="lazy" style={styles.image} />
           </motion.div>
 
           <div style={styles.content}>
@@ -114,7 +114,7 @@ export default function AboutUs() {
               transition={{ duration: 0.5, delay: 1 }}
             >
               <div style={styles.icon}>
-                <img src={premiumIcon} alt="Premium" style={{ width: '100%', height: '100%', display: 'block' }} />
+                <img src={premiumIcon} alt="Premium" loading="lazy" style={{ width: '100%', height: '100%', display: 'block' }} />
               </div>
 
               <div>

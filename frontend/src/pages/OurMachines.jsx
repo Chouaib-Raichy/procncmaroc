@@ -101,9 +101,10 @@ export default function OurMachines() {
                 <div key={m.id} style={styles.card} className="machine-card">
                   <div style={styles.imgWrap}>
                     <img
-                      src={m.image_url || placeholderImg}
+                      src={m.image_url || machineBg}
                       alt={m.title}
-                      style={styles.img}
+                      loading="lazy"
+                      style={styles.machineImg}
                     />
                   </div>
                   <div style={styles.cardBody}>

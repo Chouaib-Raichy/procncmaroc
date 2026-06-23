@@ -4,7 +4,10 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   appType: 'spa',
-  server: {
-    port: 3000,
+  server: { port: 3000 },
+  build: {
+    chunkSizeWarningLimit: 600,
+    sourcemap: false,
+    cssCodeSplit: true,
   },
 })
