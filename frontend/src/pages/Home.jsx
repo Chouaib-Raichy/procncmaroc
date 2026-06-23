@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import LazyVideo from '../components/LazyVideo';
 import heroBg from '../assets/dq-1.webp';
 import showroom from '../assets/showroom.webp';
 import placeholderImg from '../assets/placeholder.svg';
@@ -221,7 +222,7 @@ export default function Home() {
               transition={{ duration: 0.5, delay: 0.15 * i, ease: 'easeOut' }}
               whileHover={{ y: -6, transition: { duration: 0.3 } }}
             >
-              <video src={item.src} style={styles.showcaseVideo} autoPlay muted loop playsInline preload="none" />
+              <LazyVideo src={item.src} style={styles.showcaseVideo} />
               <div style={styles.showcaseOverlay}>
                 <div style={styles.showcaseOverlayContent} className="showcase-overlay-content">
                   <motion.span
