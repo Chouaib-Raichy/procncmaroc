@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import LazyVideo from '../components/LazyVideo';
 import heroBg from '../assets/dq-1.webp';
-import showroom from '../assets/showroom.webp';
+const showroom = '/showroom.webp';
 import placeholderImg from '../assets/placeholder.svg';
 import bgWhyChooseUs from '../assets/bg_whychooseus.webp';
 import fibreImg from '../assets/1.webp';
