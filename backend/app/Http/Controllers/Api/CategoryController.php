@@ -12,7 +12,7 @@ class CategoryController extends Controller
     public function index()
     {
         return CategoryDTO::collection(
-            Category::with('machines')->orderBy('name')->get()
+            Category::withCount('machines')->orderBy('name')->get()
         );
     }
 
@@ -31,7 +31,7 @@ class CategoryController extends Controller
 
     public function show(Category $category)
     {
-        return CategoryDTO::fromModel($category->load('machines'))->toArray();
+        return CategoryDTO::fromModel($category->loadCount('machines'))->toArray();
     }
 
     public function update(Request $request, Category $category)

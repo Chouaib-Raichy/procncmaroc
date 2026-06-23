@@ -127,7 +127,7 @@ export default function Products() {
                 {products.map((p, i) => (
                   <motion.div
                     key={p.id}
-                    layout
+                    layout={false}
                     custom={i}
                     variants={cardVariants}
                     initial="hidden"

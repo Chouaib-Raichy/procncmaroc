@@ -11,7 +11,7 @@ class GalleryComment extends Model
 
     protected $fillable = ['user_id', 'gallery_post_id', 'parent_id', 'body'];
 
-    protected $appends = ['likes_count', 'is_liked_by_user'];
+    protected $appends = ['likes_count'];
 
     protected $casts = [
         'deleted_at' => 'datetime',
@@ -37,13 +37,16 @@ class GalleryComment extends Model
         return $this->hasMany(GalleryCommentLike::class, 'gallery_comment_id');
     }
 
-    public function getLikesCountAttribute()
+    public function getLikesCountAttribute(): int
     {
-        return $this->likes()->count();
+        return (int) ($this->attributes['likes_count'] ?? $this->likes()->count());
     }
 
-    public function getIsLikedByUserAttribute()
+    public function getIsLikedByUserAttribute(): bool
     {
+        if (array_key_exists('is_liked_by_user', $this->attributes)) {
+            return (bool) $this->attributes['is_liked_by_user'];
+        }
         $userId = request()->user()?->id;
         if (!$userId) return false;
         return $this->likes()->where('user_id', $userId)->exists();

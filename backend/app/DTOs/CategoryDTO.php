@@ -12,12 +12,13 @@ class CategoryDTO extends DTO
         public readonly string $name,
         public readonly ?string $description,
         public readonly ?array $machines,
+        public readonly int $machines_count,
         public readonly string $created_at,
     ) {}
 
     public static function fromModel(Model $model): self
     {
-        $category = $model instanceof Category ? $model : Category::with('machines')->findOrFail($model->id);
+        $category = $model instanceof Category ? $model : Category::withCount('machines')->findOrFail($model->id);
 
         $machines = null;
         if ($category->relationLoaded('machines')) {
@@ -34,6 +35,7 @@ class CategoryDTO extends DTO
             name: $category->name,
             description: $category->description,
             machines: $machines,
+            machines_count: $category->machines_count ?? 0,
             created_at: $category->created_at->toISOString(),
         );
     }
@@ -45,6 +47,7 @@ class CategoryDTO extends DTO
             'name' => $this->name,
             'description' => $this->description,
             'machines' => $this->machines,
+            'machines_count' => $this->machines_count,
             'created_at' => $this->created_at,
         ];
     }

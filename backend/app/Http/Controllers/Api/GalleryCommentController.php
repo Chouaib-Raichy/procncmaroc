@@ -17,6 +17,24 @@ class GalleryCommentController extends Controller
     {
         $comments = $galleryPost->comments()
             ->with('user:id,name,avatar', 'replies.user:id,name,avatar')
+            ->withCount('likes')
+            ->when(auth()->check(), function ($q) {
+                $userId = auth()->id();
+                $q->addSelect([
+                    'is_liked_by_user' => GalleryCommentLike::selectRaw('1')
+                        ->whereColumn('gallery_comment_id', 'gallery_comments.id')
+                        ->where('user_id', $userId)
+                        ->limit(1)
+                ]);
+                $q->with(['replies' => fn($r) => $r->withCount('likes')
+                    ->addSelect([
+                        'is_liked_by_user' => GalleryCommentLike::selectRaw('1')
+                            ->whereColumn('gallery_comment_id', 'gallery_comments.id')
+                            ->where('user_id', $userId)
+                            ->limit(1)
+                    ])
+                ]);
+            })
             ->whereNull('parent_id')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -68,14 +86,17 @@ class GalleryCommentController extends Controller
         if ($like) {
             if ($like->trashed()) {
                 $like->restore();
-                return response()->json(['liked' => true, 'likes_count' => $galleryPost->likes()->count()]);
+                $count = GalleryPostLike::where('gallery_post_id', $galleryPost->id)->count();
+                return response()->json(['liked' => true, 'likes_count' => $count]);
             }
             $like->delete();
-            return response()->json(['liked' => false, 'likes_count' => $galleryPost->likes()->count()]);
+            $count = GalleryPostLike::where('gallery_post_id', $galleryPost->id)->count();
+            return response()->json(['liked' => false, 'likes_count' => $count]);
         }
 
         GalleryPostLike::create(['user_id' => $userId, 'gallery_post_id' => $galleryPost->id]);
-        return response()->json(['liked' => true, 'likes_count' => $galleryPost->likes()->count()]);
+        $count = GalleryPostLike::where('gallery_post_id', $galleryPost->id)->count();
+        return response()->json(['liked' => true, 'likes_count' => $count]);
     }
 
     public function toggleCommentLike(Request $request, GalleryComment $galleryComment)
@@ -89,14 +110,17 @@ class GalleryCommentController extends Controller
         if ($like) {
             if ($like->trashed()) {
                 $like->restore();
-                return response()->json(['liked' => true, 'likes_count' => $galleryComment->likes()->count()]);
+                $count = GalleryCommentLike::where('gallery_comment_id', $galleryComment->id)->count();
+                return response()->json(['liked' => true, 'likes_count' => $count]);
             }
             $like->delete();
-            return response()->json(['liked' => false, 'likes_count' => $galleryComment->likes()->count()]);
+            $count = GalleryCommentLike::where('gallery_comment_id', $galleryComment->id)->count();
+            return response()->json(['liked' => false, 'likes_count' => $count]);
         }
 
         GalleryCommentLike::create(['user_id' => $userId, 'gallery_comment_id' => $galleryComment->id]);
-        return response()->json(['liked' => true, 'likes_count' => $galleryComment->likes()->count()]);
+        $count = GalleryCommentLike::where('gallery_comment_id', $galleryComment->id)->count();
+        return response()->json(['liked' => true, 'likes_count' => $count]);
     }
 
     public function likes(GalleryPost $galleryPost)

@@ -16,7 +16,7 @@ class GalleryPost extends Model
         'deleted_at' => 'datetime',
     ];
 
-    protected $appends = ['images_url', 'likes_count', 'is_liked_by_user', 'comments_count'];
+    protected $appends = ['images_url', 'likes_count', 'comments_count'];
 
     public function user()
     {
@@ -39,20 +39,23 @@ class GalleryPost extends Model
         return array_map(fn($img) => url('storage/' . $img), $images);
     }
 
-    public function getLikesCountAttribute()
+    public function getLikesCountAttribute(): int
     {
-        return $this->likes()->count();
+        return (int) ($this->attributes['likes_count'] ?? $this->likes()->count());
     }
 
-    public function getIsLikedByUserAttribute()
+    public function getIsLikedByUserAttribute(): bool
     {
+        if (array_key_exists('is_liked_by_user', $this->attributes)) {
+            return (bool) $this->attributes['is_liked_by_user'];
+        }
         $userId = request()->user()?->id;
         if (!$userId) return false;
         return $this->likes()->where('user_id', $userId)->exists();
     }
 
-    public function getCommentsCountAttribute()
+    public function getCommentsCountAttribute(): int
     {
-        return $this->comments()->count();
+        return (int) ($this->attributes['comments_count'] ?? $this->comments()->count());
     }
 }

@@ -106,7 +106,7 @@ function CommentItem({ comment, user, onReply, onLike }) {
       </div>
       <AnimatePresence>
         {showReply && (
-          <motion.div style={styles.replyForm} initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+          <motion.div style={styles.replyForm} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
             <input value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder="Write a reply..." style={styles.replyInput} onKeyDown={(e) => e.key === 'Enter' && handleReply()} />
             <button onClick={handleReply} style={styles.replyBtn} disabled={!replyText.trim()}>Send</button>
           </motion.div>
@@ -460,9 +460,9 @@ export default function MyGallery() {
                         <AnimatePresence>
                           {expanded[post.id] && (
                             <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
                               transition={{ duration: 0.25 }}
                               style={{ overflow: 'hidden' }}
                             >

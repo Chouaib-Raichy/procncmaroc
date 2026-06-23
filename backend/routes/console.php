@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('sitemap:generate --path=' . base_path('../sitemap.xml'))->daily();
+Schedule::command('gallery:cleanup')->daily();

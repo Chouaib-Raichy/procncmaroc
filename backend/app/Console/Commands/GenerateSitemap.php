@@ -24,6 +24,7 @@ class GenerateSitemap extends Command
             ['loc' => '/about-us', 'priority' => '0.7', 'changefreq' => 'monthly'],
             ['loc' => '/contact-us', 'priority' => '0.7', 'changefreq' => 'monthly'],
             ['loc' => '/partner-map', 'priority' => '0.6', 'changefreq' => 'monthly'],
+            ['loc' => '/my-gallery', 'priority' => '0.5', 'changefreq' => 'weekly'],
             ['loc' => '/terms', 'priority' => '0.3', 'changefreq' => 'yearly'],
         ];
 

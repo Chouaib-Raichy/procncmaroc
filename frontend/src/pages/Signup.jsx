@@ -144,9 +144,10 @@ export default function Signup() {
             {serverError && (
               <motion.div
                 style={styles.serverError}
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
               >{serverError}</motion.div>
             )}
           </AnimatePresence>
@@ -369,8 +370,9 @@ export default function Signup() {
             {(touched.password || form.password) && (
               <motion.div
                 style={styles.checklist}
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
               >
                 {pwChecks.map((r, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '2px 0' }}>

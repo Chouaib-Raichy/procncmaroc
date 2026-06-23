@@ -144,9 +144,10 @@ function CommentItem({ comment, user, onReply, onLike }) {
       <AnimatePresence>
         {showReply && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             style={styles.replyForm}
           >
             <input value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder="Write a reply..." style={styles.replyInput} />
@@ -388,7 +389,7 @@ export default function CustomerGallery() {
                   whileHover={{ y: -6, boxShadow: '0 16px 40px rgba(0,0,0,0.5)', borderColor: 'rgba(163,122,57,0.4)' }}
                   style={styles.card}
                   className="story-card"
-                  layout
+                  layout={false}
                 >
                   <motion.div
                     onClick={() => post.user?.id && navigate(`/profile/${post.user.id}`)}
@@ -502,9 +503,9 @@ export default function CustomerGallery() {
                     <AnimatePresence>
                       {expanded[post.id] && (
                         <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
                           transition={{ duration: 0.25 }}
                           style={{ overflow: 'hidden' }}
                         >

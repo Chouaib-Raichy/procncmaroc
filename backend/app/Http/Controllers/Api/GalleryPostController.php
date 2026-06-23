@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\GalleryPost;
+use App\Models\GalleryPostLike;
 use App\DTOs\GalleryPostDTO;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -12,19 +13,16 @@ class GalleryPostController extends Controller
 {
     public function index()
     {
-        GalleryPost::withTrashed()
-            ->where('created_at', '<', now()->subDays(15))
-            ->each(function ($post) {
-                foreach (($post->images ?? []) as $img) {
-                    Storage::disk('public')->delete($img);
-                }
-                $post->forceDelete();
-            });
-
         $perPage = min((int) request('per_page', 9), 50);
         $paginator = GalleryPost::with('user:id,name,email,phone,business_location,avatar')
             ->withCount(['likes', 'comments'])
-            ->orderByRaw('(likes_count + comments_count) desc')
+            ->when(auth()->check(), fn($q) => $q->addSelect([
+                'is_liked_by_user' => GalleryPostLike::selectRaw('1')
+                    ->whereColumn('gallery_post_id', 'gallery_posts.id')
+                    ->where('user_id', auth()->id())
+                    ->limit(1)
+            ]))
+            ->orderByRaw('(likes_count + comments_count) desc, created_at desc')
             ->paginate($perPage);
 
         return GalleryPostDTO::paginated($paginator);

@@ -11,9 +11,9 @@ import cncImg from '../assets/3.webp';
 import mobile1Img from '../assets/mobile1.webp';
 import mobile2Img from '../assets/mobile2.webp';
 import mobile3Img from '../assets/mobile3.webp';
-import showcase1 from '../assets/showcase1.mp4';
-import showcase2 from '../assets/showcase2.mp4';
-import showcase3 from '../assets/showcase3.mp4';
+const showcase1 = '/videos/showcase1.mp4';
+const showcase2 = '/videos/showcase2.mp4';
+const showcase3 = '/videos/showcase3.mp4';
 import showcaseBg from '../assets/showcase_bg.webp';
 import {
   LuAward,
