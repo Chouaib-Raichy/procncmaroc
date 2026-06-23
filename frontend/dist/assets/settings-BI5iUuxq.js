@@ -1,1 +1,0 @@
-import{_ as e}from"./index-CfGhaVcS.js";var t=()=>e.get(`/settings`),n=t=>e.post(`/admin/settings/${t}/toggle`);export{n,t};
