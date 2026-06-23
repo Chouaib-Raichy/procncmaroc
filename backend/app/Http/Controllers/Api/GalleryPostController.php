@@ -12,9 +12,19 @@ class GalleryPostController extends Controller
 {
     public function index()
     {
+        GalleryPost::withTrashed()
+            ->where('created_at', '<', now()->subDays(15))
+            ->each(function ($post) {
+                foreach (($post->images ?? []) as $img) {
+                    Storage::disk('public')->delete($img);
+                }
+                $post->forceDelete();
+            });
+
         $perPage = min((int) request('per_page', 9), 50);
         $paginator = GalleryPost::with('user:id,name,email,phone,business_location,avatar')
-            ->orderBy('created_at', 'desc')
+            ->withCount(['likes', 'comments'])
+            ->orderByRaw('(likes_count + comments_count) desc')
             ->paginate($perPage);
 
         return GalleryPostDTO::paginated($paginator);

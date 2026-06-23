@@ -73,8 +73,6 @@ export default function SEO({
       <meta name="description" content={description} />
       <link rel="canonical" href={fullUrl} />
 
-      <link rel="alternate" hrefLang="en" href={fullUrl} />
-      <link rel="alternate" hrefLang="fr" href={`${BASE_URL}/fr${path === '/' ? '' : path}`} />
       <link rel="alternate" hrefLang="x-default" href={fullUrl} />
 
       <meta property="og:title" content={fullTitle} />

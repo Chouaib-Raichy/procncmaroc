@@ -336,7 +336,7 @@ export default function CustomerGallery() {
 
   return (
     <div style={styles.page}>
-      <SEO title="Stories" description="Discover our customers' achievements: CNC machining, laser cutting, engraving, and 3D printing projects in Morocco." canonicalUrl="/customer-gallery" />
+      <SEO title="Stories" description="Discover our customers' achievements: CNC machining, laser cutting, engraving, and 3D printing projects in Morocco." canonicalUrl="/stories" />
       <style>{`@media (min-width: 901px) { .story-card { display: flex !important; flex-direction: column !important; } .story-card-body { flex: 1 0 auto !important; } .story-action-bar { margin-top: auto !important; } .story-sidebar-overlay { display: block !important; } } @media (max-width: 900px) { .story-sidebar-overlay { display: none !important; } }`}</style>
       <div style={styles.overlay}>
         <section style={styles.container}>

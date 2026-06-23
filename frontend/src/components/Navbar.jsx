@@ -164,7 +164,7 @@ export default function Navbar() {
       </div>
 
       <div className="nav-mobile-icons" style={styles.mobileIcons}>
-        <Link to="/customer-gallery" onClick={closeAll} className="nav-mobile-icon" style={{ ...styles.mobileIcon, color: location.pathname === '/customer-gallery' ? '#a37a39' : '#666', opacity: location.pathname === '/customer-gallery' ? 1 : 0.6 }} aria-label="Stories">
+        <Link to="/stories" onClick={closeAll} className="nav-mobile-icon" style={{ ...styles.mobileIcon, color: location.pathname === '/stories' ? '#a37a39' : '#666', opacity: location.pathname === '/stories' ? 1 : 0.6 }} aria-label="Stories">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <rect x="2" y="2" width="20" height="20" rx="3"/>
             <polygon points="10 8 16 12 10 16" fill="currentColor" stroke="none"/>
@@ -230,7 +230,7 @@ export default function Navbar() {
         {isMobile() ? renderMobileMenu() : (
           <>
             <Link to="/" style={{...styles.link, ...active('/')}} onClick={closeAll}>Home</Link>
-            <Link to="/customer-gallery" style={{...styles.link, ...active('/customer-gallery')}} onClick={closeAll}>Stories</Link>
+            <Link to="/stories" style={{...styles.link, ...active('/stories')}} onClick={closeAll}>Stories</Link>
             <Link to="/partner-map" style={{...styles.link, ...active('/partner-map')}} onClick={closeAll}>Partner Map</Link>
 
             <div ref={ddRef} style={{ position: 'relative' }}

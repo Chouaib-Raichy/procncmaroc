@@ -53,7 +53,7 @@ export default function Footer() {
           <Link to="/about-us" style={styles.link}>About Us</Link>
           <Link to="/contact-us" style={styles.link}>Contact Us</Link>
           <Link to="/partner-map" style={styles.link}>Partner Map</Link>
-          <Link to="/customer-gallery" style={styles.link}>Customer Gallery</Link>
+          <Link to="/stories" style={styles.link}>Stories</Link>
         </motion.div>
 
        

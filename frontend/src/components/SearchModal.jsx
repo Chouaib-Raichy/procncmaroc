@@ -62,7 +62,7 @@ export default function SearchModal({ onClose }) {
     if (item.type === 'user') navigate(`/profile/${item.data.id}`);
     else if (item.type === 'machine') navigate(`/machines/${item.data.id}`);
     else if (item.type === 'product') navigate('/products');
-    else if (item.type === 'post') navigate('/customer-gallery');
+    else if (item.type === 'post') navigate('/stories');
   }, [navigate, onClose]);
 
   const handleKeyDown = (e) => {
