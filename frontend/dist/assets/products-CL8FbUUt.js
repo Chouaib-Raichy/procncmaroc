@@ -1,0 +1,1 @@
+import{_ as e}from"./index-ipMUvT7w.js";var t=t=>e.get(`/products`,{params:t}),n=t=>e.get(`/admin/products`,{params:t}),r=t=>e.post(`/admin/products`,t),i=(t,n)=>e.post(`/admin/products/update/${t}`,n);export{i,n,t as r,r as t};

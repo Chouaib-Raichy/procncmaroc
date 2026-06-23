@@ -92,7 +92,7 @@ export default function Home() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
       >
-        <img src={heroBg} alt="" style={styles.heroImg} />
+        <img src={heroBg} alt="" fetchpriority="high" style={styles.heroImg} />
         <div className="hero-content" style={styles.heroContent}>
             <motion.h1 className="hero-title" style={styles.heroTitle}
               initial={{ opacity: 0, x: -60 }}
