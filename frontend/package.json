@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "node scripts/generate-cities.mjs && vite build",
+    "postbuild": "copy /y dist\\index.html ..\\index.html",
     "lint": "eslint .",
     "preview": "vite preview",
     "generate-cities": "node scripts/generate-cities.mjs"
