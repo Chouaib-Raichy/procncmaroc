@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -55,8 +56,8 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->index('banned_at');
             $table->index('is_approved');
-            $table->index(['is_approved', 'role', 'business_bio']);
         });
+        DB::statement('ALTER TABLE `users` ADD INDEX `users_is_approved_role_business_bio_index` (`is_approved`, `role`, `business_bio`(191))');
     }
 
     public function down(): void
@@ -108,7 +109,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->dropIndex(['banned_at']);
             $table->dropIndex(['is_approved']);
-            $table->dropIndex(['is_approved', 'role', 'business_bio']);
         });
+        DB::statement('ALTER TABLE `users` DROP INDEX `users_is_approved_role_business_bio_index`');
     }
 };
