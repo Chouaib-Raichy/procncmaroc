@@ -1,0 +1,1 @@
+import{o as e}from"./index-2GddoI1Y.js";var t=()=>e.get(`/categories`),n=t=>e.post(`/admin/categories`,t,{headers:{"Content-Type":`multipart/form-data`}}),r=(t,n)=>e.post(`/admin/categories/update/${t}`,n,{headers:{"Content-Type":`multipart/form-data`}}),i=t=>e.delete(`/admin/categories/${t}`);export{r as i,i as n,t as r,n as t};

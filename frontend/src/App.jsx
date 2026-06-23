@@ -8,7 +8,6 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Loading from './components/Loading';
 import SEO from './components/SEO';
-import Home from './pages/Home';
 import { trackVisit } from './api/visitors';
 import './App.css';
 
@@ -20,6 +19,7 @@ const ContactUs = lazy(() => import('./pages/ContactUs'));
 const CustomerGallery = lazy(() => import('./pages/CustomerGallery'));
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
+const Home = lazy(() => import('./pages/Home'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));

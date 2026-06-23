@@ -147,7 +147,7 @@ export default function MachineDetail() {
 
               {machine.features && machine.features.length > 0 && (
                 <motion.div variants={childVariants} style={styles.featuresBox}>
-                  <h3 style={styles.featuresTitle}>Exclusive Features :</h3>
+                  <h2 style={styles.featuresTitle}>Exclusive Features :</h2>
                   <ul style={styles.featuresList}>
                     {machine.features.map((f, i) => (
                       <li key={i} style={styles.featureItem}><span style={styles.bullet}></span>{f}</li>

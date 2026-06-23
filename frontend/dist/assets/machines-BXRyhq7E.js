@@ -1,0 +1,1 @@
+import{o as e}from"./index-2GddoI1Y.js";`${window.location.origin}`;var t=()=>e.get(`/machines?all=1`),n=(t={})=>e.get(`/admin/machines`,{params:t}),r=t=>e.post(`/admin/machines`,t,{headers:{"Content-Type":`multipart/form-data`}}),i=(t,n)=>e.post(`/admin/machines/update/${t}`,n,{headers:{"Content-Type":`multipart/form-data`}});export{i,n,t as r,r as t};

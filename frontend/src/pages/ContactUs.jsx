@@ -101,7 +101,7 @@ export default function ContactUs() {
                 whileHover={{ y: -4, transition: { duration: 0.2 } }}
               >
                 <span style={styles.infoIcon}>{card.icon}</span>
-                <h4 style={styles.infoLabel}>{card.label}</h4>
+                <h2 style={styles.infoLabel}>{card.label}</h2>
                 {card.text.map((t, j) => (
                   <p key={j} style={styles.infoText}>{t}</p>
                 ))}
@@ -174,7 +174,7 @@ export default function ContactUs() {
             whileHover={{ scale: 1.01 }}
             transition={{ type: 'spring', stiffness: 200 }}
           >
-            <h3 style={styles.mapTitle}>Our Location</h3>
+            <h2 style={styles.mapTitle}>Our Location</h2>
             <div style={styles.mapWrap}>
               <iframe
                 title="Google Map"
@@ -192,7 +192,7 @@ export default function ContactUs() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
           >
-            <h4 style={styles.hoursTitle}>Working Hours</h4>
+            <h2 style={styles.hoursTitle}>Working Hours</h2>
             <div style={styles.hoursRow}><span>Monday – Saturday</span><span>9:00 AM – 6:00 PM</span></div>
             <div style={styles.hoursRow}><span>Sunday</span><span>Closed</span></div>
           </motion.div>

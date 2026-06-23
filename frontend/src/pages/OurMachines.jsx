@@ -108,7 +108,7 @@ export default function OurMachines() {
                     />
                   </div>
                   <div style={styles.cardBody}>
-                    <h3 style={styles.cardTitle}>{m.title}</h3>
+                    <h2 style={styles.cardTitle}>{m.title}</h2>
                     {m.price && <p style={styles.price}>{parseFloat(m.price).toLocaleString()} MAD</p>}
                     <p style={styles.desc}>{m.description}</p>
                     <Link to={`/machines/${m.id}`} style={styles.btn} className="more-btn">More infos</Link>

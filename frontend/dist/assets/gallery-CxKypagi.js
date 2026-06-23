@@ -1,0 +1,1 @@
+import{o as e}from"./index-2GddoI1Y.js";var t=t=>e.get(`/gallery/${t}/comments`),n=(t,n)=>e.post(`/gallery/${t}/comments`,{body:n}),r=(t,n)=>e.post(`/gallery/comments/${t}/reply`,{body:n}),i=t=>e.post(`/gallery/${t}/like`),a=t=>e.post(`/gallery/comments/${t}/like`),o=t=>e.get(`/gallery/${t}/likes`);export{a,r as i,t as n,i as o,o as r,n as t};

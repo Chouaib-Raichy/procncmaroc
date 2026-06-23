@@ -131,7 +131,7 @@ export default function Home() {
                     style={styles.cardImg}
                   />
                   <div className="card-body" style={styles.cardBody}>
-                    <h3 className="card-title" style={styles.cardTitle}>{partner.name}</h3>
+                    <h2 className="card-title" style={styles.cardTitle}>{partner.name}</h2>
                     <p className="card-text" style={styles.cardText}>
                       {partner.business_bio || partner.business_location || 'No information provided.'}
                     </p>
@@ -168,7 +168,7 @@ export default function Home() {
                 </picture>
               </div>
               <div className="card-body" style={styles.cardBody}>
-                <h3 className="card-title" style={{ ...styles.cardTitle, cursor: 'pointer' }} onClick={() => setCatIndex((p) => (p + 1) % catCards.length)}>{activeCat.title}</h3>
+                <h2 className="card-title" style={{ ...styles.cardTitle, cursor: 'pointer' }} onClick={() => setCatIndex((p) => (p + 1) % catCards.length)}>{activeCat.title}</h2>
                 <p className="card-text" style={{ ...styles.cardText, cursor: 'pointer' }} onClick={() => setCatIndex((p) => (p + 1) % catCards.length)}>{activeCat.description}</p>
                 <div style={styles.dots}>
                   {catCards.map((_, i) => (

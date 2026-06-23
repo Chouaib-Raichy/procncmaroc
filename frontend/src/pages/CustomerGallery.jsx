@@ -347,6 +347,7 @@ export default function CustomerGallery() {
             transition={{ duration: 0.5 }}
             style={{ textAlign: 'center', marginBottom: 'clamp(32px, 5vw, 60px)' }}
           >
+            <h1 style={styles.title}>Customer Stories</h1>
           </motion.div>
 
           {loading ? (
@@ -407,7 +408,7 @@ export default function CustomerGallery() {
 
                   <div style={styles.cardBody} className="story-card-body">
                     <div style={styles.cardHeader}>
-                      <h3 style={styles.cardTitle}>{post.title}</h3>
+                      <h2 style={styles.cardTitle}>{post.title}</h2>
                       {post.business_location && (() => {
                         const loc = post.business_location;
                         const m = loc.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);

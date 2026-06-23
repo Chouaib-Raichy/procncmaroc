@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
@@ -147,12 +146,8 @@ export default function Navbar() {
   );
 
   return (
-    <motion.nav style={styles.nav}
-      initial={{ y: -80, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-    >
-      <style>{`.search-btn:hover { opacity: 1 !important; color: #b8894a !important; } .search-btn:active { transform: scale(0.92) !important; } .nav-mobile-icon:hover { opacity: 0.7 !important; } @media (min-width: 901px) { .nav-mobile-icons { display: none !important; } .nav-left { gap: clamp(8px, 1.5vw, 16px) !important; margin-right: 0 !important; } .logo-text { font-size: clamp(20px, 4vw, 26px) !important; } } @media (max-width: 900px) { .nav-mobile-icons { display: flex !important; } }`}</style>
+    <nav style={styles.nav} className="nav-animate">
+      <style>{`@keyframes navSlideDown { from { transform: translateY(-80px); opacity: 0; } to { transform: translateY(0); opacity: 1; } } .nav-animate { animation: navSlideDown 0.5s ease-out; } .search-btn:hover { opacity: 1 !important; color: #b8894a !important; } .search-btn:active { transform: scale(0.92) !important; } .nav-mobile-icon:hover { opacity: 0.7 !important; } @media (min-width: 901px) { .nav-mobile-icons { display: none !important; } .nav-left { gap: clamp(8px, 1.5vw, 16px) !important; margin-right: 0 !important; } .logo-text { font-size: clamp(20px, 4vw, 26px) !important; } } @media (max-width: 900px) { .nav-mobile-icons { display: flex !important; } }`}</style>
 
       <div style={styles.navLeft} className="nav-left">
         <button className={`hamburger${menuOpen ? ' open' : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
@@ -332,14 +327,14 @@ export default function Navbar() {
             ) : (
               <div style={styles.authGroup}>
                 <Link to="/login" style={{...styles.link, ...active('/login')}} onClick={closeAll}>Login</Link>
-                <Link to="/signup" className="signup-link" style={styles.signupBtn} onClick={closeAll}>Signup</Link>
+                <Link to="/signup" className="signup-link" onClick={closeAll}>Signup</Link>
               </div>
             )}
           </>
         )}
       </div>
       {searchOpen && <SearchModal onClose={() => setSearchOpen(false)} />}
-    </motion.nav>
+    </nav>
   );
 }
 
@@ -492,16 +487,6 @@ const styles = {
     cursor: 'pointer',
     fontWeight: '500',
     fontSize: '13px',
-  },
-  signupBtn: {
-    background: '#8b682f',
-    color: '#fff',
-    textDecoration: 'none',
-    padding: '8px 20px',
-    borderRadius: '4px',
-    fontWeight: '600',
-    fontSize: 'clamp(13px, 1.3vw, 15px)',
-    whiteSpace: 'nowrap',
   },
   searchBtn: {
     background: 'transparent',

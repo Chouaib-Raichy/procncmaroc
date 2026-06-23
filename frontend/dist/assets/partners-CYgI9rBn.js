@@ -1,0 +1,1 @@
+import{o as e}from"./index-2GddoI1Y.js";var t=()=>e.get(`/partners`),n=t=>e.get(`/partners/${t}`);export{t as n,n as t};

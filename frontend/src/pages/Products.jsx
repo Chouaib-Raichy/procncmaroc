@@ -146,7 +146,7 @@ export default function Products() {
                       )}
                     </div>
                     <div style={styles.cardBody}>
-                      <h3 style={styles.cardTitle}>{p.title}</h3>
+                      <h2 style={styles.cardTitle}>{p.title}</h2>
                       {p.price != null && <div style={styles.cardMeta}><span style={styles.price}>{formatPrice(p.price)}</span></div>}
                       <p style={styles.cardDesc}>{truncate(p.description, 100)}</p>
                       <motion.a
