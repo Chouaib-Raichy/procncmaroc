@@ -36,10 +36,10 @@ function PageTracker() {
   const location = useLocation();
 
   useEffect(() => {
-    const id = setTimeout(() => {
-      trackVisit(location.pathname + location.search).catch(() => {});
-    }, 3000);
-    return () => clearTimeout(id);
+    const id = requestIdleCallback
+      ? requestIdleCallback(() => { trackVisit(location.pathname + location.search).catch(() => {}); }, { timeout: 5000 })
+      : setTimeout(() => { trackVisit(location.pathname + location.search).catch(() => {}); }, 5000);
+    return () => requestIdleCallback ? cancelIdleCallback(id) : clearTimeout(id);
   }, [location]);
 
   return null;

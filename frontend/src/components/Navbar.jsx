@@ -23,12 +23,18 @@ export default function Navbar() {
   const mobileProfileRef = useRef(null);
 
   useEffect(() => {
-    const id = setTimeout(() => {
-      api.get('/categories')
-        .then((res) => setCategories(res.data))
-        .catch(() => setCategories([]));
-    }, 2000);
-    return () => clearTimeout(id);
+    const id = requestIdleCallback
+      ? requestIdleCallback(() => {
+          api.get('/categories')
+            .then((res) => setCategories(res.data))
+            .catch(() => setCategories([]));
+        }, { timeout: 4000 })
+      : setTimeout(() => {
+          api.get('/categories')
+            .then((res) => setCategories(res.data))
+            .catch(() => setCategories([]));
+        }, 4000);
+    return () => requestIdleCallback ? cancelIdleCallback(id) : clearTimeout(id);
   }, []);
 
   useEffect(() => {
