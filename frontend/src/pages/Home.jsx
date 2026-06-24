@@ -57,43 +57,26 @@ export default function Home() {
   ];
 
   useEffect(() => {
-    const id = requestIdleCallback
-      ? requestIdleCallback(() => {
-          getAllMachines()
-            .then((res) => setMachines(res.data))
-            .catch(() => setMachines([]));
-        }, { timeout: 5000 })
-      : setTimeout(() => {
-          getAllMachines()
-            .then((res) => setMachines(res.data))
-            .catch(() => setMachines([]));
-        }, 5000);
-    return () => requestIdleCallback ? cancelIdleCallback(id) : clearTimeout(id);
+    const id = setTimeout(() => {
+      getAllMachines()
+        .then((res) => setMachines(res.data))
+        .catch(() => setMachines([]));
+    }, 5000);
+    return () => clearTimeout(id);
   }, []);
 
   useEffect(() => {
-    const id = requestIdleCallback
-      ? requestIdleCallback(() => {
-          getPartners()
-            .then((res) => {
-              const users = res.data || res;
-              if (users.length > 0) {
-                setPartner(users[Math.floor(Math.random() * users.length)]);
-              }
-            })
-            .catch(() => {});
-        }, { timeout: 6000 })
-      : setTimeout(() => {
-          getPartners()
-            .then((res) => {
-              const users = res.data || res;
-              if (users.length > 0) {
-                setPartner(users[Math.floor(Math.random() * users.length)]);
-              }
-            })
-            .catch(() => {});
-        }, 6000);
-    return () => requestIdleCallback ? cancelIdleCallback(id) : clearTimeout(id);
+    const id = setTimeout(() => {
+      getPartners()
+        .then((res) => {
+          const users = res.data || res;
+          if (users.length > 0) {
+            setPartner(users[Math.floor(Math.random() * users.length)]);
+          }
+        })
+        .catch(() => {});
+    }, 6000);
+    return () => clearTimeout(id);
   }, []);
 
   useEffect(() => {
