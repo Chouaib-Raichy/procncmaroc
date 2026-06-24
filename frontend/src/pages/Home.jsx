@@ -165,7 +165,7 @@ export default function Home() {
         }
       `}</style>
       <div style={styles.hero} className="anim-hero">
-        <img src={heroBg} alt="" fetchpriority="high" srcSet="/hero-720.webp 720w, /hero.webp 1004w" sizes="100vw" style={styles.heroImg} />
+        <img src={heroBg} alt="" fetchpriority="high" srcSet="/hero-720.webp 720w, /hero.webp 1004w" sizes="(max-width: 720px) 100vw, 1004px" style={styles.heroImg} />
         <div className="hero-content" style={styles.heroContent}>
             <h1 className="hero-title anim-hero-title" style={styles.heroTitle}>
               PREMIUM CNC & LASER SOLUTIONS
@@ -238,7 +238,7 @@ export default function Home() {
             </div>
 
         </div>
-        <img src={showroom} alt="Showroom" fetchpriority="high" srcSet="/showroom-720.webp 720w, /showroom-v2.webp 1335w" sizes="100vw" style={styles.showroomImg} />
+        <img src={showroom} alt="Showroom" fetchpriority="high" srcSet="/showroom-720.webp 720w, /showroom-v2.webp 1335w" sizes="(max-width: 720px) 100vw, 1335px" style={styles.showroomImg} />
       </div>
 
       <section ref={showcaseRef} style={styles.showcase} className={showcaseInView ? 'showcase-visible' : ''}>
