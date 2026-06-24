@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
-import SearchModal from './SearchModal';
 import slugify from '../utils/slugify';
+
+const SearchModal = lazy(() => import('./SearchModal'));
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -337,7 +338,7 @@ export default function Navbar() {
           </>
         )}
       </div>
-      {searchOpen && <SearchModal onClose={() => setSearchOpen(false)} />}
+      {searchOpen && <Suspense fallback={null}><SearchModal onClose={() => setSearchOpen(false)} /></Suspense>}
     </nav>
   );
 }

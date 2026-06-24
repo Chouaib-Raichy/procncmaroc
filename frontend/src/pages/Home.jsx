@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import LazyVideo from '../components/LazyVideo';
 const heroBg = '/hero.webp';
@@ -294,7 +294,7 @@ export default function Home() {
             </div>
 
         </div>
-        <img src={showroom} alt="Showroom" fetchpriority="high" srcSet="/showroom-720.webp 720w, /showroom-v2.webp 1335w" sizes="(max-width: 720px) 100vw, 1335px" style={styles.showroomImg} />
+        <img src={showroom} alt="Showroom" fetchpriority="high" srcSet="/showroom-720.webp 720w, /showroom-800.webp 800w, /showroom-v2.webp 1335w" sizes="(max-width: 900px) 100vw, 1335px" style={styles.showroomImg} />
       </div>
 
       <section ref={showcaseRef} style={styles.showcase} className={showcaseInView ? 'showcase-visible' : ''}>
