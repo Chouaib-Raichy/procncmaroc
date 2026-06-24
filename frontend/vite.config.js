@@ -5,6 +5,12 @@ export default defineConfig({
   plugins: [
     react(),
     {
+      name: 'remove-unused-preloads',
+      transformIndexHtml(html) {
+        return html.replace(/<link rel="modulepreload"[^>]*vendor-animations[^>]*>\n\s*/g, '');
+      },
+    },
+    {
       name: 'async-css',
       transformIndexHtml(html) {
         return html.replace(

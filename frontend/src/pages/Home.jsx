@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import LazyVideo from '../components/LazyVideo';
 const heroBg = '/hero.webp';
@@ -26,11 +25,30 @@ import { getAllMachines } from '../api/machines';
 import { getPartners } from '../api/partners';
 import SEO from '../components/SEO';
 
+function useInView(threshold = 0.1) {
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setInView(true); observer.unobserve(el); } },
+      { threshold }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [threshold]);
+  return [ref, inView];
+}
+
 export default function Home() {
   const [machines, setMachines] = useState([]);
   const [lightboxVideo, setLightboxVideo] = useState(null);
   const [partner, setPartner] = useState(null);
   const [catIndex, setCatIndex] = useState(0);
+  const [showcaseRef, showcaseInView] = useInView(0.05);
+  const [featuresRef, featuresInView] = useInView(0.05);
+  const [cardsRef, cardsInView] = useInView(0.05);
 
   const catCards = [
     { image: fibreImg, mobileImage: mobile1Img, title: 'FIBRE MARKING +', description: 'Durable & fast marking (titanium, acrylic, aluminum, gold, silver, brass...)' },
@@ -68,6 +86,43 @@ export default function Home() {
     <div>
       <SEO title="Home" description="PRO CNC MAROC — Morocco's leading CNC machining, laser cutting, engraving &amp; 3D printing company. Premium machines for industry, crafts &amp; professionals. Visit our Casablanca showroom." canonicalUrl="/" keywords="CNC machines Morocco, precision machining, laser cutting, engraving services, 3D printing, CNC router, CNC Morocco, industrial machining" />
       <style>{`
+        @keyframes heroFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideLeft { from { opacity: 0; transform: translateX(-60px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scaleXIn { from { transform: scaleX(0); opacity: 0; } to { transform: scaleX(1); opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.15); opacity: 1; } }
+        @keyframes lightboxFade { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes lightboxScale { from { transform: scale(0.85); } to { transform: scale(1); } }
+        @keyframes hoverLift { from { transform: translateY(0); } to { transform: translateY(-6px); } }
+
+        .anim-hero { animation: heroFadeIn 0.8s ease forwards; }
+        .anim-hero-title { animation: slideLeft 0.8s ease-out forwards; }
+        .anim-hero-sub { animation: slideLeft 0.8s 0.25s ease-out forwards; opacity: 0; }
+        .anim-pulse { animation: pulse 2.5s ease-in-out infinite; }
+        .anim-lightbox-bg { animation: lightboxFade 0.25s ease forwards; }
+        .anim-lightbox-media { animation: lightboxScale 0.25s ease forwards; }
+
+        .scroll-slide-up { opacity: 0; }
+        .showcase-visible .scroll-slide-up,
+        .features-visible .scroll-slide-up { animation: slideUp 0.6s ease-out forwards; }
+
+        .showcase-visible .scroll-scale-x { animation: scaleXIn 0.8s ease-out forwards; }
+        .showcase-visible .scroll-fade-down { animation: fadeDown 0.6s ease-out forwards; }
+        .showcase-visible .scroll-slide-up-stagger { animation: slideUp 0.5s ease-out forwards; animation-delay: calc(0.15s * var(--stagger, 0)); }
+        .showcase-visible .scroll-fade-up-stagger { animation: fadeUp 0.7s 0.5s ease-out forwards; }
+        .showcase-visible .scroll-scale-x-stagger { animation: scaleXIn 0.8s 0.8s ease-out forwards; }
+
+        .features-visible .scroll-fade-down { animation: fadeDown 0.6s ease-out forwards; }
+        .features-visible .scroll-slide-up-stagger { animation: slideUp 0.5s ease-out forwards; animation-delay: calc(0.1s * var(--stagger, 0)); }
+
+        .cards-visible .scroll-slide-up { animation: slideUp 0.6s ease-out forwards; }
+        .cards-visible .scroll-slide-up:last-child { animation-delay: 0.15s; }
+
+        .showcase-video-wrap { transition: transform 0.3s ease, border-color 0.4s ease, box-shadow 0.4s ease; }
+        .showcase-video-wrap:hover { transform: translateY(-6px); }
+
         @media (max-width: 768px) {
           .hero-content { left: 5% !important; top: 9px !important; }
           .hero-title { font-size: 10px !important; margin-bottom: 14px !important; }
@@ -88,40 +143,23 @@ export default function Home() {
           .home-more-link { font-size: 6px !important; margin-top: 1px !important; padding: 2px 8px !important; }
         }
       `}</style>
-      <motion.div style={styles.hero}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-      >
+      <div style={styles.hero} className="anim-hero">
         <img src={heroBg} alt="" fetchpriority="high" style={styles.heroImg} />
         <div className="hero-content" style={styles.heroContent}>
-            <motion.h1 className="hero-title" style={styles.heroTitle}
-              initial={{ opacity: 0, x: -60 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, ease: 'easeOut' }}
-            >
+            <h1 className="hero-title anim-hero-title" style={styles.heroTitle}>
               PREMIUM CNC & LASER SOLUTIONS
-            </motion.h1>
-            <motion.p className="hero-subtitle" style={styles.heroSubtitle}
-              initial={{ opacity: 0, x: -60 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.25, ease: 'easeOut' }}
-            >
+            </h1>
+            <p className="hero-subtitle anim-hero-sub" style={styles.heroSubtitle}>
               <span className="hero-tag" style={styles.heroTag}>High-performance machines</span>
               <span className="hero-desc" style={styles.heroDesc}>with free expert training & lifetime support</span>
-            </motion.p>
+            </p>
         </div>
-      </motion.div>
+      </div>
 
       <div style={styles.showroomSection}>
-          <div className="overlay-cards" style={styles.overlayCards}>
+          <div ref={cardsRef} className={`overlay-cards${cardsInView ? ' cards-visible' : ''}`} style={styles.overlayCards}>
             {/* LEFT CARD - PARTNER */}
-            <motion.div style={styles.card} className="home-card"
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, ease: 'easeOut' }}
-            >
+            <div style={styles.card} className="home-card scroll-slide-up">
               {partner ? (
                 <>
                   <img
@@ -147,10 +185,10 @@ export default function Home() {
                   Loading partner...
                 </div>
               )}
-            </motion.div>
+            </div>
 
             {/* RIGHT CARD - CATEGORY CAROUSEL */}
-            <motion.div style={styles.card} className="home-card"
+            <div style={styles.card} className="home-card scroll-slide-up"
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -181,72 +219,51 @@ export default function Home() {
                 </div>
                 <Link to="/our-machines" style={styles.moreLink} className="home-more-link">More infos</Link>
               </div>
-            </motion.div>
+            </div>
 
         </div>
         <img src={showroom} alt="Showroom" fetchpriority="high" style={styles.showroomImg} />
       </div>
 
-      <section style={styles.showcase}>
+      <section ref={showcaseRef} style={styles.showcase} className={showcaseInView ? 'showcase-visible' : ''}>
         <div style={styles.showcaseGlow} />
-        <motion.div
-          style={styles.showcaseDecoLine}
-          initial={{ scaleX: 0, opacity: 0 }}
-          whileInView={{ scaleX: 1, opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-        />
-        <motion.h2
-          style={styles.showcaseTitle}
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-        >
+        <div style={styles.showcaseDecoLine} className="scroll-scale-x" />
+        <h2 style={styles.showcaseTitle} className="scroll-fade-down">
           RAYSET HIGH PRODUCTION CAPABILITY SHOWCASE
-        </motion.h2>
+        </h2>
         <div style={styles.showcaseVideos}>
           {[
             { src: showcase1, label: 'RAYSET laser co2 machines' },
             { src: showcase2, label: 'RAYSET fiber marking machines' },
             { src: showcase3, label: 'RAYSET cnc router machines' },
           ].map((item, i) => (
-            <motion.div
+            <div
               key={i}
-              style={styles.showcaseVideoWrap}
-              className="showcase-video-wrap"
+              style={{ ...styles.showcaseVideoWrap, '--stagger': i }}
+              className="showcase-video-wrap scroll-slide-up-stagger"
               onClick={() => setLightboxVideo(item.src)}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.15 * i, ease: 'easeOut' }}
-              whileHover={{ y: -6, transition: { duration: 0.3 } }}
             >
               <LazyVideo src={item.src} style={styles.showcaseVideo} />
               <div style={styles.showcaseOverlay}>
                 <div style={styles.showcaseOverlayContent} className="showcase-overlay-content">
-                  <motion.span
+                  <span
                     style={styles.showcasePlayIcon}
-                    animate={{ scale: [1, 1.15, 1], opacity: [0.7, 1, 0.7] }}
-                    transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                    className="anim-pulse"
                   >
                     ▶
-                  </motion.span>
+                  </span>
                   <span style={styles.showcaseLabel}>Click to play</span>
                 </div>
                 <div style={styles.showcaseLabelBar}>
                   <span style={styles.showcaseLabelBarText}>{item.label}</span>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
-        <motion.p
+        <p
           style={styles.showcaseText}
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.5, ease: 'easeOut' }}
+          className="scroll-fade-up-stagger"
         >
           Pro CNC Morocco is the leading Moroccan company in digital engraving and laser cutting technology,
           distinguished by its unwavering commitment to its partners. We are the only providers of free
@@ -255,23 +272,15 @@ export default function Home() {
           ensure high performance and durability. Because our clients are not just customers, they are our
           lifelong partners. We don't just sell a service; we are committed to continuously supporting you
           to ensure your success.
-        </motion.p>
-        <motion.div
+        </p>
+        <div
           style={styles.showcaseDecoLine}
-          initial={{ scaleX: 0, opacity: 0 }}
-          whileInView={{ scaleX: 1, opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.8, ease: 'easeOut' }}
+          className="scroll-scale-x-stagger"
         />
       </section>
 
-      <section style={styles.features}>
-        <motion.h2 style={styles.sectionTitle}
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-        >Why Choose PRO CNC MAROC</motion.h2>
+      <section ref={featuresRef} style={styles.features} className={featuresInView ? 'features-visible' : ''}>
+        <h2 style={styles.sectionTitle} className="scroll-fade-down">Why Choose PRO CNC MAROC</h2>
         <div style={styles.whyChooseGrid}>
           {[
             {
@@ -295,51 +304,40 @@ export default function Home() {
               text: "Our team is available anytime to answer your questions and assist you.",
             },
           ].map((item, index) => (
-            <motion.div
+            <div
               key={index}
-              style={styles.whyChooseItem}
-              className="why-choose-item"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 * index, ease: 'easeOut' }}
+              style={{ ...styles.whyChooseItem, '--stagger': index }}
+              className="why-choose-item scroll-slide-up-stagger"
             >
               <div style={styles.whyChooseIcon} className="why-choose-icon">
                 {item.icon}
               </div>
               <h3 style={styles.whyChooseTitle}>{item.title}</h3>
               <p style={styles.whyChooseText}>{item.text}</p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </section>
 
-      <AnimatePresence>
-        {lightboxVideo && (
-          <motion.div
-            style={styles.videoLightbox}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setLightboxVideo(null)}
-          >
-            <motion.video
-              src={lightboxVideo}
-              style={styles.videoLightboxMedia}
-              autoPlay
-              muted
-              loop
-              playsInline
-              controls
-              initial={{ scale: 0.85 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.85 }}
-              transition={{ duration: 0.25 }}
-              onClick={(e) => e.stopPropagation()}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {lightboxVideo && (
+        <div
+          style={styles.videoLightbox}
+          className="anim-lightbox-bg"
+          onClick={() => setLightboxVideo(null)}
+        >
+          <video
+            src={lightboxVideo}
+            style={styles.videoLightboxMedia}
+            className="anim-lightbox-media"
+            autoPlay
+            muted
+            loop
+            playsInline
+            controls
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }
