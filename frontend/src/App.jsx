@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import { useEffect, lazy, Suspense } from 'react';
+import { useEffect, useRef, lazy, Suspense } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -34,12 +34,19 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageTracker() {
   const location = useLocation();
+  const tracked = useRef(false);
 
   useEffect(() => {
-    const id = requestIdleCallback
-      ? requestIdleCallback(() => { trackVisit(location.pathname + location.search).catch(() => {}); }, { timeout: 5000 })
-      : setTimeout(() => { trackVisit(location.pathname + location.search).catch(() => {}); }, 5000);
-    return () => requestIdleCallback ? cancelIdleCallback(id) : clearTimeout(id);
+    if (tracked.current) return;
+    tracked.current = true;
+    const visit = () => { trackVisit(location.pathname + location.search).catch(() => {}); };
+    if (document.readyState === 'complete') {
+      setTimeout(visit, 5000);
+    } else {
+      const onLoad = () => setTimeout(visit, 5000);
+      window.addEventListener('load', onLoad);
+      return () => window.removeEventListener('load', onLoad);
+    }
   }, [location]);
 
   return null;

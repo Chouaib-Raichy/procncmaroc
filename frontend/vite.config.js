@@ -25,6 +25,8 @@ export default defineConfig({
         manualChunks(id) {
           if (id.includes('node_modules/framer-motion')) return 'vendor-animations';
           if (id.includes('node_modules/leaflet') || id.includes('node_modules/react-leaflet')) return 'vendor-maps';
+          if (id.includes('node_modules/react-router') || id.includes('node_modules/@remix-run')) return 'vendor-router';
+          if (id.includes('node_modules/react-helmet-async')) return 'vendor-meta';
         },
       },
     },
