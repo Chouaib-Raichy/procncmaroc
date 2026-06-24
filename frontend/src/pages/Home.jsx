@@ -165,7 +165,7 @@ export default function Home() {
         }
       `}</style>
       <div style={styles.hero} className="anim-hero">
-        <img src={heroBg} alt="" fetchpriority="high" style={styles.heroImg} />
+        <img src={heroBg} alt="" fetchpriority="high" srcSet="/hero-720.webp 720w, /hero.webp 1004w" sizes="100vw" style={styles.heroImg} />
         <div className="hero-content" style={styles.heroContent}>
             <h1 className="hero-title anim-hero-title" style={styles.heroTitle}>
               PREMIUM CNC & LASER SOLUTIONS
@@ -209,12 +209,7 @@ export default function Home() {
             </div>
 
             {/* RIGHT CARD - CATEGORY CAROUSEL */}
-            <div style={styles.card} className="home-card scroll-slide-up"
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
-            >
+            <div style={styles.card} className="home-card scroll-slide-up">
               <div style={styles.carouselImgWrap} className="carousel-img-wrap">
                 <picture style={{ display: 'block', width: '100%', height: '100%' }}>
                   <source media="(max-width: 768px)" srcSet={activeCat.mobileImage} />
@@ -243,7 +238,7 @@ export default function Home() {
             </div>
 
         </div>
-        <img src={showroom} alt="Showroom" fetchpriority="high" style={styles.showroomImg} />
+        <img src={showroom} alt="Showroom" fetchpriority="high" srcSet="/showroom-720.webp 720w, /showroom-v2.webp 1335w" sizes="100vw" style={styles.showroomImg} />
       </div>
 
       <section ref={showcaseRef} style={styles.showcase} className={showcaseInView ? 'showcase-visible' : ''}>

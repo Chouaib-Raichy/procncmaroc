@@ -29,7 +29,8 @@ export default defineConfig({
     rolldownOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('node_modules/framer-motion')) return 'vendor-animations';
+          // framer-motion NOT listed here — all pages using it are lazy-loaded,
+          // so it will be automatically code-split without a separate eager chunk.
           if (id.includes('node_modules/leaflet') || id.includes('node_modules/react-leaflet')) return 'vendor-maps';
           if (id.includes('node_modules/react-router') || id.includes('node_modules/@remix-run')) return 'vendor-router';
           if (id.includes('node_modules/react-helmet-async')) return 'vendor-meta';
