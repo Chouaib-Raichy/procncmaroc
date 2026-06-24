@@ -23,6 +23,7 @@ export default defineConfig({
   appType: 'spa',
   server: { port: 3000 },
   build: {
+    target: 'es2015',
     chunkSizeWarningLimit: 600,
     sourcemap: false,
     cssCodeSplit: true,

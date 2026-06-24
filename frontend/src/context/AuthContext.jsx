@@ -4,22 +4,26 @@ import api from '../api/axios';
 const AuthContext = createContext();
 
 function getToken() {
-  return localStorage.getItem('token') || sessionStorage.getItem('token');
+  try { return localStorage.getItem('token'); } catch { /* private mode */ }
+  try { return sessionStorage.getItem('token'); } catch { /* private mode */ }
+  return null;
 }
 
 function setToken(token, remember) {
-  if (remember) {
-    localStorage.setItem('token', token);
-    sessionStorage.removeItem('token');
-  } else {
-    sessionStorage.setItem('token', token);
-    localStorage.removeItem('token');
-  }
+  try {
+    if (remember) {
+      localStorage.setItem('token', token);
+      try { sessionStorage.removeItem('token'); } catch {}
+    } else {
+      sessionStorage.setItem('token', token);
+      try { localStorage.removeItem('token'); } catch {}
+    }
+  } catch { /* private mode */ }
 }
 
 function removeToken() {
-  localStorage.removeItem('token');
-  sessionStorage.removeItem('token');
+  try { localStorage.removeItem('token'); } catch { /* private mode */ }
+  try { sessionStorage.removeItem('token'); } catch { /* private mode */ }
 }
 
 export function AuthProvider({ children }) {
