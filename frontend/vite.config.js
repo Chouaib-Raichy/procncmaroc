@@ -19,6 +19,12 @@ export default defineConfig({
         );
       },
     },
+    {
+      name: 'remove-crossorigin',
+      transformIndexHtml(html) {
+        return html.replace(/\s*crossorigin(="[^"]*")?/g, '');
+      },
+    },
   ],
   appType: 'spa',
   server: { port: 3000 },
