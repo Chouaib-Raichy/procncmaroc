@@ -103,9 +103,65 @@ export default function Home() {
 
   const activeCat = catCards[catIndex];
 
+  const faqSchema = [
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What types of CNC machines does PRO CNC MAROC sell in Morocco?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'We offer a wide range of CNC machines including CNC routers, CO2 laser engraving/cutting machines, fiber laser marking machines, and 3D printers. Our machines are suitable for wood, acrylic, metal, leather, paper, plastic, aluminum, and more.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Do you provide training with CNC machine purchase?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes, we provide free professional training with every machine purchase. Our experts will train you on operation, maintenance, and optimization to ensure you get the most out of your investment.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What technical support do you offer after purchasing a CNC machine?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'We offer lifetime free technical support for all machines purchased from PRO CNC MAROC. Our team is available to help with troubleshooting, maintenance advice, and operational questions via phone, WhatsApp, and email.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Where is PRO CNC MAROC located?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'PRO CNC MAROC is based in Casablanca, Morocco. We serve clients across Morocco, Africa, Europe, and the Middle East. You can visit our showroom in Casablanca to see machines in action.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What materials can your laser cutting machines handle?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Our CO2 laser machines can cut and engrave acrylic, wood, leather, paper, plastic, and more. Our fiber laser machines handle metals including stainless steel, aluminum, gold, silver, brass, and titanium.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How can I get a quote for a CNC machine in Morocco?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'You can contact us via phone at +212 625 280 991, email at contact@procncmaroc.com, or WhatsApp for a personalized quote. We offer competitive pricing and can help you choose the right machine for your needs.',
+          },
+        },
+      ],
+    },
+  ];
+
   return (
     <div>
-      <SEO title="Home" description="PRO CNC MAROC — Morocco's leading CNC machining, laser cutting, engraving &amp; 3D printing company. Premium machines for industry, crafts &amp; professionals. Visit our Casablanca showroom." canonicalUrl="/" keywords="CNC machines Morocco, precision machining, laser cutting, engraving services, 3D printing, CNC router, CNC Morocco, industrial machining" />
+      <SEO title="Home" description="PRO CNC MAROC — Morocco's leading CNC machining, laser cutting, engraving &amp; 3D printing company. Premium machines for industry, crafts &amp; professionals. Visit our Casablanca showroom." canonicalUrl="/" keywords="CNC machines Morocco, precision machining, laser cutting, engraving services, 3D printing, CNC router, CNC Morocco, industrial machining" jsonLd={faqSchema} />
       <style>{`
         @keyframes heroFadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideLeft { from { opacity: 0; transform: translateX(-60px); } to { opacity: 1; transform: translateX(0); } }

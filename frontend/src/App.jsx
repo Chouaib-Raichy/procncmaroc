@@ -92,7 +92,8 @@ function AppContent() {
             <Route path="/about-us" element={<PublicPage><ErrorBoundary><AboutUs /></ErrorBoundary></PublicPage>} />
             <Route path="/contact-us" element={<PublicPage><ErrorBoundary><ContactUs /></ErrorBoundary></PublicPage>} />
             <Route path="/stories" element={<PublicPage><ErrorBoundary><CustomerGallery /></ErrorBoundary></PublicPage>} />
-            <Route path="/machines/:id" element={<PublicPage><ErrorBoundary><MachineDetail /></ErrorBoundary></PublicPage>} />
+            <Route path="/machines/:slugAndId" element={<PublicPage><ErrorBoundary><MachineDetail /></ErrorBoundary></PublicPage>} />
+            <Route path="/machine/:id" element={<PublicPage><ErrorBoundary><MachineDetail /></ErrorBoundary></PublicPage>} />
             <Route path="/profile/:id" element={<PublicPage><ErrorBoundary><PublicProfile /></ErrorBoundary></PublicPage>} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />

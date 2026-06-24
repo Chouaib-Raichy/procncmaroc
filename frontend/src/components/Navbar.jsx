@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import SearchModal from './SearchModal';
+import slugify from '../utils/slugify';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -131,7 +132,7 @@ export default function Navbar() {
                   {mobileCatOpen === cat.id && cat.machines?.length > 0 && (
                     <div className="nav-machine-list">
                       {cat.machines.map((m, mi) => (
-                        <Link key={m.id} to={`/machines/${m.id}`} className="nav-machine-link" onClick={closeAll}>{m.title}</Link>
+                        <Link key={m.id} to={`/machines/${slugify(m.title)}-${m.id}`} className="nav-machine-link" onClick={closeAll}>{m.title}</Link>
                       ))}
                     </div>
                   )}
@@ -257,7 +258,7 @@ export default function Navbar() {
                       {activeCat === cat.id && cat.machines?.length > 0 && (
                         <div style={styles.subDropdown}>
                           {cat.machines.map((m) => (
-                            <Link key={m.id} to={`/machines/${m.id}`} style={styles.machineLink} onClick={closeAll}>{m.title}</Link>
+                            <Link key={m.id} to={`/machines/${slugify(m.title)}-${m.id}`} style={styles.machineLink} onClick={closeAll}>{m.title}</Link>
                           ))}
                         </div>
                       )}

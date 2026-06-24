@@ -7,6 +7,7 @@ import { getCategories } from '../api/categories';
 import machineBg from '../assets/machineBG.webp';
 import placeholderImg from '../assets/placeholder.svg';
 import SEO from '../components/SEO';
+import slugify from '../utils/slugify';
 
 export default function OurMachines() {
   const [allMachines, setAllMachines] = useState([]);
@@ -111,7 +112,7 @@ export default function OurMachines() {
                     <h2 style={styles.cardTitle}>{m.title}</h2>
                     {m.price && <p style={styles.price}>{parseFloat(m.price).toLocaleString()} MAD</p>}
                     <p style={styles.desc}>{m.description}</p>
-                    <Link to={`/machines/${m.id}`} style={styles.btn} className="more-btn">More infos</Link>
+                    <Link to={`/machines/${slugify(m.title)}-${m.id}`} style={styles.btn} className="more-btn">More infos</Link>
                   </div>
                 </div>
               ))}

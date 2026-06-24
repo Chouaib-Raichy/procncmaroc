@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 export default function NotFound() {
   return (
     <div style={styles.page}>
-      <SEO title="Page Not Found" description="The page you are looking for does not exist or has been moved." noindex={true} />
+      <SEO title="404 — Page Not Found | PRO CNC MAROC" description="Page not found. Browse our CNC machines, laser cutters, and engraving solutions in Morocco. Visit our homepage to explore." noindex={true} />
       <div style={styles.overlay}>
         <div style={styles.card}>
           <h1 style={styles.code}>404</h1>

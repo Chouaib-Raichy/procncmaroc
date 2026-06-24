@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchAll } from '../api/search';
+import slugify from '../utils/slugify';
 
 const ICONS = {
   users: '👤',
@@ -60,7 +61,7 @@ export default function SearchModal({ onClose }) {
   const handleSelect = useCallback((item) => {
     onClose();
     if (item.type === 'user') navigate(`/profile/${item.data.id}`);
-    else if (item.type === 'machine') navigate(`/machines/${item.data.id}`);
+    else if (item.type === 'machine') navigate(`/machines/${slugify(item.data.title)}-${item.data.id}`);
     else if (item.type === 'product') navigate('/products');
     else if (item.type === 'post') navigate('/stories');
   }, [navigate, onClose]);

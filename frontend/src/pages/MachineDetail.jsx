@@ -7,6 +7,7 @@ import ErrorState from '../components/ErrorState';
 import machineBg from '../assets/machineBG.webp';
 import placeholderImg from '../assets/placeholder.svg';
 import SEO from '../components/SEO';
+import slugify from '../utils/slugify';
 
 const PHONE = '212625280991';
 
@@ -27,7 +28,8 @@ const btnAnim = {
 };
 
 export default function MachineDetail() {
-  const { id } = useParams();
+  const { slugAndId, id: paramId } = useParams();
+  const id = paramId || (slugAndId ? slugAndId.split('-').pop() : null);
   const [machine, setMachine] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -68,12 +70,16 @@ export default function MachineDetail() {
     );
   }
 
+  const machineSlug = slugify(machine.title);
+  const machineUrl = `/machines/${machineSlug}-${id}`;
+  const machineFullUrl = `https://www.procncmaroc.com${machineUrl}`;
+
   return (
     <div style={styles.page}>
-      <SEO title={machine.title} description={machine.description + ' — Available at PRO CNC MAROC in Morocco. Call +212625280991 for pricing &amp; demo.'} canonicalUrl={'/machines/' + id} ogImage={machine.image_url || undefined} ogType="product" keywords={machine.title + ', CNC machine Morocco, ' + (machine.category?.name || 'CNC') + ' Morocco, buy CNC Morocco'} breadcrumbs={[
+      <SEO title={machine.title} description={machine.description + ' — Available at PRO CNC MAROC in Morocco. Call +212625280991 for pricing &amp; demo.'} canonicalUrl={machineUrl} ogImage={machine.image_url || undefined} ogType="product" keywords={machine.title + ', CNC machine Morocco, ' + (machine.category?.name || 'CNC') + ' Morocco, buy CNC Morocco'} breadcrumbs={[
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.procncmaroc.com' },
         { '@type': 'ListItem', position: 2, name: 'Our Machines', item: 'https://www.procncmaroc.com/our-machines' },
-        { '@type': 'ListItem', position: 3, name: machine.title, item: 'https://www.procncmaroc.com/machines/' + id },
+        { '@type': 'ListItem', position: 3, name: machine.title, item: machineFullUrl },
       ]} jsonLd={{
         '@type': 'Product',
         name: machine.title,
@@ -84,7 +90,7 @@ export default function MachineDetail() {
           price: parseFloat(machine.price),
           priceCurrency: 'MAD',
           availability: 'https://schema.org/InStock',
-          url: `https://www.procncmaroc.com/machines/${id}`,
+          url: machineFullUrl,
           seller: { '@type': 'Organization', name: 'PRO CNC MAROC' },
         } : undefined,
         category: machine.category?.name || undefined,
