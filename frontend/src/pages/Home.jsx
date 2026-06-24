@@ -478,7 +478,7 @@ const styles = {
     alignSelf: 'flex-end',
     marginTop: 'clamp(4px, 0.5vw, 8px)',
   },
-  showroomImg: { width: '100%', height: 'auto', display: 'block', aspectRatio: '1672 / 941' },
+  showroomImg: { width: '100%', height: 'auto', display: 'block', aspectRatio: '1335 / 751' },
 
   showcase: {
     padding: 'clamp(30px, 4vw, 50px) clamp(16px, 4vw, 60px)',
