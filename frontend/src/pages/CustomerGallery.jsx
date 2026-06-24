@@ -417,7 +417,7 @@ export default function CustomerGallery() {
                         <motion.a
                           href={mapsHref}
                           target="_blank" rel="noopener noreferrer"
-                          style={styles.gmapsBtn} title="View on Google Maps"
+                          style={styles.gmapsBtn} aria-label="View on Google Maps" title="View on Google Maps"
                           whileHover={{ background: 'rgba(79,195,247,0.18)', borderColor: 'rgba(79,195,247,0.5)' }}
                           whileTap={{ scale: 0.9 }}
                         >
