@@ -36,7 +36,10 @@ function PageTracker() {
   const location = useLocation();
 
   useEffect(() => {
-    trackVisit(location.pathname + location.search).catch(() => {});
+    const id = setTimeout(() => {
+      trackVisit(location.pathname + location.search).catch(() => {});
+    }, 3000);
+    return () => clearTimeout(id);
   }, [location]);
 
   return null;

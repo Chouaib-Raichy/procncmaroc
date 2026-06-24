@@ -23,9 +23,12 @@ export default function Navbar() {
   const mobileProfileRef = useRef(null);
 
   useEffect(() => {
-    api.get('/categories')
-      .then((res) => setCategories(res.data))
-      .catch(() => setCategories([]));
+    const id = setTimeout(() => {
+      api.get('/categories')
+        .then((res) => setCategories(res.data))
+        .catch(() => setCategories([]));
+    }, 2000);
+    return () => clearTimeout(id);
   }, []);
 
   useEffect(() => {
