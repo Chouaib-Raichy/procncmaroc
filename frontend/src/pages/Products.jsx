@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SEO from '../components/SEO';
 import { getProducts } from '../api/products';
@@ -43,6 +43,7 @@ export default function Products() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const gridRef = useRef(null);
 
   useEffect(() => {
     const t = setTimeout(() => { setDebouncedSearch(search); setPage(1); }, 300);
@@ -67,14 +68,23 @@ export default function Products() {
 
   useEffect(() => { fetch(); }, [fetch]);
 
+  useEffect(() => {
+    if (gridRef.current && !loading) {
+      gridRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [page, loading]);
+
   return (
     <div style={styles.page}>
+      <style>{`.product-card:hover .product-card-img { transform: scale(1.08); } .product-card:hover .product-card-overlay { opacity: 1; }`}</style>
       <SEO title="Products" description="PRO CNC MAROC — Premium CNC products &amp; services in Morocco. Precision machining, laser cutting, engraving, 3D printing &amp; industrial maintenance. Quality guaranteed." canonicalUrl="/products" keywords="CNC products Morocco, machining services, laser cutting service, 3D printing service, metal fabrication Morocco" jsonLd={{ '@type': 'ItemList', name: 'Products', itemListElement: [] }} />
       <div style={styles.overlay}>
-        <div style={styles.header}>
-          <motion.h1 style={styles.title} {...fadeUp()}>Products</motion.h1>
-          <motion.p style={styles.subtitle} {...fadeUp(0.1)}>Professional CNC equipment and accessories</motion.p>
-        </div>
+        <motion.div style={styles.header} {...fadeUp()}>
+          <motion.span style={styles.badge}>Our Catalog</motion.span>
+          <motion.h1 style={styles.title}>Products</motion.h1>
+          <motion.p style={styles.subtitle} {...fadeUp(0.1)}>Professional CNC equipment, tooling & accessories — precision engineered for industry</motion.p>
+          <div style={styles.titleDivider} />
+        </motion.div>
 
         <motion.div style={styles.searchWrap} {...fadeUp(0.15)}>
           <div style={styles.searchInner}>
@@ -95,25 +105,26 @@ export default function Products() {
         </motion.div>
 
         {loading ? (
-          <div style={styles.grid}>
+          <div style={styles.grid} ref={gridRef}>
             {Array.from({ length: 9 }).map((_, i) => (
               <div key={i} style={styles.skeleton}>
                 <div style={styles.skelImg} />
-                <div style={{ padding: '16px' }}>
-                  <div style={{ ...styles.skelLine, width: '70%', height: '18px', marginBottom: '10px' }} />
-                  <div style={{ ...styles.skelLine, width: '40%', height: '14px', marginBottom: '12px' }} />
+                <div style={{ padding: 'clamp(14px, 2vw, 20px)' }}>
+                  <div style={{ ...styles.skelLine, width: '75%', height: '18px', marginBottom: '10px' }} />
+                  <div style={{ ...styles.skelLine, width: '35%', height: '14px', marginBottom: '14px' }} />
                   <div style={{ ...styles.skelLine, width: '90%', height: '12px', marginBottom: '6px' }} />
-                  <div style={{ ...styles.skelLine, width: '60%', height: '12px', marginBottom: '16px' }} />
-                  <div style={{ ...styles.skelLine, width: '100%', height: '38px' }} />
+                  <div style={{ ...styles.skelLine, width: '55%', height: '12px', marginBottom: '18px' }} />
+                  <div style={{ ...styles.skelLine, width: '100%', height: '40px' }} />
                 </div>
               </div>
             ))}
           </div>
         ) : error ? (
-          <div style={styles.center}>
-            <p style={{ color: '#e74c3c', marginBottom: '16px' }}>{error}</p>
+          <motion.div style={styles.center} {...fadeUp(0.2)}>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+            <p style={{ color: '#e74c3c', margin: '16px 0' }}>{error}</p>
             <button onClick={fetch} style={styles.retryBtn}>Retry</button>
-          </div>
+          </motion.div>
         ) : products.length === 0 ? (
           <motion.div style={styles.empty} {...fadeUp(0.2)}>
             <EmptyIcon />
@@ -121,7 +132,14 @@ export default function Products() {
             {debouncedSearch && <button onClick={() => setSearch('')} style={styles.clearSearchBtn}>Clear search</button>}
           </motion.div>
         ) : (
-          <>
+          <div ref={gridRef}>
+            <div style={styles.resultsBar}>
+              <span style={styles.resultsText}>
+                {total === 0 ? 'No results' : `${total} ${total === 1 ? 'product' : 'products'} found`}
+                {debouncedSearch && <span style={{ color: '#888' }}> for &ldquo;{debouncedSearch}&rdquo;</span>}
+              </span>
+            </div>
+
             <motion.div style={styles.grid} initial="hidden" animate="visible">
               <AnimatePresence mode="popLayout">
                 {products.map((p, i) => (
@@ -133,22 +151,30 @@ export default function Products() {
                     initial="hidden"
                     animate="visible"
                     exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                    whileHover={{ y: -6, transition: { duration: 0.2 } }}
+                    whileHover={{ y: -8, transition: { duration: 0.25 } }}
+                    className="product-card"
                     style={styles.card}
                   >
                     <div style={styles.cardImgWrap}>
                       {p.images_url?.length > 0 ? (
-                        <img src={p.images_url[0]} alt={p.title} loading="lazy" style={styles.cardImg} />
+                        <div style={styles.cardImgInner}>
+                          <img src={p.images_url[0]} alt={p.title} loading="lazy" className="product-card-img" style={styles.cardImg} />
+                          <div className="product-card-overlay" style={styles.cardImgOverlay}>
+                            <span style={styles.viewLabel}>View Product</span>
+                          </div>
+                        </div>
                       ) : (
                         <div style={styles.cardImgPlaceholder}>
                           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
                         </div>
                       )}
+                      {p.price != null && (
+                        <div style={styles.priceBadge}>{formatPrice(p.price)}</div>
+                      )}
                     </div>
                     <div style={styles.cardBody}>
                       <h2 style={styles.cardTitle}>{p.title}</h2>
-                      {p.price != null && <div style={styles.cardMeta}><span style={styles.price}>{formatPrice(p.price)}</span></div>}
-                      <p style={styles.cardDesc}>{truncate(p.description, 100)}</p>
+                      {p.description && <p style={styles.cardDesc}>{truncate(p.description, 100)}</p>}
                       <motion.a
                         href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hi, I am interested in: ' + p.title)}`}
                         target="_blank" rel="noopener noreferrer"
@@ -157,7 +183,7 @@ export default function Products() {
                         whileTap={{ scale: 0.97 }}
                       >
                         <WhatsAppIcon />
-                        Order via WhatsApp
+                        Inquire Now
                       </motion.a>
                     </div>
                   </motion.div>
@@ -176,17 +202,21 @@ export default function Products() {
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
                 </motion.button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
-                  <motion.button
-                    key={n}
-                    onClick={() => setPage(n)}
-                    style={{ ...styles.pageNum, background: n === page ? '#d4af37' : 'transparent', color: n === page ? '#000' : '#ccc', borderColor: n === page ? '#d4af37' : '#444' }}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    {n}
-                  </motion.button>
-                ))}
+                {generatePageNumbers(page, totalPages).map((n, idx) =>
+                  n === '...' ? (
+                    <span key={`ellipsis-${idx}`} style={styles.ellipsis}>...</span>
+                  ) : (
+                    <motion.button
+                      key={n}
+                      onClick={() => setPage(n)}
+                      style={{ ...styles.pageNum, background: n === page ? '#d4af37' : 'transparent', color: n === page ? '#000' : '#ccc', borderColor: n === page ? '#d4af37' : '#444' }}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      {n}
+                    </motion.button>
+                  )
+                )}
                 <motion.button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
@@ -198,15 +228,24 @@ export default function Products() {
                 </motion.button>
               </motion.div>
             )}
-
-            <motion.p style={styles.count} {...fadeUp(0.35)}>
-              Showing {products.length} of {total} {total === 1 ? 'product' : 'products'}
-            </motion.p>
-          </>
+          </div>
         )}
       </div>
     </div>
   );
+}
+
+function generatePageNumbers(current, total) {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const pages = [];
+  pages.push(1);
+  if (current > 3) pages.push('...');
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+  for (let i = start; i <= end; i++) pages.push(i);
+  if (current < total - 2) pages.push('...');
+  pages.push(total);
+  return pages;
 }
 
 const styles = {
@@ -217,16 +256,27 @@ const styles = {
   },
   overlay: {
     minHeight: 'calc(100vh - 70px)',
-    background: 'rgba(0,0,0,0.75)',
+    background: 'linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.78) 100%)',
     padding: 'clamp(40px, 6vw, 80px) clamp(16px, 4vw, 60px)',
   },
   header: { textAlign: 'center', marginBottom: 'clamp(28px, 4vw, 44px)' },
+  badge: {
+    display: 'inline-block', background: 'rgba(212,175,55,0.12)', color: '#d4af37',
+    fontSize: '11px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase',
+    padding: '6px 16px', borderRadius: '20px', marginBottom: '14px',
+    border: '1px solid rgba(212,175,55,0.2)',
+  },
   title: {
-    color: '#d4af37', fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 700,
-    margin: 0, letterSpacing: '-0.5px',
+    color: '#d4af37', fontSize: 'clamp(30px, 5vw, 48px)', fontWeight: 800,
+    margin: '0 0 10px', letterSpacing: '-0.5px',
   },
   subtitle: {
-    color: '#999', fontSize: 'clamp(14px, 1.5vw, 17px)', marginTop: '8px',
+    color: '#999', fontSize: 'clamp(14px, 1.5vw, 17px)', margin: '0 auto',
+    maxWidth: '600px', lineHeight: 1.6,
+  },
+  titleDivider: {
+    width: '60px', height: '2px', background: 'linear-gradient(90deg, transparent, #d4af37, transparent)',
+    margin: '20px auto 0',
   },
   searchWrap: {
     maxWidth: '560px', margin: '0 auto clamp(32px, 5vw, 48px)',
@@ -234,7 +284,7 @@ const styles = {
   searchInner: {
     display: 'flex', alignItems: 'center', gap: '10px',
     background: 'rgba(255,255,255,0.06)', border: '1px solid #444',
-    borderRadius: '50px', padding: '0 16px', transition: 'border-color 0.2s',
+    borderRadius: '50px', padding: '0 18px', transition: 'border-color 0.2s',
   },
   searchIcon: { color: '#888', flexShrink: 0, display: 'flex' },
   searchInput: {
@@ -246,49 +296,67 @@ const styles = {
     background: 'none', border: 'none', color: '#888', cursor: 'pointer',
     padding: '4px', display: 'flex', flexShrink: 0,
   },
+  resultsBar: {
+    maxWidth: '1200px', margin: '0 auto 16px', display: 'flex',
+    justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px',
+  },
+  resultsText: {
+    color: '#999', fontSize: '14px',
+  },
   grid: {
     display: 'grid', gap: 'clamp(16px, 2vw, 24px)',
     gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))',
     maxWidth: '1200px', margin: '0 auto',
   },
   card: {
-    background: 'linear-gradient(145deg, #111, #0a0a0a)',
-    border: '1px solid #222', borderRadius: '14px', overflow: 'hidden',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+    background: 'linear-gradient(165deg, rgba(20,20,20,0.95), rgba(12,12,12,0.98))',
+    border: '1px solid rgba(255,255,255,0.06)',
+    borderRadius: '16px', overflow: 'hidden',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)',
     display: 'flex', flexDirection: 'column',
+    backdropFilter: 'blur(4px)',
   },
   cardImgWrap: {
     position: 'relative', width: '100%', aspectRatio: '4/3',
-    background: '#111', overflow: 'hidden',
+    background: '#0d0d0d', overflow: 'hidden',
   },
-  cardImg: { width: '100%', height: '100%', objectFit: 'cover', display: 'block' },
+  cardImgInner: {
+    width: '100%', height: '100%', position: 'relative',
+    overflow: 'hidden',
+  },
+  cardImg: {
+    width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+    transition: 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+  },
+  cardImgOverlay: {
+    position: 'absolute', inset: 0,
+    background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 50%, transparent 100%)',
+    display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+    padding: '16px', opacity: 0, transition: 'opacity 0.3s ease',
+  },
+  viewLabel: {
+    color: '#fff', fontSize: '13px', fontWeight: 600,
+    background: 'rgba(0,0,0,0.6)', padding: '6px 20px', borderRadius: '20px',
+    backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.1)',
+  },
+  priceBadge: {
+    position: 'absolute', top: '12px', right: '12px',
+    background: 'linear-gradient(135deg, #a37a39, #d4af37)',
+    color: '#000', fontSize: 'clamp(13px, 1.2vw, 15px)', fontWeight: 800,
+    padding: '5px 14px', borderRadius: '8px',
+    boxShadow: '0 4px 12px rgba(212,175,55,0.3)',
+  },
   cardImgPlaceholder: {
     width: '100%', height: '100%', display: 'flex', alignItems: 'center',
     justifyContent: 'center', background: '#151515',
-  },
-  badge: {
-    position: 'absolute', top: '10px', left: '10px',
-    background: 'rgba(212,175,55,0.9)', color: '#000',
-    fontSize: '11px', fontWeight: 700, padding: '4px 10px',
-    borderRadius: '20px', textTransform: 'uppercase', letterSpacing: '0.5px',
   },
   cardBody: {
     padding: 'clamp(14px, 2vw, 20px)', flex: 1,
     display: 'flex', flexDirection: 'column',
   },
   cardTitle: {
-    color: '#fff', fontSize: 'clamp(15px, 1.5vw, 17px)', fontWeight: 700,
+    color: '#fff', fontSize: 'clamp(16px, 1.5vw, 18px)', fontWeight: 700,
     margin: '0 0 8px', lineHeight: 1.3,
-  },
-  cardMeta: {
-    display: 'flex', alignItems: 'center', gap: '12px',
-    marginBottom: '10px', flexWrap: 'wrap',
-  },
-  price: {
-    color: '#d4af37', fontSize: 'clamp(18px, 2vw, 22px)', fontWeight: 800,
-  },
-  featureCount: {
-    color: '#888', fontSize: '12px',
   },
   cardDesc: {
     color: '#999', fontSize: '13px', lineHeight: 1.6, margin: '0 0 16px',
@@ -297,12 +365,13 @@ const styles = {
   whatsappBtn: {
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
     gap: '8px', background: '#25D366', color: '#fff', textDecoration: 'none',
-    padding: '11px 16px', borderRadius: '8px', fontWeight: 700,
+    padding: '12px 18px', borderRadius: '10px', fontWeight: 700,
     fontSize: '13px', border: 'none', cursor: 'pointer', marginTop: 'auto',
+    boxShadow: '0 4px 14px rgba(37,211,102,0.25)',
   },
   pagination: {
     display: 'flex', justifyContent: 'center', alignItems: 'center',
-    gap: '6px', marginTop: 'clamp(32px, 5vw, 48px)',
+    gap: '6px', marginTop: 'clamp(36px, 5vw, 52px)',
   },
   pageBtn: {
     background: 'transparent', border: '1px solid #444', color: '#ccc',
@@ -314,10 +383,10 @@ const styles = {
     cursor: 'pointer', fontWeight: 700, fontSize: '13px',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
   },
-  count: {
-    textAlign: 'center', color: '#666', fontSize: '13px', marginTop: '16px',
+  ellipsis: {
+    color: '#666', fontSize: '14px', width: '24px', textAlign: 'center',
   },
-  center: { textAlign: 'center', padding: '60px 20px' },
+  center: { textAlign: 'center', padding: '80px 20px' },
   retryBtn: {
     background: '#d4af37', color: '#000', border: 'none',
     padding: '10px 28px', borderRadius: '6px', fontWeight: 700, cursor: 'pointer',
@@ -331,9 +400,9 @@ const styles = {
     padding: '8px 20px', borderRadius: '6px', cursor: 'pointer', fontWeight: 600,
   },
   skeleton: {
-    background: 'linear-gradient(145deg, #0d0d0d, #151515)',
-    border: '1px solid #222', borderRadius: '14px', overflow: 'hidden',
+    background: 'linear-gradient(165deg, rgba(15,15,15,0.9), rgba(20,20,20,0.95))',
+    border: '1px solid rgba(255,255,255,0.04)', borderRadius: '16px', overflow: 'hidden',
   },
-  skelImg: { width: '100%', aspectRatio: '4/3', background: '#1a1a1a' },
-  skelLine: { background: '#1a1a1a', borderRadius: '4px' },
+  skelImg: { width: '100%', aspectRatio: '4/3', background: '#181818' },
+  skelLine: { background: '#181818', borderRadius: '4px' },
 };
