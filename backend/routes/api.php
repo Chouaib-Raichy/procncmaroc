@@ -63,6 +63,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/admin/machines/update/{machine}', [MachineController::class, 'update']);
         Route::delete('/admin/machines/{machine}', [MachineController::class, 'destroy']);
 
+        Route::get('/admin/categories', [CategoryController::class, 'index']);
         Route::post('/admin/categories', [CategoryController::class, 'store']);
         Route::post('/admin/categories/update/{category}', [CategoryController::class, 'update']);
         Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy']);

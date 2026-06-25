@@ -16,7 +16,7 @@ import {
   deleteProduct,
 } from '../api/products';
 import {
-  getCategories,
+  getAdminCategories,
   createCategory,
   updateCategory,
   deleteCategory,
@@ -1002,7 +1002,7 @@ function MachineManager() {
       setLastPage(d.last_page || 1);
       setTotal(d.total || d.length || 0);
     }).catch(() => {});
-    getCategories().then((res) => setCategories(res.data)).catch(() => {}).finally(() => setLoading(false));
+    getAdminCategories().then((res) => setCategories(res.data)).catch(() => {}).finally(() => setLoading(false));
   };
 
   useEffect(() => { load(); }, [page]);
@@ -1592,7 +1592,7 @@ function CategoryManager() {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const load = () => { getCategories().then((res) => setCategories(res.data)).catch(() => {}).finally(() => setLoading(false)); };
+  const load = () => { getAdminCategories().then((res) => setCategories(res.data)).catch(() => {}).finally(() => setLoading(false)); };
   useEffect(() => { load(); }, []);
 
   const openAdd = () => {
