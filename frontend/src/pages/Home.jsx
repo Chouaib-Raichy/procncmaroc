@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import LazyVideo from '../components/LazyVideo';
 const heroBg = '/hero.webp';
 const showroom = '/showroom-v2.webp';
@@ -143,13 +142,24 @@ export default function Home() {
     },
   ];
 
+  useEffect(() => {
+    const links = [
+      { rel: 'preload', as: 'image', href: '/hero-720.webp', fetchpriority: 'high', imagesrcset: '/hero-720.webp 720w, /hero.webp 1004w', imagesizes: '(max-width: 720px) 100vw, 1004px' },
+      { rel: 'preload', as: 'image', href: '/showroom-720.webp', fetchpriority: 'high', imagesrcset: '/showroom-720.webp 720w, /showroom-800.webp 800w, /showroom-v2.webp 1335w', imagesizes: '(max-width: 900px) 100vw, 1335px' },
+    ];
+    const els = links.map((attrs) => {
+      const el = document.createElement('link');
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      el.setAttribute('data-preload', 'lcp');
+      document.head.appendChild(el);
+      return el;
+    });
+    return () => els.forEach((el) => el.remove());
+  }, []);
+
   return (
     <div>
       <SEO title="Home" description="PRO CNC MAROC — Morocco's leading CNC machining, laser cutting, engraving &amp; 3D printing company. Premium machines for industry, crafts &amp; professionals. Visit our Casablanca showroom." canonicalUrl="/" keywords="CNC machines Morocco, precision machining, laser cutting, engraving services, 3D printing, CNC router, CNC Morocco, industrial machining" jsonLd={faqSchema} />
-      <Helmet>
-        <link rel="preload" as="image" href="/hero-720.webp" fetchpriority="high" imagesrcset="/hero-720.webp 720w, /hero.webp 1004w" imagesizes="(max-width: 720px) 100vw, 1004px" />
-        <link rel="preload" as="image" href="/showroom-720.webp" fetchpriority="high" imagesrcset="/showroom-720.webp 720w, /showroom-800.webp 800w, /showroom-v2.webp 1335w" imagesizes="(max-width: 900px) 100vw, 1335px" />
-      </Helmet>
       <style>{`
         @keyframes heroFadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideLeft { from { opacity: 0; transform: translateX(-60px); } to { opacity: 1; transform: translateX(0); } }
