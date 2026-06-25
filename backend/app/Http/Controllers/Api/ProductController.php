@@ -67,7 +67,7 @@ class ProductController extends Controller
             'images.*'       => 'image|max:10240',
             'deleted_images' => 'nullable|array',
             'deleted_images.*' => 'string',
-            'visible'        => 'boolean',
+            'visible'        => 'sometimes|boolean',
         ]);
 
         $currentImages = $product->images ?? [];

@@ -11,7 +11,7 @@ class MachineDTO extends DTO
     public function __construct(
         public readonly int $id,
         public readonly string $title,
-        public readonly string $description,
+        public readonly ?string $description,
         public readonly ?string $image_url,
         public readonly bool $visible,
         public readonly ?int $category_id,

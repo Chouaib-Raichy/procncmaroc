@@ -60,9 +60,8 @@ class MachineController extends Controller
     {
         $data = $request->validate([
             'title'       => 'required|string|max:255',
-            'description' => 'required|string',
             'image'       => 'nullable|image|max:51200',
-            'visible'     => 'boolean',
+            'visible'     => 'sometimes|boolean',
             'category_id' => 'nullable|exists:categories,id',
             'price'       => 'nullable|numeric|min:0',
             'pdf'         => 'nullable|file|mimes:pdf|max:10240',
@@ -80,6 +79,8 @@ class MachineController extends Controller
         if ($request->filled('features')) {
             $data['features'] = json_decode($request->features);
         }
+
+        $data['description'] = $data['description'] ?? '';
 
         $machine = Machine::create($data);
 
@@ -106,7 +107,7 @@ class MachineController extends Controller
             'title'       => 'sometimes|string|max:255',
             'description' => 'sometimes|string',
             'image'       => 'nullable|image|max:51200',
-            'visible'     => 'boolean',
+            'visible'     => 'sometimes|boolean',
             'category_id' => 'nullable|exists:categories,id',
             'price'       => 'nullable|numeric|min:0',
             'pdf'         => 'nullable|file|mimes:pdf|max:10240',
