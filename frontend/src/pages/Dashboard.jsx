@@ -984,7 +984,7 @@ function MachineManager() {
   const [total, setTotal] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ title: '', description: '', visible: true, category_id: '', price: '', features: '' });
+  const [form, setForm] = useState({ title: '', visible: true, category_id: '', price: '', features: '' });
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const [pdfFile, setPdfFile] = useState(null);
@@ -1009,7 +1009,7 @@ function MachineManager() {
 
   const openAdd = () => {
     setEditing(null);
-    setForm({ title: '', description: '', visible: true, category_id: '', price: '', features: '' });
+    setForm({ title: '', visible: true, category_id: '', price: '', features: '' });
     setImage(null); setPreview(null); setPdfFile(null); setPdfName('');
     setShowModal(true);
   };
@@ -1017,7 +1017,7 @@ function MachineManager() {
   const openEdit = (m) => {
     setEditing(m);
     setForm({
-      title: m.title, description: m.description, visible: m.visible,
+      title: m.title, visible: m.visible,
       category_id: m.category_id ?? '', price: m.price ?? '',
       features: m.features ? m.features.join('\n') : '',
     });
@@ -1027,12 +1027,11 @@ function MachineManager() {
   };
 
   const handleSave = async () => {
-    if (!form.title.trim() || !form.description.trim()) return;
+    if (!form.title.trim()) return;
     setSaving(true);
     try {
       const fd = new FormData();
       fd.append('title', form.title);
-      fd.append('description', form.description);
       fd.append('visible', form.visible ? '1' : '0');
       fd.append('category_id', form.category_id || '');
       if (form.price) fd.append('price', form.price);
@@ -1205,8 +1204,6 @@ function MachineManager() {
             <h2 style={modalTitle}>{editing ? 'Edit Machine' : 'Add Machine'}</h2>
             <label style={label}>Title</label>
             <input style={input} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Machine name" />
-            <label style={label}>Description</label>
-            <textarea style={textarea} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Machine description" rows={3} />
             <label style={label}>Category</label>
             <select style={input} value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })}>
               <option value="">-- No category --</option>
@@ -1228,7 +1225,7 @@ function MachineManager() {
             </label>
             <div style={modalActions}>
               <button style={cancelBtn} onClick={() => setShowModal(false)}>Cancel</button>
-              <button style={saveBtn} onClick={handleSave} disabled={saving || !form.title.trim() || !form.description.trim()}>
+              <button style={saveBtn} onClick={handleSave} disabled={saving || !form.title.trim()}>
                 {saving ? 'Saving...' : editing ? 'Update' : 'Create'}
               </button>
             </div>
@@ -1247,7 +1244,7 @@ function ProductManager() {
   const [total, setTotal] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ title: '', description: '', price: '', visible: true });
+  const [form, setForm] = useState({ title: '', price: '', visible: true });
   const [images, setImages] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
   const [existingPaths, setExistingPaths] = useState([]);
@@ -1275,7 +1272,7 @@ function ProductManager() {
 
   const openAdd = () => {
     setEditing(null);
-    setForm({ title: '', description: '', price: '', visible: true });
+    setForm({ title: '', price: '', visible: true });
     setImages([]); setExistingImages([]); setExistingPaths([]); setRemovedPaths([]); setNewPreviews([]);
     setShowModal(true);
   };
@@ -1283,7 +1280,7 @@ function ProductManager() {
   const openEdit = (p) => {
     setEditing(p);
     setForm({
-      title: p.title, description: p.description || '',
+      title: p.title,
       price: p.price ?? '', visible: p.visible,
     });
     setImages([]); setNewPreviews([]);
@@ -1318,7 +1315,6 @@ function ProductManager() {
     try {
       const fd = new FormData();
       fd.append('title', form.title);
-      fd.append('description', form.description);
       fd.append('visible', form.visible ? '1' : '0');
       if (form.price) fd.append('price', form.price);
       images.forEach((img) => fd.append('images[]', img));
@@ -1421,7 +1417,6 @@ function ProductManager() {
               <tr>
                 <th style={th}>Image</th>
                 <th style={th}>Title</th>
-                <th style={th}>Description</th>
                 <th style={th}>Price</th>
                 <th style={th}>Status</th>
                 <th style={th}>Actions</th>
@@ -1447,7 +1442,6 @@ function ProductManager() {
                     />
                   </td>
                   <td style={{ ...td, fontWeight: '600', color:'#fff' }}>{p.title}</td>
-                  <td style={td}>{p.description ? (p.description.length > 60 ? p.description.slice(0, 60).trimEnd() + '...' : p.description) : '-'}</td>
                   <td style={td}>{p.price ? `${parseFloat(p.price).toLocaleString()} MAD` : '-'}</td>
                   <td style={td}>
                     <span style={{ ...badge, background: p.visible ? '#27ae60' : '#e74c3c', display:'inline-flex', alignItems:'center', gap:'4px' }}>
@@ -1534,8 +1528,6 @@ function ProductManager() {
             <h2 style={modalTitle}>{editing ? 'Edit Product' : 'Add Product'}</h2>
             <label style={label}>Title</label>
             <input style={input} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Product name" />
-            <label style={label}>Description</label>
-            <textarea style={textarea} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Product description" rows={3} />
             <label style={label}>Price (MAD)</label>
             <input style={input} type="number" step="0.01" min="0" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="0.00" />
             <label style={label}>Images <span style={{ color:'#999', fontWeight:400 }}>({imageCount()}/3, min 1)</span></label>
@@ -1572,7 +1564,7 @@ function ProductManager() {
             </label>
             <div style={modalActions}>
               <button style={cancelBtn} onClick={() => setShowModal(false)}>Cancel</button>
-              <button style={saveBtn} onClick={handleSave} disabled={saving || !form.title.trim() || !form.description.trim() || imageCount() < 1}>
+              <button style={saveBtn} onClick={handleSave} disabled={saving || !form.title.trim() || imageCount() < 1}>
                 {saving ? 'Saving...' : editing ? 'Update' : 'Create'}
               </button>
             </div>
@@ -1596,7 +1588,6 @@ function CategoryManager() {
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
   const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -1605,11 +1596,11 @@ function CategoryManager() {
   useEffect(() => { load(); }, []);
 
   const openAdd = () => {
-    setEditing(null); setName(''); setDescription('');
+    setEditing(null); setName('');
     setShowModal(true);
   };
   const openEdit = (c) => {
-    setEditing(c); setName(c.name); setDescription(c.description || '');
+    setEditing(c); setName(c.name);
     setShowModal(true);
   };
 
@@ -1619,7 +1610,6 @@ function CategoryManager() {
     try {
       const fd = new FormData();
       fd.append('name', name);
-      if (description.trim()) fd.append('description', description);
       if (editing) await updateCategory(editing.id, fd); else await createCategory(fd);
       load(); setShowModal(false);
     } catch { alert('Error saving category'); }
@@ -1645,7 +1635,7 @@ function CategoryManager() {
         <div style={{ overflowX: 'auto' }}>
           <table style={table}>
             <thead>
-              <tr><th style={th}>Name</th><th style={th}>Description</th><th style={th}>Machines</th><th style={th}>Actions</th></tr>
+              <tr><th style={th}>Name</th><th style={th}>Machines</th><th style={th}>Actions</th></tr>
             </thead>
             <tbody>
               {[1,2,3].map((i) => (
@@ -1695,7 +1685,6 @@ function CategoryManager() {
             <thead>
               <tr>
                 <th style={th}>Name</th>
-                <th style={th}>Description</th>
                 <th style={th}>Machines</th>
                 <th style={th}>Actions</th>
               </tr>
@@ -1712,7 +1701,6 @@ function CategoryManager() {
                   style={tr}
                 >
                   <td style={{ ...td, fontWeight: '600', color:'#fff' }}>{c.name}</td>
-                  <td style={td}>{c.description ? (c.description.length > 60 ? c.description.slice(0, 60).trimEnd() + '...' : c.description) : '-'}</td>
                   <td style={td}>
                     <span style={{ color:'#a37a39', fontWeight:700 }}>{c.machines?.length || 0}</span>
                   </td>
@@ -1750,8 +1738,6 @@ function CategoryManager() {
             <h2 style={modalTitle}>{editing ? 'Edit Category' : 'Add Category'}</h2>
             <label style={label}>Name</label>
             <input style={input} value={name} onChange={(e) => setName(e.target.value)} placeholder="Category name" />
-            <label style={label}>Description</label>
-            <textarea style={textarea} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Category description" rows={3} />
             <div style={modalActions}>
               <button style={cancelBtn} onClick={() => setShowModal(false)}>Cancel</button>
               <button style={saveBtn} onClick={handleSave} disabled={saving || !name.trim()}>
