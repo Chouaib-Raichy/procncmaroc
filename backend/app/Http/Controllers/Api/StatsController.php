@@ -41,32 +41,22 @@ class StatsController extends Controller
 
     public function summary()
     {
-        return Cache::remember('dashboard_summary', 300, function () {
-            $totalUsers = User::count();
-            $pendingUsers = User::where('is_approved', false)->where('role', 'user')->whereNotNull('business_bio')->count();
-            $totalMachines = Machine::count();
-            $totalMessages = Contact::count();
-            $totalVisits = PageView::count();
-            $visitsToday = PageView::whereDate('visited_at', today())->count();
-            $uniqueVisitors = PageView::distinct('ip_address')->count('ip_address');
-
-            $visitsPerDay = PageView::select(DB::raw('DATE(visited_at) as date'), DB::raw('count(*) as count'))
-                ->where('visited_at', '>=', now()->subDays(7))
-                ->groupBy('date')
-                ->orderBy('date')
-                ->get()
-                ->map(fn($r) => ['date' => $r->date, 'count' => $r->count]);
-
-            return response()->json([
-                'total_users' => $totalUsers,
-                'pending_users' => $pendingUsers,
-                'total_machines' => $totalMachines,
-                'total_messages' => $totalMessages,
-                'total_visits' => $totalVisits,
-                'visits_today' => $visitsToday,
-                'unique_visitors' => $uniqueVisitors,
-                'visits_per_day' => $visitsPerDay,
-            ])->getData();
+        return Cache::remember('dashboard_summary_v2', 300, function () {
+            return [
+                'total_users' => User::count(),
+                'pending_users' => User::where('is_approved', false)->where('role', 'user')->whereNotNull('business_bio')->count(),
+                'total_machines' => Machine::count(),
+                'total_messages' => Contact::count(),
+                'total_visits' => PageView::count(),
+                'visits_today' => PageView::whereDate('visited_at', today())->count(),
+                'unique_visitors' => PageView::distinct('ip_address')->count('ip_address'),
+                'visits_per_day' => PageView::select(DB::raw('DATE(visited_at) as date'), DB::raw('count(*) as count'))
+                    ->where('visited_at', '>=', now()->subDays(7))
+                    ->groupBy('date')
+                    ->orderBy('date')
+                    ->get()
+                    ->map(fn($r) => ['date' => $r->date, 'count' => $r->count]),
+            ];
         });
     }
 }
