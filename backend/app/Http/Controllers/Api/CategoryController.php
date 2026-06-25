@@ -19,8 +19,7 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'name' => 'required|string|max:255',
         ]);
 
         return response()->json(
@@ -37,8 +36,7 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category)
     {
         $data = $request->validate([
-            'name'        => 'sometimes|string|max:255',
-            'description' => 'nullable|string',
+            'name' => 'sometimes|string|max:255',
         ]);
 
         $category->update($data);

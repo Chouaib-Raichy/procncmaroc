@@ -22,11 +22,6 @@ function formatPrice(price) {
   return Number(price).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' MAD';
 }
 
-function truncate(text, len = 100) {
-  if (!text || text.length <= len) return text || '';
-  return text.slice(0, len).trimEnd() + '...';
-}
-
 const fadeUp = (delay = 0) => ({ initial: { opacity: 0, y: 24 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.45, delay, ease: 'easeOut' } });
 
 const cardVariants = {
@@ -174,7 +169,6 @@ export default function Products() {
                     </div>
                     <div style={styles.cardBody}>
                       <h2 style={styles.cardTitle}>{p.title}</h2>
-                      {p.description && <p style={styles.cardDesc}>{truncate(p.description, 100)}</p>}
                       <motion.a
                         href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hi, I am interested in: ' + p.title)}`}
                         target="_blank" rel="noopener noreferrer"

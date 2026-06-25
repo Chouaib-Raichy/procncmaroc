@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 class Product extends Model
 {
     protected $fillable = [
-        'title', 'description', 'price', 'images', 'visible',
+        'title', 'price', 'images', 'visible',
     ];
 
     protected $casts = [

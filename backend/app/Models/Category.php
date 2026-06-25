@@ -9,7 +9,7 @@ class Category extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['name', 'description'];
+    protected $fillable = ['name'];
 
     protected $casts = [
         'deleted_at' => 'datetime',

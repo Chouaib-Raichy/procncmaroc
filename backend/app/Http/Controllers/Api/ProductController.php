@@ -15,10 +15,7 @@ class ProductController extends Controller
         $query = Product::where('visible', true)->orderBy('created_at', 'desc');
 
         if ($search = request('search')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
+            $query->where('title', 'like', "%{$search}%");
         }
 
         if (request('all')) {
@@ -39,7 +36,6 @@ class ProductController extends Controller
     {
         $data = $request->validate([
             'title'       => 'required|string|max:255',
-            'description' => 'nullable|string',
             'price'       => 'nullable|numeric|min:0',
             'images'      => 'nullable|array|max:3',
             'images.*'    => 'image|max:10240',
@@ -66,7 +62,6 @@ class ProductController extends Controller
     {
         $data = $request->validate([
             'title'          => 'sometimes|string|max:255',
-            'description'    => 'nullable|string',
             'price'          => 'nullable|numeric|min:0',
             'images'         => 'nullable|array|max:3',
             'images.*'       => 'image|max:10240',

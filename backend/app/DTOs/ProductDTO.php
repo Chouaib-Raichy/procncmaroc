@@ -10,7 +10,6 @@ class ProductDTO extends DTO
     public function __construct(
         public readonly int $id,
         public readonly string $title,
-        public readonly ?string $description,
         public readonly ?float $price,
         public readonly ?array $images,
         public readonly ?array $images_url,
@@ -25,7 +24,6 @@ class ProductDTO extends DTO
         return new self(
             id: $product->id,
             title: $product->title,
-            description: $product->description,
             price: $product->price !== null ? (float) $product->price : null,
             images: $product->images,
             images_url: $product->images_url,
@@ -39,7 +37,6 @@ class ProductDTO extends DTO
         return [
             'id'          => $this->id,
             'title'       => $this->title,
-            'description' => $this->description,
             'price'       => $this->price,
             'images'      => $this->images,
             'images_url'  => $this->images_url,
