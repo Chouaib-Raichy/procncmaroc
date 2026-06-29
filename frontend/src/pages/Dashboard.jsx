@@ -1289,6 +1289,14 @@ function MachineManager() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        open={deleteConfirm !== null}
+        onConfirm={confirmDeleteMachine}
+        onCancel={() => setDeleteConfirm(null)}
+        title="Delete this machine?"
+        message="This action cannot be undone."
+      />
     </>
   );
 }
@@ -1635,6 +1643,14 @@ function ProductManager() {
         title={alertMsg?.title || 'Notice'}
         message={alertMsg?.message || ''}
         onClose={() => setAlertMsg(null)}
+      />
+
+      <ConfirmModal
+        open={deleteConfirm !== null}
+        onConfirm={confirmDeleteProduct}
+        onCancel={() => setDeleteConfirm(null)}
+        title="Delete this product?"
+        message="This action cannot be undone."
       />
     </>
   );
