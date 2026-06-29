@@ -4,3 +4,6 @@ Thumbs.db
 node_modules/
 .vscode/
 .idea/
+frontend/dist*.tar*
+frontend/dist*.zip
+frontend/track.json

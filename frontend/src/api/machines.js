@@ -8,7 +8,8 @@ export const getAllMachines = () => api.get('/machines?all=1');
 export const getAdminMachines = (params = {}) => {
   const page = params.page ? params.page - 1 : 0;
   const size = params.per_page || params.size || 10;
-  return api.get('/admin/machines', { params: { page, size, ...params } });
+  const { page: _, ...rest } = params;
+  return api.get('/admin/machines', { params: { page, size, ...rest } });
 };
 
 export const getMachine = (id) => api.get(`/admin/machines/${id}`);
@@ -17,7 +18,7 @@ export const createMachine = (formData) => api.post('/admin/machines', formData,
   headers: { 'Content-Type': 'multipart/form-data' },
 });
 
-export const updateMachine = (id, formData) => api.post(`/admin/machines/${id}`, formData, {
+export const updateMachine = (id, formData) => api.put(`/admin/machines/${id}`, formData, {
   headers: { 'Content-Type': 'multipart/form-data' },
 });
 
