@@ -710,6 +710,7 @@ function PendingRegistrations() {
   const [lightbox, setLightbox] = useState(null);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState(null);
+  const [rejectConfirm, setRejectConfirm] = useState(null);
 
   const fetch = (p = page) => {
     setLoading(true);
@@ -736,8 +737,11 @@ function PendingRegistrations() {
     } catch {}
   };
 
-  const handleReject = async (id) => {
-    if (!window.confirm('Reject this user? Their account will be permanently deleted.')) return;
+  const handleReject = (id) => setRejectConfirm(id);
+
+  const confirmRejectUser = async () => {
+    const id = rejectConfirm;
+    setRejectConfirm(null);
     try {
       await rejectUser(id);
       setUsers((prev) => prev.filter((u) => u.id !== id));
@@ -978,6 +982,14 @@ function PendingRegistrations() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        open={rejectConfirm !== null}
+        onConfirm={confirmRejectUser}
+        onCancel={() => setRejectConfirm(null)}
+        title="Reject this user?"
+        message="Their account will be permanently deleted."
+      />
     </div>
   );
 }
