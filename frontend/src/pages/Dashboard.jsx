@@ -1048,10 +1048,10 @@ function MachineManager() {
       if (form.features.trim()) fd.append('features', JSON.stringify(form.features.split('\n').filter((l) => l.trim())));
       if (editing) {
         const res = await updateMachine(editing.id, fd);
-        setMachines((prev) => prev.map((m) => (m.id === editing.id ? res.data : m)));
+        setMachines((prev) => prev.map((m) => (m.id === editing.id ? res.data.data : m)));
       } else {
         const res = await createMachine(fd);
-        setMachines((prev) => [res.data, ...prev]);
+        setMachines((prev) => [res.data.data, ...prev]);
       }
       setShowModal(false);
     } catch { alert('Error saving machine'); }
@@ -1078,7 +1078,7 @@ function MachineManager() {
       if (m.price) fd.append('price', m.price);
       if (m.features?.length) fd.append('features', JSON.stringify(m.features));
       const res = await updateMachine(m.id, fd);
-      setMachines((prev) => prev.map((x) => (x.id === m.id ? res.data : x)));
+      setMachines((prev) => prev.map((x) => (x.id === m.id ? res.data.data : x)));
     } catch { alert('Error toggling visibility'); }
   };
 
@@ -1381,10 +1381,10 @@ function ProductManager() {
       }
       if (editing) {
         const res = await updateProduct(editing.id, fd);
-        setProducts((prev) => prev.map((p) => (p.id === editing.id ? res.data : p)));
+        setProducts((prev) => prev.map((p) => (p.id === editing.id ? res.data.data : p)));
       } else {
         const res = await createProduct(fd);
-        setProducts((prev) => [res.data, ...prev]);
+        setProducts((prev) => [res.data.data, ...prev]);
         setTotal((t) => t + 1);
       }
       setShowModal(false);
@@ -1411,7 +1411,7 @@ function ProductManager() {
       const fd = new FormData();
       fd.append('visible', p.visible ? '0' : '1');
       const res = await updateProduct(p.id, fd);
-      setProducts((prev) => prev.map((x) => (x.id === p.id ? res.data : x)));
+      setProducts((prev) => prev.map((x) => (x.id === p.id ? res.data.data : x)));
     } catch (e) { setAlertMsg({ title: 'Error', message: e.response?.data?.message || 'Error toggling visibility' }); }
   };
 
