@@ -24,7 +24,7 @@ export default function ContactUs() {
     e.preventDefault();
     setSending(true);
     try {
-      await api.post('/contact', {
+      await api.post('/contacts', {
         first_name: form.firstName,
         last_name: form.lastName,
         email: form.email,

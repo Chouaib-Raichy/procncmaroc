@@ -38,7 +38,7 @@ export default function MachineDetail() {
     setLoading(true);
     setError(null);
     api.get(`/machines/${id}`)
-      .then((res) => setMachine(res.data))
+      .then((res) => setMachine(res.data?.data || res.data))
       .catch(() => setError('Failed to load machine details. Please try again.'))
       .finally(() => setLoading(false));
   };

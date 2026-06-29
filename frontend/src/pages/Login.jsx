@@ -256,6 +256,23 @@ export default function Login() {
             ) : 'Sign In'}
           </motion.button>
 
+          <div style={styles.divider}>
+            <span style={styles.dividerLine} />
+            <span style={styles.dividerText}>OR</span>
+            <span style={styles.dividerLine} />
+          </div>
+
+          <a
+            href={`${window.location.origin}/realms/procncmaroc/protocol/openid-connect/auth?client_id=procncmaroc-backend&redirect_uri=${encodeURIComponent(window.location.origin + '/auth/keycloak/callback')}&response_type=code&scope=openid+email+profile`}
+            style={styles.keycloakBtn}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            Login with Keycloak
+          </a>
+
           <p style={styles.text}>
             Don't have an account?{' '}
             <Link to="/signup" style={styles.link}>Create one</Link>
@@ -431,6 +448,41 @@ const styles = {
     color: '#d4af37',
     textDecoration: 'none',
     fontWeight: '600',
+  },
+  divider: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    margin: '20px 0 16px',
+  },
+  dividerLine: {
+    flex: 1,
+    height: '1px',
+    background: '#333',
+  },
+  dividerText: {
+    color: '#666',
+    fontSize: '12px',
+    fontWeight: 600,
+    letterSpacing: '1px',
+  },
+  keycloakBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    background: '#1a1a2e',
+    color: '#e0e0ff',
+    border: '1px solid #3a3a6e',
+    padding: 'clamp(13px, 2vw, 15px)',
+    borderRadius: '8px',
+    fontSize: 'clamp(14px, 2vw, 16px)',
+    fontWeight: '600',
+    cursor: 'pointer',
+    letterSpacing: '0.3px',
+    textDecoration: 'none',
+    transition: 'background 0.2s, border-color 0.2s',
+    marginBottom: '8px',
   },
   spinner: {
     width: '18px',

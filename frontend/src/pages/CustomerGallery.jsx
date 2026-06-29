@@ -299,10 +299,13 @@ export default function CustomerGallery() {
     setError(null);
     api.get(`/gallery?page=${p}&per_page=9`)
       .then((res) => {
-        setPosts(res.data.data);
-        setTotalPages(res.data.last_page);
+        const d = res.data;
+        const body = d.data || d;
+        const items = body.content || body || [];
+        setPosts(items);
+        setTotalPages(body.total_pages ?? body.last_page ?? 1);
         const likeMap = {};
-        res.data.data.forEach((p) => { likeMap[p.id] = { liked: p.is_liked_by_user, count: p.likes_count }; });
+        items.forEach((p) => { likeMap[p.id] = { liked: p.is_liked_by_user, count: p.likes_count }; });
         setLikes(likeMap);
       })
       .catch(() => setError('Failed to load gallery.'))

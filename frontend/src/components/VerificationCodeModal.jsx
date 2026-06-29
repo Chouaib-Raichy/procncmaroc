@@ -26,7 +26,7 @@ export default function VerificationCodeModal({ email, onVerified, onClose }) {
     setTimer(600);
     setCanResend(false);
     try {
-      await api.post('/profile/send-code');
+      await api.post('/auth/profile/send-code');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to send code');
     } finally {

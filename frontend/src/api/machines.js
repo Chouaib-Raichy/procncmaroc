@@ -5,7 +5,11 @@ const BASE_URL = import.meta.env.VITE_API_URL || `${window.location.origin}/api`
 export const getMachines = (page = 1) => api.get(`/machines?page=${page}&per_page=9`);
 export const getAllMachines = () => api.get('/machines?all=1');
 
-export const getAdminMachines = (params = {}) => api.get('/admin/machines', { params });
+export const getAdminMachines = (params = {}) => {
+  const page = params.page ? params.page - 1 : 0;
+  const size = params.per_page || params.size || 10;
+  return api.get('/admin/machines', { params: { page, size, ...params } });
+};
 
 export const getMachine = (id) => api.get(`/admin/machines/${id}`);
 
@@ -13,7 +17,7 @@ export const createMachine = (formData) => api.post('/admin/machines', formData,
   headers: { 'Content-Type': 'multipart/form-data' },
 });
 
-export const updateMachine = (id, formData) => api.post(`/admin/machines/update/${id}`, formData, {
+export const updateMachine = (id, formData) => api.post(`/admin/machines/${id}`, formData, {
   headers: { 'Content-Type': 'multipart/form-data' },
 });
 

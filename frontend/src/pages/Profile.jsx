@@ -152,7 +152,7 @@ export default function Profile() {
 
   const handleVerified = async (code) => {
     const body = { code, ...pendingChanges };
-    await api.post('/profile/update-verified', body);
+    await api.post('/auth/profile/update-verified', body);
     refreshUser();
     setVerifyModal(null);
     setPendingChanges(null);
@@ -168,7 +168,7 @@ export default function Profile() {
   const currentBg = profileBgPreview || user.profile_bg_url;
   const images = user.business_images_url || [];
   const memberSince = user.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : '';
-  const roleLabel = user.role === 'admin' ? 'Administrator' : 'Member';
+  const roleLabel = user.role === 'ROLE_ADMIN' ? 'Administrator' : 'Member';
 
   const fields = [
     { key: 'name', label: 'Full Name', placeholder: 'John Doe', autoComplete: 'name' },

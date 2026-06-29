@@ -30,6 +30,7 @@ const PublicProfile = lazy(() => import('./pages/PublicProfile'));
 const CompleteRegistration = lazy(() => import('./pages/CompleteRegistration'));
 const PendingApproval = lazy(() => import('./pages/PendingApproval'));
 const TermsOfUse = lazy(() => import('./pages/TermsOfUse'));
+const KeycloakCallback = lazy(() => import('./pages/KeycloakCallback'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageTracker() {
@@ -56,7 +57,7 @@ function ProtectedRoute({ approved, children }) {
   const { user, loading } = useAuth();
   if (loading) return null;
   if (!user) return <Navigate to="/login" replace />;
-  if (approved && !user.is_approved && user.role !== 'admin') {
+  if (approved && !user.is_approved && user.role !== 'ROLE_ADMIN') {
     if (user.business_bio) return <Navigate to="/pending-approval" replace />;
     return <Navigate to="/complete-registration" replace />;
   }
@@ -67,7 +68,7 @@ function ProtectedRoute({ approved, children }) {
 function PublicPage({ children }) {
   const { user, loading } = useAuth();
   if (loading) return null;
-  if (user && !user.is_approved && user.role !== 'admin') {
+  if (user && !user.is_approved && user.role !== 'ROLE_ADMIN') {
     if (user.business_bio) return <Navigate to="/pending-approval" replace />;
     return <Navigate to="/complete-registration" replace />;
   }
@@ -102,6 +103,7 @@ function AppContent() {
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/complete-registration" element={<CompleteRegistration />} />
             <Route path="/pending-approval" element={<PendingApproval />} />
+            <Route path="/auth/keycloak/callback" element={<KeycloakCallback />} />
             <Route path="/terms" element={<TermsOfUse />} />
             <Route path="/profile" element={<ProtectedRoute approved><ErrorBoundary><Profile /></ErrorBoundary></ProtectedRoute>} />
             <Route path="/my-gallery" element={<ProtectedRoute approved><ErrorBoundary><MyGallery /></ErrorBoundary></ProtectedRoute>} />

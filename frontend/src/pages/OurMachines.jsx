@@ -24,8 +24,8 @@ export default function OurMachines() {
     setError(null);
     Promise.all([getAllMachines(), getCategories()])
       .then(([mRes, cRes]) => {
-        setAllMachines(mRes.data);
-        setCategories(cRes.data);
+        setAllMachines(mRes.data?.data?.content || mRes.data?.data || mRes.data || []);
+        setCategories(cRes.data?.data || cRes.data || []);
       })
       .catch(() => setError('Failed to load machines. Please try again.'))
       .finally(() => setLoading(false));

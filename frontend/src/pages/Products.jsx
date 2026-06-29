@@ -53,9 +53,10 @@ export default function Products() {
     getProducts(params)
       .then((res) => {
         const d = res.data;
-        setProducts(d.data ?? d);
-        setTotalPages(d.last_page ?? 1);
-        setTotal(d.total ?? 0);
+        const body = d.data || d;
+        setProducts(Array.isArray(body) ? body : (body.content || []));
+        setTotalPages(body.total_pages ?? body.last_page ?? 1);
+        setTotal(body.total_elements ?? body.total ?? 0);
       })
       .catch(() => setError('Failed to load products. Please try again.'))
       .finally(() => setLoading(false));

@@ -43,7 +43,7 @@ function formatDate(dateStr) {
 }
 
 function formatRole(role) {
-  if (role === 'admin') return 'Administrator';
+  if (role === 'ROLE_ADMIN') return 'Administrator';
   if (role === 'partner') return 'Partner';
   return 'Member';
 }
@@ -72,7 +72,7 @@ export default function PublicProfile() {
   const fetch = () => {
     setLoading(true);
     setError(null);
-    getPartner(id).then((res) => { setData(res.data); setCarouselIndex(0); }).catch(() => setError('Failed to load profile.')).finally(() => setLoading(false));
+    getPartner(id).then((res) => { setData(res.data?.data || res.data); setCarouselIndex(0); }).catch(() => setError('Failed to load profile.')).finally(() => setLoading(false));
   };
 
   useEffect(() => { fetch(); }, [id]);
@@ -114,7 +114,7 @@ export default function PublicProfile() {
   );
 
   const u = data.user;
-  const images = u.business_images_url || [];
+  const images = u.business_images || [];
   const roleLabel = formatRole(u.role);
   const memberSince = formatDate(u.created_at);
   const mapsLink = (loc) => {

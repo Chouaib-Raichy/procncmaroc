@@ -13,7 +13,8 @@ export default function slugify(text) {
     'Ø': 'O', 'Ù': 'U', 'Ú': 'U', 'Û': 'U', 'Ü': 'U',
     'Ý': 'Y', 'Þ': 'TH', 'Ÿ': 'Y',
   };
-  return text
+  if (!text) return '';
+  return String(text)
     .replace(/[àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ]/gi, (c) => map[c] || c)
     .replace(/[^a-zA-Z0-9\s-]/g, '')
     .replace(/\s+/g, '-')

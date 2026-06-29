@@ -4,8 +4,8 @@ import api from '../api/axios';
 const AuthContext = createContext();
 
 function getToken() {
-  try { return localStorage.getItem('token'); } catch { /* private mode */ }
-  try { return sessionStorage.getItem('token'); } catch { /* private mode */ }
+  try { return localStorage.getItem('token'); } catch {}
+  try { return sessionStorage.getItem('token'); } catch {}
   return null;
 }
 
@@ -18,12 +18,12 @@ function setToken(token, remember) {
       sessionStorage.setItem('token', token);
       try { localStorage.removeItem('token'); } catch {}
     }
-  } catch { /* private mode */ }
+  } catch {}
 }
 
 function removeToken() {
-  try { localStorage.removeItem('token'); } catch { /* private mode */ }
-  try { sessionStorage.removeItem('token'); } catch { /* private mode */ }
+  try { localStorage.removeItem('token'); } catch {}
+  try { sessionStorage.removeItem('token'); } catch {}
 }
 
 export function AuthProvider({ children }) {
@@ -33,8 +33,8 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const token = getToken();
     if (token) {
-      api.get('/profile')
-        .then((res) => setUser(res.data.user || res.data))
+      api.get('/auth/profile')
+        .then((res) => setUser(res.data?.data || res.data))
         .catch(() => removeToken())
         .finally(() => setLoading(false));
     } else {
@@ -43,42 +43,49 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (email, password, remember = false) => {
-    const res = await api.post('/login', { email, password });
-    setToken(res.data.token, remember);
-    setUser(res.data.user);
+    const res = await api.post('/auth/login', { email, password });
+    setToken(res.data.data.token, remember);
+    setUser(res.data.data.user);
     return res.data;
   };
 
   const register = async (name, entreprise_name, email, phone, business_location, city, country, password, password_confirmation, remember = false) => {
-    const res = await api.post('/register', { name, entreprise_name, email, phone, business_location, city, country, password, password_confirmation });
-    setToken(res.data.token, remember);
-    setUser(res.data.user);
+    const res = await api.post('/auth/register', { name, entreprise_name, email, phone, business_location, city, country, password, password_confirmation });
+    setToken(res.data.data.token, remember);
+    setUser(res.data.data.user);
     return res.data;
   };
 
+  const setSession = (token, user) => {
+    setToken(token, true);
+    setUser(user);
+  };
+
   const logout = async () => {
-    await api.post('/logout');
+    try {
+      await api.post('/auth/logout');
+    } catch {
+      // Local cleanup regardless of server response
+    }
     removeToken();
     setUser(null);
   };
 
-  const updateProfile = async (formData) => {
-    const res = await api.post('/profile/update', formData);
-    setUser(res.data.user || res.data);
+  const updateProfile = async (data) => {
+    const res = await api.put('/auth/profile', data);
+    setUser(res.data?.data || res.data);
     return res.data;
   };
 
   const refreshUser = async () => {
     try {
-      const res = await api.get('/profile');
-      setUser(res.data.user || res.data);
-    } catch {
-      // ignore
-    }
+      const res = await api.get('/auth/profile');
+      setUser(res.data.data || res.data);
+    } catch {}
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, updateProfile, refreshUser }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateProfile, refreshUser, setSession }}>
       {children}
     </AuthContext.Provider>
   );

@@ -7,7 +7,7 @@ export const createCategory = (formData) => api.post('/admin/categories', formDa
   headers: { 'Content-Type': 'multipart/form-data' },
 });
 
-export const updateCategory = (id, formData) => api.post(`/admin/categories/update/${id}`, formData, {
+export const updateCategory = (id, formData) => api.post(`/admin/categories/${id}`, formData, {
   headers: { 'Content-Type': 'multipart/form-data' },
 });
 

@@ -79,7 +79,7 @@ export default function PartnerMap() {
   const loadPartners = () => {
     setLoading(true);
     setError(null);
-    getPartners().then((res) => setPartners(res.data)).catch(() => setError('Failed to load partners. Please try again.')).finally(() => setLoading(false));
+    getPartners().then((res) => setPartners(res.data?.data || res.data || [])).catch(() => setError('Failed to load partners. Please try again.')).finally(() => setLoading(false));
   };
 
   useEffect(() => { loadPartners(); }, []);

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
@@ -18,10 +18,11 @@ export default function CompleteRegistration() {
   const [bioError, setBioError] = useState('');
   const fileRef = useRef(null);
 
-  if (!user || user.is_approved || user.business_bio) {
-    navigate('/', { replace: true });
-    return null;
-  }
+  useEffect(() => {
+    if (!user || user.is_approved || user.business_bio) {
+      navigate('/', { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleFiles = (files) => {
     const remaining = MAX_IMAGES - images.length;
@@ -49,10 +50,7 @@ export default function CompleteRegistration() {
     setBioError('');
     setSending(true);
     try {
-      const fd = new FormData();
-      fd.append('business_bio', bio);
-      images.forEach((img) => fd.append('images[]', img));
-      await api.post('/register/complete', fd);
+      await api.put('/auth/profile', { business_bio: bio });
       await refreshUser();
       navigate('/pending-approval', { replace: true });
     } catch (err) {

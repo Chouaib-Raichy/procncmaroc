@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
 import Loading from '../components/Loading';
 import placeholderImg from '../assets/placeholder.svg';
+import machineBg from '../assets/machineBG.webp';
 import {
   getAdminMachines,
   createMachine,
@@ -47,7 +48,7 @@ export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   if (loading) return <Loading text="Loading dashboard..." />;
-  if (!user || user.role !== 'admin') return <Navigate to="/" replace />;
+  if (!user || user.role !== 'ROLE_ADMIN') return <Navigate to="/" replace />;
 
   return (
     <>
@@ -136,7 +137,10 @@ function Overview() {
   const [hoveredDay, setHoveredDay] = useState(null);
 
   useEffect(() => {
-    getStatsSummary().then((res) => setStats(res.data)).catch(() => {}).finally(() => setLoading(false));
+    getStatsSummary().then((res) => {
+      const raw = res.data?.data ?? res.data;
+      setStats({ ...raw, visits_per_day: raw.visits_per_day || [] });
+    }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   const fmt = (n) => Number(n).toLocaleString();
@@ -371,9 +375,10 @@ function UsersManager() {
     setLoading(true);
     getUsers({ per_page: 10, page }).then((res) => {
       const d = res.data;
-      setUsers(d.data || d);
-      setLastPage(d.last_page || 1);
-      setTotal(d.total || d.length || 0);
+      const body = d.data || d;
+      setUsers(Array.isArray(body) ? body : (body.content || []));
+      setLastPage(body.total_pages ?? body.last_page ?? 1);
+      setTotal(body.total_elements ?? body.total ?? 0);
     }).catch(() => {}).finally(() => setLoading(false));
   };
   useEffect(() => { load(); }, [page]);
@@ -505,7 +510,7 @@ function UsersManager() {
                 <td style={{ ...td, fontWeight: '600', color: '#fff' }}>{u.name}</td>
                 <td style={td}>{u.email}</td>
                 <td style={td}>
-                  {u.role === 'admin' ? (
+                  {u.role === 'ROLE_ADMIN' ? (
                     <span style={{ display:'inline-flex', alignItems:'center', gap:'4px', color:'#d4af37', fontWeight:700 }}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                       Admin
@@ -538,7 +543,7 @@ function UsersManager() {
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
                       Edit
                     </motion.button>
-                    {u.role !== 'admin' && (
+                    {u.role !== 'ROLE_ADMIN' && (
                       <>
                         <motion.button
                           style={{ ...smallBtn, background: u.banned_at ? '#27ae60' : '#e74c3c', display:'inline-flex', alignItems:'center', gap:'4px' }}
@@ -710,8 +715,10 @@ function PendingRegistrations() {
     setLoading(true);
     setError(null);
     getPendingUsers(p).then((res) => {
-      setUsers(res.data.data);
-      setPagination({ current: res.data.current_page, last: res.data.last_page, total: res.data.total });
+      const d = res.data;
+      const body = d.data || d;
+      setUsers(body.content || body || []);
+      setPagination({ current: body.current_page ?? body.page + 1 ?? 1, last: body.total_pages ?? body.last_page ?? 1, total: body.total_elements ?? body.total ?? 0 });
     }).catch(() => setError('Failed to load pending users')).finally(() => setLoading(false));
   };
 
@@ -859,7 +866,7 @@ function PendingRegistrations() {
 
               <div style={cardDivider} />
 
-              <div style={cardBody}>
+              <div style={pendingCardBody}>
                 <div style={infoRow}>
                   <span style={infoLabel}>Phone</span>
                   <span style={infoValue}>{u.phone || '-'}</span>
@@ -998,11 +1005,12 @@ function MachineManager() {
     setLoading(true);
     getAdminMachines({ per_page: 10, page }).then((res) => {
       const d = res.data;
-      setMachines(d.data || d);
-      setLastPage(d.last_page || 1);
-      setTotal(d.total || d.length || 0);
+      const body = d.data || d;
+      setMachines(Array.isArray(body) ? body : (body.content || []));
+      setLastPage(body.total_pages ?? body.last_page ?? 1);
+      setTotal(body.total_elements ?? body.total ?? (Array.isArray(body) ? body.length : 0));
     }).catch(() => {});
-    getAdminCategories().then((res) => setCategories(res.data)).catch(() => {}).finally(() => setLoading(false));
+    getAdminCategories().then((res) => { const d = res.data; const body = d.data || d; setCategories(Array.isArray(body) ? body : (body.content || [])); }).catch(() => {}).finally(() => setLoading(false));
   };
 
   useEffect(() => { load(); }, [page]);
@@ -1064,8 +1072,11 @@ function MachineManager() {
   const toggleVisible = async (m) => {
     try {
       const fd = new FormData();
+      fd.append('title', m.title);
       fd.append('visible', m.visible ? '0' : '1');
-      fd.append('category_id', m.category_id ?? '');
+      if (m.category_id) fd.append('category_id', m.category_id);
+      if (m.price) fd.append('price', m.price);
+      if (m.features?.length) fd.append('features', JSON.stringify(m.features));
       const res = await updateMachine(m.id, fd);
       setMachines((prev) => prev.map((x) => (x.id === m.id ? res.data : x)));
     } catch { alert('Error toggling visibility'); }
@@ -1080,13 +1091,13 @@ function MachineManager() {
         <div style={{ overflowX: 'auto' }}>
           <table style={table}>
             <thead>
-              <tr><th style={th}>Image</th><th style={th}>Title</th><th style={th}>Price</th><th style={th}>Category</th><th style={th}>Status</th><th style={th}>Actions</th></tr>
+              <tr><th style={th}>Image</th><th style={th}>Title</th><th style={th}>Category</th><th style={th}>Price</th><th style={th}>Status</th><th style={th}>Actions</th></tr>
             </thead>
             <tbody>
               {[1,2,3].map((i) => (
                 <tr key={i} style={tr}>
                   {[1,2,3,4,5,6].map((j) => (
-                    <td key={j} style={td}><div style={{ height:'14px', background:'#1a1a1a', borderRadius:'4px', width: j === 2 ? '140px' : j === 3 ? '80px' : '60px' }} /></td>
+                    <td key={j} style={td}><div style={{ height:'14px', background:'#1a1a1a', borderRadius:'4px', width: j === 2 ? '200px' : j === 3 ? '120px' : j === 4 ? '100px' : '60px' }} /></td>
                   ))}
                 </tr>
               ))}
@@ -1131,8 +1142,8 @@ function MachineManager() {
               <tr>
                 <th style={th}>Image</th>
                 <th style={th}>Title</th>
-                <th style={th}>Price</th>
                 <th style={th}>Category</th>
+                <th style={th}>Price</th>
                 <th style={th}>Status</th>
                 <th style={th}>Actions</th>
               </tr>
@@ -1149,11 +1160,22 @@ function MachineManager() {
                   style={tr}
                 >
                   <td style={td}>
-                    <img src={m.image_url || placeholderImg} alt="" style={{ ...thumb, cursor: 'pointer' }} onClick={() => setLightboxImg(m.image_url || placeholderImg)} />
+                    <img
+                      src={m.image_url || machineBg}
+                      alt={m.title}
+                      loading="lazy"
+                      style={thumb}
+                      onClick={() => setLightboxImg(m.image_url || machineBg)}
+                      onError={(e) => { e.target.src = machineBg; }}
+                    />
                   </td>
                   <td style={{ ...td, fontWeight: '600', color:'#fff' }}>{m.title}</td>
-                  <td style={td}>{m.price ? `${parseFloat(m.price).toLocaleString()} MAD` : '-'}</td>
-                  <td style={td}>{m.category?.name || '-'}</td>
+                  <td style={td}>
+                    {m.category?.name || m.category_id || '-'}
+                  </td>
+                  <td style={td}>
+                    {m.price ? `${parseFloat(m.price).toLocaleString()} MAD` : '-'}
+                  </td>
                   <td style={td}>
                     <span style={{ ...badge, background: m.visible ? '#27ae60' : '#e74c3c', display:'inline-flex', alignItems:'center', gap:'4px' }}>
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -1165,7 +1187,7 @@ function MachineManager() {
                   <td style={td}>
                     <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                       <motion.button
-                        style={{ ...smallBtn, background:'#555' }}
+                        style={{ ...smallBtn, background: m.visible ? '#e74c3c' : '#27ae60', display:'inline-flex', alignItems:'center', gap:'4px' }}
                         onClick={() => toggleVisible(m)}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -1196,7 +1218,42 @@ function MachineManager() {
               ))}
             </tbody>
           </table>
-        </div>
+          {lastPage > 1 && (
+            <div style={paginationRow}>
+              <div style={paginationInfo}>
+                Page {page} of {lastPage} — {total} machines
+              </div>
+              <div style={paginationBtns}>
+                <motion.button
+                  style={pageBtn(page <= 1)}
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  ← Prev
+                </motion.button>
+                {Array.from({ length: lastPage }, (_, i) => i + 1).map((n) => (
+                  <motion.button
+                    key={n}
+                    style={pageNumBtn(n === page)}
+                    onClick={() => setPage(n)}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {n}
+                  </motion.button>
+                ))}
+                <motion.button
+                  style={pageBtn(page >= lastPage)}
+                  disabled={page >= lastPage}
+                  onClick={() => setPage((p) => Math.min(lastPage, p + 1))}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Next →
+                </motion.button>
+              </div>
+            </div>
+          )}
+          </div>
       )}
       {showModal && (
         <div style={overlay} onClick={() => setShowModal(false)}>
@@ -1260,9 +1317,10 @@ function ProductManager() {
     setLoading(true);
     getAdminProducts({ per_page: 10, page }).then((res) => {
       const d = res.data;
-      setProducts(d.data || d);
-      setLastPage(d.last_page || 1);
-      setTotal(d.total || d.length || 0);
+      const body = d.data || d;
+      setProducts(Array.isArray(body) ? body : (body.content || []));
+      setLastPage(body.total_pages ?? body.last_page ?? 1);
+      setTotal(body.total_elements ?? body.total ?? (Array.isArray(body) ? body.length : 0));
     }).catch(() => {}).finally(() => setLoading(false));
   };
 
@@ -1592,7 +1650,7 @@ function CategoryManager() {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const load = () => { getAdminCategories().then((res) => setCategories(res.data)).catch(() => {}).finally(() => setLoading(false)); };
+  const load = () => { getAdminCategories().then((res) => { const d = res.data; const body = d.data || d; setCategories(Array.isArray(body) ? body : (body.content || [])); }).catch(() => {}).finally(() => setLoading(false)); };
   useEffect(() => { load(); }, []);
 
   const openAdd = () => {
@@ -1769,9 +1827,11 @@ function VisitorsManager() {
   const load = (p = 1) => {
     setLoading(true);
     getVisitors(p, 50).then((res) => {
-      setVisitors(res.data.data || []);
-      setLastPage(res.data.last_page || 1);
-      setPage(res.data.current_page || 1);
+      const d = res.data;
+      const body = d.data || d;
+      setVisitors(body.content || body || []);
+      setLastPage(body.total_pages ?? body.totalPages ?? body.last_page ?? 1);
+      setPage(body.current_page ?? (body.number ?? body.page ?? 0) + 1);
     }).catch(() => {}).finally(() => setLoading(false));
   };
 
@@ -1916,7 +1976,7 @@ function MessagesManager() {
   const [viewMsg, setViewMsg] = useState(null);
 
   useEffect(() => {
-    getMessages().then((res) => setMessages(res.data))
+    getMessages().then((res) => { const d = res.data; const body = d.data || d; setMessages(Array.isArray(body) ? body : (body.content || [])); })
       .catch((e) => setError(e?.response?.data?.message || 'Failed to load messages'))
       .finally(() => setLoading(false));
   }, []);
@@ -2074,6 +2134,13 @@ const saveBtn = { background: '#a37a39', color: '#fff', border: 'none', padding:
 const pendingHeader = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'clamp(16px, 2.5vw, 24px)', flexWrap: 'wrap', gap: '12px' };
 const countBadge = { background: '#a37a39', color: '#fff', padding: '6px 16px', borderRadius: '20px', fontSize: '13px', fontWeight: '700' };
 const cardGrid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 'clamp(14px, 2vw, 20px)' };
+const card = { background: 'linear-gradient(145deg, #0d0d0d, #161616)', border: '1px solid #a37a39', borderRadius: '8px', overflow: 'hidden', display: 'flex', flexDirection: 'column' };
+const imgWrap = { width: '100%', overflow: 'hidden', maxHeight: '240px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#000' };
+const machineImg = { width: '100%', height: 'auto', maxHeight: '240px', objectFit: 'contain', display: 'block' };
+const cardBody = { padding: 'clamp(10px, 1.2vw, 14px)', display: 'flex', flexDirection: 'column', flex: 1 };
+const cardTitle = { fontSize: 'clamp(16px, 1.6vw, 18px)', color: '#a37a39', margin: '0 0 6px' };
+const price = { fontSize: 'clamp(14px, 1.3vw, 15px)', color: '#d4af37', fontWeight: '700', margin: '0 0 8px' };
+const desc = { fontSize: 'clamp(13px, 1.2vw, 14px)', color: '#ccc', lineHeight: 1.6, flex: 1, margin: '0 0 10px' };
 const userCard = { background: 'linear-gradient(145deg, #0d0d0d, #161616)', border: '1px solid #2a2a2a', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.4)' };
 const cardTop = { display: 'flex', alignItems: 'center', gap: '14px', padding: 'clamp(16px, 2vw, 20px) clamp(16px, 2vw, 20px) 0' };
 const userAvatar = { width: '48px', height: '48px', borderRadius: '50%', background: 'linear-gradient(135deg, #a37a39, #c8952e)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontWeight: 'bold', fontSize: '20px', flexShrink: 0 };
@@ -2082,7 +2149,7 @@ const userName = { color: '#fff', fontSize: 'clamp(15px, 1.5vw, 17px)', fontWeig
 const userEmail = { color: '#888', fontSize: '13px', marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
 const userCompany = { color: '#d4af37', fontSize: '13px', fontWeight: '600', marginTop: '1px' };
 const cardDivider = { height: '1px', background: 'linear-gradient(90deg, transparent, #a37a39, transparent)', margin: 'clamp(12px, 2vw, 16px) 0' };
-const cardBody = { padding: '0 clamp(16px, 2vw, 20px)' };
+const pendingCardBody = { padding: '0 clamp(16px, 2vw, 20px)' };
 const infoRow = { display: 'flex', justifyContent: 'space-between', padding: '5px 0', fontSize: 'clamp(13px, 1.2vw, 14px)' };
 const infoLabel = { color: '#777' };
 const infoValue = { color: '#ccc', fontWeight: '600', textAlign: 'right' };
@@ -2101,6 +2168,24 @@ const paginationInfo = { color: '#777', fontSize: '13px' };
 const paginationBtns = { display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', justifyContent: 'center' };
 const pageBtn = (disabled) => ({ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '6px 12px', borderRadius: '6px', border: '1px solid ' + (disabled ? '#333' : '#555'), background: disabled ? '#111' : '#1a1a1a', color: disabled ? '#555' : '#ccc', cursor: disabled ? 'not-allowed' : 'pointer', fontWeight: '600', fontSize: '13px', opacity: disabled ? 0.5 : 1 });
 const pageNumBtn = (active) => ({ width: '34px', height: '34px', borderRadius: '6px', border: active ? '1px solid #a37a39' : '1px solid #333', background: active ? 'rgba(163,122,57,0.2)' : '#111', color: active ? '#d4af37' : '#888', cursor: 'pointer', fontWeight: active ? '700' : '500', fontSize: '13px' });
+
+  /* ---------- Machine Card Styles ---------- */
+const styles = {
+  cardGrid,
+  card,
+  imgWrap,
+  machineImg,
+  cardBody,
+  cardTitle,
+  price,
+  desc,
+  paginationRow,
+  paginationInfo,
+  paginationBtns,
+  pageBtn,
+  pageNumBtn,
+};
+
 const lightboxOverlay = { position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.85)', cursor: 'zoom-out' };
 
 /* ---------- Skeleton ---------- */

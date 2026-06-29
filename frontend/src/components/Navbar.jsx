@@ -28,9 +28,21 @@ export default function Navbar() {
   const fetchCategories = () => {
     if (catFetched.current) return;
     catFetched.current = true;
-    api.get('/categories')
-      .then((res) => setCategories(res.data))
-      .catch(() => setCategories([]));
+    Promise.all([
+      api.get('/categories'),
+      api.get('/machines', { params: { page: 0, size: 100, visible: true } })
+    ]).then(([cRes, mRes]) => {
+      const cats = cRes.data?.data || cRes.data || [];
+      const machines = mRes.data?.data?.content || mRes.data?.data || mRes.data || [];
+      const grouped = {};
+      machines.forEach(m => {
+        if (m.categoryId) {
+          if (!grouped[m.categoryId]) grouped[m.categoryId] = [];
+          grouped[m.categoryId].push(m);
+        }
+      });
+      setCategories(cats.map(c => ({ ...c, machines: grouped[c.id] || [] })));
+    }).catch(() => setCategories([]));
   };
 
   useEffect(() => {
@@ -104,7 +116,7 @@ export default function Navbar() {
           )}
           <div className="nav-user-info">
             <div className="nav-user-name">{user.name}</div>
-            <div className="nav-user-role">{user.role === 'admin' ? 'Administrator' : 'Member'}</div>
+            <div className="nav-user-role">{user.role === 'ROLE_ADMIN' ? 'Administrator' : 'Member'}</div>
           </div>
         </div>
       )}
@@ -147,6 +159,9 @@ export default function Navbar() {
       <NavLink to="/products" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>} style={{ '--i': 3 }}>Products</NavLink>
       <NavLink to="/about-us" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>} style={{ '--i': 4 }}>About Us</NavLink>
       <NavLink to="/contact-us" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>} style={{ '--i': 5 }}>Contact Us</NavLink>
+      {user?.role === 'ROLE_ADMIN' && (
+        <NavLink to="/dashboard" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a37a39" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>} style={{ '--i': 6 }}>Dashboard</NavLink>
+      )}
     </>
   );
 
@@ -195,7 +210,7 @@ export default function Navbar() {
             </button>
             {mobileProfileOpen && (
               <div style={styles.mobileProfileDropdown}>
-                {user.role === 'admin' && (
+                {user.role === 'ROLE_ADMIN' && (
                   <Link to="/dashboard" onClick={() => { setMobileProfileOpen(false); closeAll(); }} style={styles.mobileProfileItem}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a37a39" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px', verticalAlign: 'middle' }}><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
                     Dashboard
@@ -273,6 +288,10 @@ export default function Navbar() {
             <Link to="/about-us" style={{...styles.link, ...active('/about-us')}} onClick={closeAll}>About Us</Link>
             <Link to="/contact-us" style={{...styles.link, ...active('/contact-us')}} onClick={closeAll}>Contact Us</Link>
 
+            {user?.role === 'ROLE_ADMIN' && (
+              <Link to="/dashboard" style={{...styles.link, ...active('/dashboard'), color: '#a37a39', fontWeight: 700}} onClick={closeAll}>Dashboard</Link>
+            )}
+
             <button onClick={(e) => { e.stopPropagation(); setSearchOpen(true); }} className="search-btn" style={styles.searchBtn} aria-label="Search">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8"/>
@@ -304,7 +323,7 @@ export default function Navbar() {
                     <div style={{ padding: '10px 16px', borderBottom: '1px solid #222', color: '#a37a39', fontSize: '14px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {user.name}
                     </div>
-                    {user.role === 'admin' && (
+                    {user.role === 'ROLE_ADMIN' && (
                       <Link to="/dashboard" onClick={() => { setUserMenuOpen(false); closeAll(); }}
                         style={{ display: 'block', padding: '10px 16px', color: '#a37a39', textDecoration: 'none', fontSize: '14px', transition: 'background 0.2s' }}
                         onMouseEnter={(e) => e.target.style.background = '#111'}

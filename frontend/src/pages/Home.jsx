@@ -59,7 +59,7 @@ export default function Home() {
   useEffect(() => {
     const id = setTimeout(() => {
       getAllMachines()
-        .then((res) => setMachines(res.data))
+        .then((res) => setMachines(res.data?.data?.content || res.data?.data || res.data || []))
         .catch(() => setMachines([]));
     }, 5000);
     return () => clearTimeout(id);
@@ -69,8 +69,8 @@ export default function Home() {
     const id = setTimeout(() => {
       getPartners()
         .then((res) => {
-          const users = res.data || res;
-          if (users.length > 0) {
+          const users = res.data?.data || res.data || res;
+          if (users?.length > 0) {
             setPartner(users[Math.floor(Math.random() * users.length)]);
           }
         })
