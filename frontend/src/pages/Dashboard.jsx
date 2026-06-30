@@ -1388,22 +1388,15 @@ function ProductManager() {
 
   const handleSave = async () => {
     if (!form.title.trim()) return;
-    if (imageCount() < 1) { setAlertMsg({ title: 'Missing Image', message: 'At least 1 image is required.' }); return; }
     setSaving(true);
     try {
-      const fd = new FormData();
-      fd.append('title', form.title);
-      fd.append('visible', form.visible ? '1' : '0');
-      if (form.price) fd.append('price', form.price);
-      images.forEach((img) => fd.append('images[]', img));
-      if (removedPaths.length) {
-        removedPaths.forEach((path) => fd.append('deleted_images[]', path));
-      }
+      const body = { title: form.title, visible: !!form.visible };
+      if (form.price) body.price = Number(form.price);
       if (editing) {
-        const res = await updateProduct(editing.id, fd);
+        const res = await updateProduct(editing.id, body);
         setProducts((prev) => prev.map((p) => (p.id === editing.id ? res.data.data : p)));
       } else {
-        const res = await createProduct(fd);
+        const res = await createProduct(body);
         setProducts((prev) => [res.data.data, ...prev]);
         setTotal((t) => t + 1);
       }
@@ -1428,9 +1421,7 @@ function ProductManager() {
 
   const toggleVisible = async (p) => {
     try {
-      const fd = new FormData();
-      fd.append('visible', p.visible ? '0' : '1');
-      const res = await updateProduct(p.id, fd);
+      const res = await updateProduct(p.id, { visible: !p.visible });
       setProducts((prev) => prev.map((x) => (x.id === p.id ? res.data.data : x)));
     } catch (e) { setAlertMsg({ title: 'Error', message: e.response?.data?.message || 'Error toggling visibility' }); }
   };
