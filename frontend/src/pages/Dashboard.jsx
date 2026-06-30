@@ -1362,7 +1362,7 @@ function ProductManager() {
       price: p.price ?? '', visible: p.visible,
     });
     setImages([]); setNewPreviews([]);
-    setExistingImages(p.images_url || []);
+    setExistingImages(p.images || []);
     setExistingPaths(p.images || []);
     setRemovedPaths([]);
     setShowModal(true);
@@ -1633,7 +1633,7 @@ function ProductManager() {
             </label>
             <div style={modalActions}>
               <button style={cancelBtn} onClick={() => setShowModal(false)}>Cancel</button>
-              <button style={saveBtn} onClick={handleSave} disabled={saving || !form.title.trim() || imageCount() < 1}>
+              <button style={saveBtn} onClick={handleSave} disabled={saving || !form.title.trim()}>
                 {saving ? 'Saving...' : editing ? 'Update' : 'Create'}
               </button>
             </div>
