@@ -373,7 +373,7 @@ function UsersManager() {
 
   const load = () => {
     setLoading(true);
-    getUsers({ per_page: 10, page }).then((res) => {
+    getUsers({ size: 10, page: page - 1 }).then((res) => {
       const d = res.data;
       const body = d.data || d;
       setUsers(Array.isArray(body) ? body : (body.content || []));
@@ -1335,7 +1335,7 @@ function ProductManager() {
 
   const load = () => {
     setLoading(true);
-    getAdminProducts({ per_page: 10, page }).then((res) => {
+    getAdminProducts({ size: 10, page: page - 1 }).then((res) => {
       const d = res.data;
       const body = d.data || d;
       setProducts(Array.isArray(body) ? body : (body.content || []));
