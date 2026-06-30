@@ -31,6 +31,8 @@ import ConfirmModal from '../components/ConfirmModal';
 import AlertModal from '../components/AlertModal';
 import SEO from '../components/SEO';
 
+const storageUrl = (path) => path ? `/storage/${path}` : null;
+
 const sidebarItems = [
   { key: 'overview', label: 'Overview', icon: '📊' },
   { key: 'users', label: 'Users', icon: '👥' },
@@ -1362,7 +1364,7 @@ function ProductManager() {
       price: p.price ?? '', visible: p.visible,
     });
     setImages([]); setNewPreviews([]);
-    setExistingImages(p.images || []);
+    setExistingImages((p.images || []).map((img) => storageUrl(img)));
     setExistingPaths(p.images || []);
     setRemovedPaths([]);
     setShowModal(true);
@@ -1504,10 +1506,10 @@ function ProductManager() {
                 >
                   <td style={td}>
                     <img
-                      src={p.images_url?.[0] || placeholderImg}
+                      src={storageUrl(p.images?.[0]) || placeholderImg}
                       alt=""
                       style={{ ...thumb, cursor: 'pointer' }}
-                      onClick={() => setLightboxImg(p.images_url?.[0] || placeholderImg)}
+                      onClick={() => setLightboxImg(storageUrl(p.images?.[0]) || placeholderImg)}
                     />
                   </td>
                   <td style={{ ...td, fontWeight: '600', color:'#fff' }}>{p.title}</td>
