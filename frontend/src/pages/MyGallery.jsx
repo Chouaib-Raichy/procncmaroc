@@ -209,7 +209,7 @@ export default function MyGallery() {
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [fullImg, setFullImg] = useState(null);
-  const [form, setForm] = useState({ title: '', description: '', business_location: user?.business_location || '', contact_phone: user?.phone || '' });
+  const [form, setForm] = useState({ title: '', description: '', business_location: '', contact_phone: '' });
   const [files, setFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [error, setError] = useState('');
@@ -226,9 +226,10 @@ export default function MyGallery() {
   useEffect(() => {
     api.get('/gallery/my')
       .then((res) => {
-        setPosts(res.data);
+        const posts = res.data?.data?.content || res.data?.data || [];
+        setPosts(posts);
         const likeMap = {};
-        res.data.forEach((p) => { likeMap[p.id] = { liked: p.is_liked_by_user, count: p.likes_count }; });
+        posts.forEach((p) => { likeMap[p.id] = { liked: p.is_liked_by_user, count: p.likes_count }; });
         setLikes(likeMap);
       })
       .catch(() => navigate('/login'))
@@ -252,12 +253,13 @@ export default function MyGallery() {
       fd.append('description', form.description);
       fd.append('business_location', form.business_location);
       fd.append('contact_phone', form.contact_phone);
-      files.forEach((f) => fd.append('images[]', f));
+      files.forEach((f) => fd.append('images', f));
 
       const res = await api.post('/gallery', fd);
-      setPosts([{ ...res.data, _commentCount: 0 }, ...posts]);
-      setLikes((prev) => ({ ...prev, [res.data.id]: { liked: false, count: 0 } }));
-      setForm({ title: '', description: '', business_location: user?.business_location || '', contact_phone: user?.phone || '' });
+      const newPost = res.data?.data || res.data;
+      setPosts([{ ...newPost, _commentCount: 0 }, ...posts]);
+      setLikes((prev) => ({ ...prev, [newPost.id]: { liked: false, count: 0 } }));
+      setForm({ title: '', description: '', business_location: '', contact_phone: '' });
       setFiles([]);
       setPreviews([]);
       setShowModal(false);

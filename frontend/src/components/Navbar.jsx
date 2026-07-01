@@ -36,9 +36,10 @@ export default function Navbar() {
       const machines = mRes.data?.data?.content || mRes.data?.data || mRes.data || [];
       const grouped = {};
       machines.forEach(m => {
-        if (m.categoryId) {
-          if (!grouped[m.categoryId]) grouped[m.categoryId] = [];
-          grouped[m.categoryId].push(m);
+        const catId = m.category_id || m.categoryId;
+        if (catId) {
+          if (!grouped[catId]) grouped[catId] = [];
+          grouped[catId].push(m);
         }
       });
       setCategories(cats.map(c => ({ ...c, machines: grouped[c.id] || [] })));
@@ -265,14 +266,15 @@ export default function Navbar() {
                   {categories.map((cat) => (
                     <div key={cat.id} style={styles.catItem}
                       onMouseEnter={() => setActiveCat(cat.id)}
-                      onMouseLeave={() => setActiveCat(null)}
                     >
-                      <div style={styles.catRow}>
+                      <div style={{...styles.catRow, background: activeCat === cat.id ? '#1a1a1a' : 'transparent'}}>
                         <Link to="/our-machines" style={styles.catLabel} onClick={closeAll}>{cat.name}</Link>
                         {cat.machines?.length > 0 && <span style={styles.arrow}>&#9656;</span>}
                       </div>
                       {activeCat === cat.id && cat.machines?.length > 0 && (
-                        <div style={styles.subDropdown}>
+                        <div style={styles.subDropdown}
+                          onMouseEnter={() => setActiveCat(cat.id)}
+                        >
                           {cat.machines.map((m) => (
                             <Link key={m.id} to={`/machines/${slugify(m.title)}-${m.id}`} style={styles.machineLink} onClick={closeAll}>{m.title}</Link>
                           ))}
@@ -287,10 +289,6 @@ export default function Navbar() {
             <Link to="/products" style={{...styles.link, ...active('/products')}} onClick={closeAll}>Products</Link>
             <Link to="/about-us" style={{...styles.link, ...active('/about-us')}} onClick={closeAll}>About Us</Link>
             <Link to="/contact-us" style={{...styles.link, ...active('/contact-us')}} onClick={closeAll}>Contact Us</Link>
-
-            {user?.role === 'ROLE_ADMIN' && (
-              <Link to="/dashboard" style={{...styles.link, ...active('/dashboard'), color: '#a37a39', fontWeight: 700}} onClick={closeAll}>Dashboard</Link>
-            )}
 
             <button onClick={(e) => { e.stopPropagation(); setSearchOpen(true); }} className="search-btn" style={styles.searchBtn} aria-label="Search">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -323,23 +321,23 @@ export default function Navbar() {
                     <div style={{ padding: '10px 16px', borderBottom: '1px solid #222', color: '#a37a39', fontSize: '14px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {user.name}
                     </div>
-                    {user.role === 'ROLE_ADMIN' && (
-                      <Link to="/dashboard" onClick={() => { setUserMenuOpen(false); closeAll(); }}
-                        style={{ display: 'block', padding: '10px 16px', color: '#a37a39', textDecoration: 'none', fontSize: '14px', transition: 'background 0.2s' }}
-                        onMouseEnter={(e) => e.target.style.background = '#111'}
-                        onMouseLeave={(e) => e.target.style.background = 'transparent'}
-                      >Dashboard</Link>
-                    )}
-                    <Link to="/my-gallery" onClick={() => { setUserMenuOpen(false); closeAll(); }}
-                      style={{ display: 'block', padding: '10px 16px', color: '#ccc', textDecoration: 'none', fontSize: '14px', transition: 'background 0.2s' }}
-                      onMouseEnter={(e) => e.target.style.background = '#111'}
-                      onMouseLeave={(e) => e.target.style.background = 'transparent'}
-                      >My Stories</Link>
                     <Link to="/profile" onClick={() => { setUserMenuOpen(false); closeAll(); }}
                       style={{ display: 'block', padding: '10px 16px', color: '#ccc', textDecoration: 'none', fontSize: '14px', transition: 'background 0.2s' }}
                       onMouseEnter={(e) => e.target.style.background = '#111'}
                       onMouseLeave={(e) => e.target.style.background = 'transparent'}
                     >My Profile</Link>
+                    <Link to="/my-gallery" onClick={() => { setUserMenuOpen(false); closeAll(); }}
+                      style={{ display: 'block', padding: '10px 16px', color: '#ccc', textDecoration: 'none', fontSize: '14px', transition: 'background 0.2s' }}
+                      onMouseEnter={(e) => e.target.style.background = '#111'}
+                      onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                      >My Stories</Link>
+                    {user.role === 'ROLE_ADMIN' && (
+                      <Link to="/dashboard" onClick={() => { setUserMenuOpen(false); closeAll(); }}
+                        style={{ display: 'block', padding: '10px 16px', color: '#a37a39', textDecoration: 'none', fontSize: '14px', fontWeight: 700, transition: 'background 0.2s' }}
+                        onMouseEnter={(e) => e.target.style.background = '#111'}
+                        onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                      >Dashboard</Link>
+                    )}
                     <button onClick={() => { setUserMenuOpen(false); handleLogout(); closeAll(); }}
                       style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 16px', color: '#e57373', background: 'none', border: 'none', fontSize: '14px', cursor: 'pointer', transition: 'background 0.2s' }}
                       onMouseEnter={(e) => e.target.style.background = '#111'}

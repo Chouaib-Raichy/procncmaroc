@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SEO from '../components/SEO';
-import { getProducts } from '../api/products';
+import { getProducts, searchProducts } from '../api/products';
 
 const WHATSAPP_NUMBER = '+212625280991';
 
@@ -17,6 +17,9 @@ const EmptyIcon = () => (
   <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /><line x1="8" y1="11" x2="14" y2="11" /></svg>
 );
 
+const storageUrl = (p) => p ? `/storage/${p}` : p;
+const ArrowLeft = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>;
+const ArrowRight = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>;
 function formatPrice(price) {
   if (price == null) return null;
   return Number(price).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' MAD';
@@ -38,6 +41,7 @@ export default function Products() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [carouselIdx, setCarouselIdx] = useState({});
   const gridRef = useRef(null);
 
   useEffect(() => {
@@ -48,9 +52,8 @@ export default function Products() {
   const fetch = useCallback(() => {
     setLoading(true);
     setError(null);
-    const params = { page, per_page: 9 };
-    if (debouncedSearch.trim()) params.search = debouncedSearch.trim();
-    getProducts(params)
+    const params = { page: page - 1, size: 9 };
+    (debouncedSearch.trim() ? searchProducts(debouncedSearch.trim(), params) : getProducts(params))
       .then((res) => {
         const d = res.data;
         const body = d.data || d;
@@ -152,9 +155,20 @@ export default function Products() {
                     style={styles.card}
                   >
                     <div style={styles.cardImgWrap}>
-                      {p.images_url?.length > 0 ? (
+                      {p.images?.length > 0 ? (
                         <div style={styles.cardImgInner}>
-                          <img src={p.images_url[0]} alt={p.title} loading="lazy" className="product-card-img" style={styles.cardImg} />
+                          <img src={storageUrl(p.images[carouselIdx[p.id] ?? 0])} alt={p.title} loading="lazy" className="product-card-img" style={styles.cardImg} />
+                          {p.images.length > 1 && (
+                            <>
+                              <button style={styles.carouselBtnLeft} onClick={(e) => { e.stopPropagation(); setCarouselIdx((prev) => ({ ...prev, [p.id]: ((prev[p.id] ?? 0) - 1 + p.images.length) % p.images.length })); }}><ArrowLeft /></button>
+                              <button style={styles.carouselBtnRight} onClick={(e) => { e.stopPropagation(); setCarouselIdx((prev) => ({ ...prev, [p.id]: ((prev[p.id] ?? 0) + 1) % p.images.length })); }}><ArrowRight /></button>
+                              <div style={styles.carouselDots}>
+                                {p.images.map((_, i) => (
+                                  <span key={i} style={{ ...styles.carouselDot, background: (carouselIdx[p.id] ?? 0) === i ? '#d4af37' : 'rgba(255,255,255,0.35)' }} />
+                                ))}
+                              </div>
+                            </>
+                          )}
                           <div className="product-card-overlay" style={styles.cardImgOverlay}>
                             <span style={styles.viewLabel}>View Product</span>
                           </div>
@@ -344,6 +358,28 @@ const styles = {
   cardImgPlaceholder: {
     width: '100%', height: '100%', display: 'flex', alignItems: 'center',
     justifyContent: 'center', background: '#151515',
+  },
+  carouselBtnLeft: {
+    position: 'absolute', left: '6px', top: '50%', transform: 'translateY(-50%)',
+    background: 'rgba(0,0,0,0.5)', border: 'none', color: '#fff', cursor: 'pointer',
+    borderRadius: '50%', width: '30px', height: '30px', display: 'flex',
+    alignItems: 'center', justifyContent: 'center', zIndex: 2,
+    transition: 'background 0.2s',
+  },
+  carouselBtnRight: {
+    position: 'absolute', right: '6px', top: '50%', transform: 'translateY(-50%)',
+    background: 'rgba(0,0,0,0.5)', border: 'none', color: '#fff', cursor: 'pointer',
+    borderRadius: '50%', width: '30px', height: '30px', display: 'flex',
+    alignItems: 'center', justifyContent: 'center', zIndex: 2,
+    transition: 'background 0.2s',
+  },
+  carouselDots: {
+    position: 'absolute', bottom: '8px', left: '50%', transform: 'translateX(-50%)',
+    display: 'flex', gap: '5px', zIndex: 2,
+  },
+  carouselDot: {
+    width: '7px', height: '7px', borderRadius: '50%',
+    transition: 'background 0.2s',
   },
   cardBody: {
     padding: 'clamp(14px, 2vw, 20px)', flex: 1,

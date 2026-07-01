@@ -1392,13 +1392,20 @@ function ProductManager() {
     if (!form.title.trim()) return;
     setSaving(true);
     try {
-      const body = { title: form.title, visible: !!form.visible };
-      if (form.price) body.price = Number(form.price);
+      const fd = new FormData();
+      fd.append('title', form.title);
+      fd.append('visible', form.visible ? '1' : '0');
+      if (form.price) fd.append('price', form.price);
       if (editing) {
-        const res = await updateProduct(editing.id, body);
+        const keepPaths = existingPaths.filter((path) => !removedPaths.includes(path));
+        fd.append('existing_images', JSON.stringify(keepPaths));
+      }
+      images.forEach((file) => fd.append('images', file));
+      if (editing) {
+        const res = await updateProduct(editing.id, fd);
         setProducts((prev) => prev.map((p) => (p.id === editing.id ? res.data.data : p)));
       } else {
-        const res = await createProduct(body);
+        const res = await createProduct(fd);
         setProducts((prev) => [res.data.data, ...prev]);
         setTotal((t) => t + 1);
       }
@@ -1423,7 +1430,12 @@ function ProductManager() {
 
   const toggleVisible = async (p) => {
     try {
-      const res = await updateProduct(p.id, { visible: !p.visible });
+      const fd = new FormData();
+      fd.append('title', p.title);
+      fd.append('visible', p.visible ? '0' : '1');
+      if (p.price) fd.append('price', p.price);
+      if (p.images?.length) fd.append('existing_images', JSON.stringify(p.images));
+      const res = await updateProduct(p.id, fd);
       setProducts((prev) => prev.map((x) => (x.id === p.id ? res.data.data : x)));
     } catch (e) { setAlertMsg({ title: 'Error', message: e.response?.data?.message || 'Error toggling visibility' }); }
   };

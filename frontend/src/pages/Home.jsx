@@ -5,12 +5,15 @@ const heroBg = '/hero.webp';
 const showroom = '/showroom-v2.webp';
 import placeholderImg from '../assets/placeholder.svg';
 import bgWhyChooseUs from '../assets/bg_whychooseus.webp';
-import fibreImg from '../assets/1.webp';
-import laserImg from '../assets/2.webp';
-import cncImg from '../assets/3.webp';
-import mobile1Img from '../assets/mobile1.webp';
-import mobile2Img from '../assets/mobile2.webp';
-import mobile3Img from '../assets/mobile3.webp';
+import fibreImg from '../assets/111.png';
+import laserImg from '../assets/222.png';
+import cncImg from '../assets/333.png';
+import mobile1Img from '../assets/111.png';
+import mobile2Img from '../assets/222.png';
+import mobile3Img from '../assets/333.png';
+import poster1Img from '../assets/1.webp';
+import poster2Img from '../assets/2.webp';
+import poster3Img from '../assets/3.webp';
 const showcase1 = '/videos/showcase1.mp4';
 const showcase2 = '/videos/showcase2.mp4';
 const showcase3 = '/videos/showcase3.mp4';
@@ -72,9 +75,13 @@ export default function Home() {
           const users = res.data?.data || res.data || res;
           if (users?.length > 0) {
             setPartner(users[Math.floor(Math.random() * users.length)]);
+          } else {
+            setPartner({ name: 'Partner', business_bio: 'Join our network of CNC professionals.', city: 'Morocco', id: 1 });
           }
         })
-        .catch(() => {});
+        .catch(() => {
+          setPartner({ name: 'Partner', business_bio: 'Join our network of CNC professionals.', city: 'Morocco', id: 1 });
+        });
     }, 6000);
     return () => clearTimeout(id);
   }, []);
@@ -205,17 +212,19 @@ export default function Home() {
           .hero-desc { font-size: 8px !important; display: block !important; }
           .hero-subtitle { margin: 0 !important; }
           .overlay-cards { top: 0 !important; bottom: 0 !important; transform: none !important; justify-content: center !important; align-items: stretch !important; flex-wrap: nowrap !important; gap: 36px !important; }
-          .home-card { width: clamp(110px, 38vw, 220px) !important; height: 100% !important; }
+          .home-card { width: clamp(110px, 38vw, 220px) !important; height: 100% !important; border-width: 1px !important; }
+          .home-card:first-child { display: flex !important; flex-direction: column !important; }
           .home-card:last-child { display: flex !important; flex-direction: column !important; }
-          .home-card img { height: 78% !important; }
-          .carousel-img-wrap { flex: 1 1 auto !important; display: flex !important; min-height: 0 !important; }
+          .home-card:first-child img { flex: 1 1 auto !important; height: auto !important; min-height: 0 !important; width: 100% !important; object-fit: contain !important; padding: 0 !important; }
+          .home-card:first-child .card-body { flex: 0 0 auto !important; }
+          .carousel-img-wrap { flex: 1 1 auto !important; display: flex !important; min-height: 0 !important; padding: 2px 0 0 0 !important; }
           .carousel-img-wrap img { height: 100% !important; width: 100% !important; object-fit: cover !important; }
           .card-body { padding: 6px 4px 2px !important; }
           .home-card:last-child .card-body { flex: 0 0 auto !important; }
           .card-title { font-size: 7px !important; margin-bottom: 2px !important; }
-          .card-text { font-size: 5.5px !important; margin-bottom: 2px !important; -webkit-line-clamp: 2 !important; }
+          .card-text { font-size: 7px !important; margin-bottom: 2px !important; -webkit-line-clamp: 3 !important; }
           .card-location { font-size: 7px !important; margin-bottom: 2px !important; }
-          .home-more-link { font-size: 6px !important; margin-top: 1px !important; padding: 2px 8px !important; }
+          .home-more-link { font-size: 8px !important; margin-top: 3px !important; padding: 4px 10px !important; }
         }
       `}</style>
       <div style={styles.hero} className="anim-hero">
@@ -266,7 +275,7 @@ export default function Home() {
             <div style={styles.card} className="home-card scroll-slide-up">
               <div style={styles.carouselImgWrap} className="carousel-img-wrap">
                 <picture style={{ display: 'block', width: '100%', height: '100%' }}>
-                  <source media="(max-width: 768px)" srcSet={activeCat.mobileImage} />
+                  <source media="(max-width: 100vw)" srcSet={activeCat.mobileImage} />
                   <img
                     src={activeCat.image}
                     alt={activeCat.title}
@@ -303,9 +312,9 @@ export default function Home() {
         </h2>
         <div style={styles.showcaseVideos}>
           {[
-            { src: showcase1, label: 'RAYSET laser co2 machines' },
-            { src: showcase2, label: 'RAYSET fiber marking machines' },
-            { src: showcase3, label: 'RAYSET cnc router machines' },
+            { src: showcase1, poster: poster2Img, label: 'RAYSET laser co2 machines' },
+            { src: showcase2, poster: poster1Img, label: 'RAYSET fiber marking machines' },
+            { src: showcase3, poster: poster3Img, label: 'RAYSET cnc router machines' },
           ].map((item, i) => (
             <div
               key={i}
@@ -313,7 +322,7 @@ export default function Home() {
               className="showcase-video-wrap scroll-slide-up-stagger"
               onClick={() => setLightboxVideo(item.src)}
             >
-              <LazyVideo src={item.src} style={styles.showcaseVideo} />
+              <LazyVideo poster={item.poster} style={styles.showcaseVideo} />
               <div style={styles.showcaseOverlay}>
                 <div style={styles.showcaseOverlayContent} className="showcase-overlay-content">
                   <span
@@ -395,6 +404,13 @@ export default function Home() {
           className="anim-lightbox-bg"
           onClick={() => setLightboxVideo(null)}
         >
+          <button
+            style={styles.videoLightboxClose}
+            onClick={() => setLightboxVideo(null)}
+            aria-label="Close video"
+          >
+            ✕
+          </button>
           <video
             src={lightboxVideo}
             style={styles.videoLightboxMedia}
@@ -682,6 +698,25 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
+  },
+  videoLightboxClose: {
+    position: 'fixed',
+    top: '24px',
+    right: '28px',
+    width: '44px',
+    height: '44px',
+    borderRadius: '50%',
+    border: '1px solid rgba(255,255,255,0.15)',
+    background: 'rgba(0,0,0,0.6)',
+    color: '#fff',
+    fontSize: '20px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    zIndex: 10000,
+    transition: 'all 0.2s',
+    backdropFilter: 'blur(6px)',
   },
   videoLightboxMedia: {
     maxWidth: '90vw',

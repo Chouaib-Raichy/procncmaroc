@@ -1,7 +1,11 @@
-export default function LazyVideo({ style }) {
+export default function LazyVideo({ style, poster }) {
   return (
     <div style={{ ...style, overflow: 'hidden', background: '#0d0d0d' }}>
-      <div style={{ width: '100%', height: '100%', background: 'radial-gradient(circle at 50% 50%, rgba(163,122,57,0.06) 0%, #0d0d0d 70%)' }} />
+      {poster ? (
+        <img src={poster} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+      ) : (
+        <div style={{ width: '100%', height: '100%', background: 'radial-gradient(circle at 50% 50%, rgba(163,122,57,0.06) 0%, #0d0d0d 70%)' }} />
+      )}
     </div>
   );
 }
